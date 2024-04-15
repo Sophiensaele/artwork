@@ -1704,14 +1704,6 @@ class ProjectController extends Controller
                         ->get();
                 }
 
-                if ($component->type === 'ChecklistAllComponent') {
-                    $headerObject = $this->checklistService->getProjectChecklists(
-                        $project,
-                        $headerObject,
-                        $componentInTab
-                    );
-                }
-
                 if ($component->type === 'ProjectAllDocumentsComponent') {
                     $headerObject->project->project_files_all = $project->project_files;
                 }
