@@ -16,7 +16,7 @@ Es wird darauf hingewiesen, dass diese Dokumentation noch in Bearbeitung ist und
 Diese Anleitung wird auf Deutsch verfasst, weil die Software Artwork bisher nur auf Deutsch verfügbar ist.
 ______________________
 
-`Hinweis: Die Installtion der Tool-Chain (Visual Basic, VS Code, Docker, Laravel etc) für eine Weiterentwicklung von artwork ist in Arbeit.`
+`Hinweis: Die Installation der Tool-Chain (Visual Basic, VS Code, Docker, Laravel etc) für eine Weiterentwicklung von artwork ist in Arbeit.`
 
 ________________
 
@@ -438,7 +438,56 @@ sudo ufw status
 
 
 
-Diese Befehle konfigurieren die Firewall so, dass sie den Zugriff auf wesentliche Web- und SSH-Dienste für die  ermöglicht
+Diese Befehle konfigurieren die Firewall so, dass sie den Zugriff auf wesentliche Web- und SSH-Dienste ermöglicht.
+
+### Installation von Fail2Ban
+
+Fail2Ban sichert den SSH Zugang per Passwort ab.
+
+Zuerst muss Fail2Ban installiert werden:
+
+
+```bash
+sudo apt install fail2ban
+```
+
+#### Grundlegende Konfiguration von Fail2Ban
+
+Fail2Ban wird mit einer Hauptkonfigurationsdatei (jail.conf) geliefert, die nicht direkt bearbeitet werden sollte, da Änderungen bei einem Update überschrieben werden können. Stattdessen erstellt man eine lokale Kopie (jail.local), die Vorrang hat.
+
+Erstellen der lokalen Konfigurationsdatei
+
+```bash
+sudo nano /etc/fail2ban/jail.local
+```
+
+Es kann folgende Beispielkonfiguration eingefügt werden.
+
+```bash
+[DEFAULT]
+# Sperrt Hosts für eine Stunde:
+bantime = 3600
+
+# Eine IP-Adresse wird gesperrt, wenn sie innerhalb von 10 Minuten 5 fehlgeschlagene Anmeldeversuche hat
+findtime = 600
+maxretry = 5
+
+# Ignoriert lokale Netzwerkadressen
+ignoreip = 127.0.0.1/8
+
+# Aktion, die ausgeführt wird, ist das Sperren der IP
+action = %(action_mwl)s
+
+[sshd]
+enabled = true
+port    = ssh
+filter  = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+
+```
+
+
 
 __________________
 ____________________
