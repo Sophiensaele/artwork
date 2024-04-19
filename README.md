@@ -362,7 +362,7 @@ nano /etc/sudoers
    - Folgende Zeile hinzufügen, um dem Benutzer `art` sudo-Rechte zu gewähren:
 
 ```bash
-art ALL=(ALL) ALL`
+art ALL=(ALL) ALL
 ```
 
 #### Änderungen speichern und schließen
