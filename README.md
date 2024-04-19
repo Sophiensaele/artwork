@@ -440,6 +440,8 @@ sudo ufw status
 
 Diese Befehle konfigurieren die Firewall so, dass sie den Zugriff auf wesentliche Web- und SSH-Dienste ermöglicht.
 
+_____________
+
 ### Installation von Fail2Ban
 
 Fail2Ban sichert den SSH Zugang per Passwort ab.
