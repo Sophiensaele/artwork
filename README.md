@@ -1,5 +1,9 @@
 # Hands on Artwork
 
+Dies ist ein Fork des Projektmanagement-Tools artwork.
+Die Sophiensaele beteiligen sich an der Weiterentwicklung dieser Software. 
+
+
 ## Motivation
 Ziel ist es, Artwork innerhalb weniger Stunden einsatzbereit zu bekommen. Eine Methode dafür ist die Nutzung eines Virtual Private Servers (VPS) - ein virtualisierter Rechenknoten mit softwaredefinierter begrenzter Rechenleistung. Bei einem VPS teilen sich mehrere Nutzer die gleiche Hardware auf der Serveranwendungen ausgeführt werden. Im Gegensatz zu einem dezidierten Server wo ein Nutzer das Gerät alleine nutzt, stellt ein VPS eine  kostengünstige Alternative dar.
 
@@ -509,7 +513,8 @@ ___________
 Zuerst müssen Certbot und Nginx installiert werden, falls noch nicht geschehen:
 ```bash
      sudo apt update
-     sudo apt install certbot nginx
+     sudo apt install certbot python3-certbot-nginx
+
 ```
 
 ### Certbot für automatische SSL-Konfiguration verwenden
@@ -591,7 +596,7 @@ server {
 
 
 
-e Datei, die Sie hier beschrieben haben, ist eine .env-Datei (Environment-Konfigurationsdatei) für eine Laravel-basierte Anwendung, die auf einem Server läuft. Diese Datei enthält Umgebungsvariablen, die wichtige Konfigurationen für die Anwendung speichern. Umgebungsvariablen sind Schlüssel-Wert-Paare, die zur Konfiguration von Aspekten der Anwendungsumgebung verwendet werden, ohne den Code zu ändern.
+Die Datei, die Sie hier beschrieben ist, ist eine .env-Datei (Environment-Konfigurationsdatei) für eine Laravel-basierte Anwendung, die auf einem Server läuft. Diese Datei enthält Umgebungsvariablen, die wichtige Konfigurationen für die Anwendung speichern. Umgebungsvariablen sind Schlüssel-Wert-Paare, die zur Konfiguration von Aspekten der Anwendungsumgebung verwendet werden, ohne den Code zu ändern.
 
 
 Die .env-Datei im Verzeichnis 
