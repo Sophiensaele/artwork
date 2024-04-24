@@ -9,11 +9,12 @@ Ziel ist es, Artwork innerhalb weniger Stunden einsatzbereit zu bekommen. Eine M
 
 Dank der Konfiguration über eine öffentliche IP-Adresse kann die Installation auf einer eigenen Domain zugänglich gemacht werden. Dies ermöglicht es, die Software sowohl intern als auch extern für Zugriffe verfügbar zu machen.
 
- >**Diese Dokumentation bezeiht sich auf eine Installation von artwork für eine produktive Nutzung.**
+ >**Diese Dokumentation bezeiht sich auf eine Installation von artwork für eine produktive Nutzung in prototypischer Form.**
 
 Es wird darauf hingewiesen, dass diese Dokumentation noch in Bearbeitung ist und kontinuierlich erweitert wird.
 
-Diese Anleitung wird auf Deutsch verfasst, weil die Software Artwork bisher nur auf Deutsch verfügbar ist.
+Diese Anleitung wird auf Deutsch verfasst.  
+
 ______________________
 
 `Hinweis: Die Installation der Tool-Chain (Visual Basic, VS Code, Docker, Laravel etc) für eine Weiterentwicklung von artwork ist in Arbeit.`
@@ -55,6 +56,28 @@ Docker ist ein Werkzeug, das die Erstellung, den Versand und den Betrieb von Anw
 
 Artwork kann entweder als eigenständige Anwendung für dedizierte Server oder als Multi-Container-App, die durch Docker unterstützt wird, installiert werden.
 Standalone
+
+
+_______________________________
+
+
+## Entwicklungpfade von Artwork ( Branches )
+
+- **Entwicklungszweig (dev Branch)**: Dient als primärer Entwicklungsast, auf dem Entwickler ihre Bausteine testen. Er wird genutzt, um neue Funktionen und Experimente zu integrieren.
+
+- **Staging-Zweig (staging Branch)**: Funktioniert als Testserverumgebung und kann als Betaversion betrachtet werden. Er wird für Tests vor der Veröffentlichung verwendet.
+
+- **Hauptzweig (main Branch)**: Dieser Zweig ist der stabile Ast und sollte als Grundlage für alle Produktionssysteme dienen. Er enthält die zuverlässigste und am gründlichsten getestete Version des Codes.
+
+
+`Die vorliegende Anleitung bezieht sich auf den Inhalt im Hauptentwicklungszweig „main“.`
+  
+  
+Im offizielen Repository befinden sich weitere Entwicklungspfade (Branches), die von einzellnen Entwicklern im Projekt genutzt werden.
+
+
+___________________________
+
 
 
 ## Voraussetzungen
@@ -560,12 +583,21 @@ ___________
 
 ## SSL-Zertifikatinstallation für Artwork auf einem Ubuntu-Server
 
+____________
+
+### Let's Encrypt
+
+bietet eine automatisierte Dienstleistung zur Ausstellung von SSL/TLS-Zertifikaten an, die verschlüsselte Verbindungen via `https`   im Internet ermöglicht. Um diesen Dienst zu nutzen, ist das Dienstprogramm `Certbot` zu empfehlen.
+     
+     
+
+
+
 ### Certbot und Nginx installieren
 Zuerst müssen Certbot und Nginx installiert werden, falls noch nicht geschehen:
 ```bash
      sudo apt update
      sudo apt install certbot python3-certbot-nginx
-
 ```
 
 ### Certbot für automatische SSL-Konfiguration verwenden
@@ -580,6 +612,24 @@ Zuerst müssen Certbot und Nginx installiert werden, falls noch nicht geschehen:
      - `--no-eff-email`: Verzichtet auf zusätzliche E-Mails außer Erneuerungsbenachrichtigungen.
      - `--email`: Gibt die E-Mail-Adresse für wichtige Benachrichtigungen an.
      - `-d`: Spezifiziert die Domain für das SSL-Zertifikat. <-- Super Wichtig!
+   
+   __________________
+   
+   
+   Die erstellen Dateien sind Teile des SSL-Zertifikats, das von `Let's Encrypt` bereitgestellt wird:
+
+```bash
+/etc/letsencrypt/live/artwork.meinewebsite.de/fullchain.pem
+```
+Diese Datei enthält das SSL-Zertifikat zusammen mit allen Zwischenzertifikaten.
+
+```bash
+/etc/letsencrypt/live/artwork.meinewebsite.de/privkey.pem
+```
+Diese Datei enthält den privaten Schlüssel des Zertifikats.
+
+
+______________________
 
 ### SSL-Zertifikat nicht erfolgreich installiert
 Bei vorhandenem DNS-Record zu einer Domain meldet Certbot ein Zertifikat bei LetsEncrypt an.
@@ -590,7 +640,7 @@ In der Datei
 sudo nano /etc/nginx/sites-enabled/default
 ```
 
-müsen die Pfade manuell gesetzt werden.
+müsen die Pfade zu den Zertifikaten von oben  manuell gesetzt werden.
 
 
 
@@ -604,18 +654,14 @@ server {
     listen 80;
     server_name artwork.meinewebsite.de;
     listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/artwork.flashz.directory/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/artwork.flashz.directory/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/artwork.meinewebsite.de/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/artwork.meinewebsite.de/privkey.pem;
 
 # Empfohlene SSL-Einstellungen
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384';
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
-
-
-
-
 
     #SSL Settings
     #ssl_certificate /poth/to/cert;
@@ -759,7 +805,92 @@ MAIL_ENCRYPTION=tls
 
 ```
 
+_______________  
+  
+  ## Updateprozess der Standalone-Installation
+  
+Um das Skript `update.sh` im Verzeichnis `artwork` auszuführen sind folgende Befehle erforderlich.
 
-```python
+
+```bash
+cd artwork
+chmod 755 update.sh
+./update.sh
+```
+
+Das `update.sh` Skript benötigt root-User Privilegien, da es Befehle mit `sudo` ausführt.
+  
+  
+  ```bash
+  
+  #!/usr/bin/env bash
+
+#Update OS
+sudo apt-get update
+sudo NEEDRESTART_MODE=a apt-get dist-upgrade -y
+
+#Get new code
+sudo git -C /var/www/html pull
+
+#Install dependencies
+sudo COMPOSER_ALLOW_SUPERUSER=1 php /var/www/html/composer.phar -d /var/www/html --no-interaction install
+
+sudo chown -R www-data:www-data /var/www/html
+
+#Clear cache and update db
+sudo php /var/www/html/artisan cache:clear
+sudo php /var/www/html/artisan optimize
+sudo php /var/www/html/artisan migrate --force
+
+## Setup js
+sudo npm --prefix /var/www/html install
+#First dev, then prod to bake the keys into soketi(pusher)
+sudo npm --prefix /var/www/html run dev
+sudo npm --prefix /var/www/html run prod
+
+sudo chown -R www-data:www-data /var/www/html
+
+sudo systemctl restart artwork-worker
+
 
 ```
+
+### Hauptaufgaben des Skripts `update.sh`:
+
+#### Betriebssystem aktualisieren:
+   
+   Es stellt sicher, dass das Betriebssystem, auf dem der Server läuft, die neuesten Sicherheitspatches und Updates erhält.
+   
+   
+   ___________________
+   
+   
+##### Neuesten Quellcode holen:
+   
+   Das Skript aktualisiert den Code der Webanwendung auf dem Server, indem es die neueste Version aus dem offiziellen Git-Repository zieht.
+   
+   ______________
+   
+   
+   
+#### Abhängigkeiten installieren:
+
+
+
+   
+   Alle erforderlichen PHP- und JavaScript-Bibliotheken und -Pakete werden installiert oder aktualisiert.
+   
+   
+   
+   ____________
+   
+#### Anwendungsressourcen und Datenbank aktualisieren:
+   
+   Das Skript führt Befehle aus, die spezifisch für Laravel sind, wie das Löschen des Caches oder das Durchführen von Datenbankmigrationen
+   
+   _____________________
+   
+#### Dienste neu starten:
+   
+  Nachdem alle Updates und Optimierungen durchgeführt wurden, wird der spezifische Dienst der Anwendung (z.B. ein Background Worker) neu gestartet, um alle Änderungen zu übernehmen und die Anwendung auf dem neuesten Stand zu halten.
+________________________  
