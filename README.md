@@ -1,13 +1,12 @@
 # Hands on Artwork
 
 Dies ist ein Fork des Projektmanagement-Tools artwork.
-Die Sophiensaele beteiligen sich an der Weiterentwicklung dieser Software. 
-
+Die Sophiensaele beteiligen sich an der Weiterentwicklung dieser Software. Im Sinne der AGPL-3.0 Lizenz, kommen Änderungen und weitere Entwicklungen dem Projekt zugute.
 
 ## Motivation
-Ziel ist es, Artwork innerhalb weniger Stunden einsatzbereit zu bekommen. Eine Methode dafür ist die Nutzung eines Virtual Private Servers (VPS) - ein virtualisierter Rechenknoten mit softwaredefinierter begrenzter Rechenleistung. Bei einem VPS teilen sich mehrere Nutzer die gleiche Hardware auf der Serveranwendungen ausgeführt werden. Im Gegensatz zu einem dezidierten Server wo ein Nutzer das Gerät alleine nutzt, stellt ein VPS eine  kostengünstige Alternative dar.
+Ziel dieser Anleitung ist es, Artwork innerhalb weniger Stunden einsatzbereit zu bekommen. Eine Methode dafür ist die Nutzung eines Virtual Private Servers (VPS) - ein virtualisierter Rechenknoten mit softwaredefinierter begrenzter Rechenleistung. Bei einem VPS teilen sich mehrere Nutzer die gleiche Hardware auf der Serveranwendungen ausgeführt werden. Im Gegensatz zu einem dezidierten Server wo ein Nutzer das Gerät alleine nutzt, stellt ein VPS eine  kostengünstige Alternative dar.
 
-Dank der Konfiguration über eine öffentliche IP-Adresse kann die Installation auf einer eigenen Domain zugänglich gemacht werden. Dies ermöglicht es, die Software sowohl intern als auch extern für Zugriffe verfügbar zu machen.
+Dank der Konfiguration über eine öffentliche IP-Adresse kann die Installation auf einer eigenen Domain zugänglich gemacht werden. Dies ermöglicht es, die Software sowohl intern als auch extern für Zugriffe verfügbar zu machen. Dies ist auch für eine artwork-Testumgebung nützlich.
 
  >**Diese Dokumentation bezeiht sich auf eine Installation von artwork für eine produktive Nutzung in prototypischer Form.**
 
@@ -67,7 +66,7 @@ _______________________________
 
 - **Staging-Zweig (staging Branch)**: Funktioniert als Testserverumgebung und kann als Betaversion betrachtet werden. Er wird für Tests vor der Veröffentlichung verwendet.
 
-- **Hauptzweig (main Branch)**: Dieser Zweig ist der stabile Ast und sollte als Grundlage für alle Produktionssysteme dienen. Er enthält die zuverlässigste und am gründlichsten getestete Version des Codes.
+- **Hauptzweig (main Branch)**: Dieser Zweig ist der stabile Entwicklungspfad und sollte als Grundlage für alle Produktionssysteme genutzt werden. Es enthält die zuverlässigste und am gründlichsten getestete Version des Codes.
 
 
 `Die vorliegende Anleitung bezieht sich auf den Inhalt im Hauptentwicklungszweig „main“.`
@@ -886,11 +885,11 @@ sudo systemctl restart artwork-worker
    
 #### Anwendungsressourcen und Datenbank aktualisieren:
    
-   Das Skript führt Befehle aus, die spezifisch für Laravel sind, wie das Löschen des Caches oder das Durchführen von Datenbankmigrationen
+   Das Skript führt Befehle aus, die spezifisch für (php) Laravel sind, wie das Löschen des Caches oder das Durchführen von Datenbankmigrationen
    
    _____________________
    
 #### Dienste neu starten:
    
-  Nachdem alle Updates und Optimierungen durchgeführt wurden, wird der spezifische Dienst der Anwendung (z.B. ein Background Worker) neu gestartet, um alle Änderungen zu übernehmen und die Anwendung auf dem neuesten Stand zu halten.
+  Nachdem alle Updates durchgeführt wurden, wird der spezifische Dienst der Anwendung (ein Background Worker) neu gestartet, um alle Änderungen zu übernehmen und die Anwendung neu zu starten.
 ________________________  
