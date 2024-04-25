@@ -896,11 +896,11 @@ sudo systemctl restart artwork-worker
 ________________________  
 ___________________________
 
-## Backup-Management in `artwork`
+## Backup-Management mit `artwork`
 
-Backups sind entscheidend für die Absicherung von Daten und deren Wiederherstellung nach Datenverlust durch Systemfehler oder Datenkorruption. Für die MySQL-Datenbank der Software `Artwork` sollte ein regelmäßiges Backup erstellt werden. In einer produktiven Umgebung sollte dies in festen Invervallen geschehen.
+Backups sind entscheidend für die Absicherung von Daten und deren Wiederherstellung nach Datenverlust durch Systemfehler oder Datenkorruption. Für die `MySQL-Datenbank` der Software `Artwork` sollte ein regelmäßiges Backup erstellt werden. In einer produktiven Umgebung sollte dies in festen Invervallen geschehen.
 
-Das hier beschriebene Verfahren ermöglicht das Exportieren von Backups der "Artwork"-Datenbank und die Archivierung lokal. Diese Anleitung demonstriert, wie ein manuelles Backup erstellt wird. Um menschliche Fehler zu minimieren, wird empfohlen, den Backup-Prozess per Skript zu automatisieren.
+Das hier beschriebene Verfahren ermöglicht das Exportieren von Backups der "Artwork"-Datenbank und dessen Archivierung lokal. Diese Anleitung demonstriert, wie ein manuelles Backup erstellt wird. Um menschliche Fehler zu minimieren, wird empfohlen, den Backup-Prozess per Skript zu automatisieren.
 
 ### Werkzeugkette Datenbank-Management
 
@@ -919,12 +919,29 @@ _______________
 
 **Projektwebseite**: [Scoop Webseite](https://scoop.sh/)
 
+
+
+
 ### Installation von Scoop Paketmanager:
-PowerShell öffnen und folgenden Befehl ausführen:
+PowerShell öffnen und folgendende Befehle ausführen:
+
+
 ```bash
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+Gibt dem lokalen Benutzer in der Powershell Rechte signierte Skripe auszuführen.
+Scoop wird automatisiert per Skript instlaliert.
+
+
+```bash
 iwr -useb get.scoop.sh | iex
 ```
+
+Installiert die Paketverwaltung `scoop`auf dem lokalen Benutzerkonto eines Windows-Computer.
+
+
+
 
 ### Installieren von Git mit Scoop
 
@@ -940,14 +957,182 @@ Git wird für die scoop Paketverwaltung benötigt.
 scoop bucket add extras
 ```
 
+
+
+Zum hinzufügen des Extras Bucket ( erweiterte Programmbibliothek) wird `git` benötigt.
+In diesem `Bucket` ist das erforderliche Programm für das Backup-Management enthalten.
+
+
+
 ### Suche nach Paketen mit Scoop:
 ```bash
 scoop search sql
 ```
 
-Diese Suche gibt alle Software aus, die mit scoop zu installieren ist. Dabei auch MySQL - Workbench.  
+Diese Suche gibt alle Softwarenamen aus, die mit scoop zu installieren sind. Dabei auch MySQL - Workbench - im Bucket `extras`
+
+Ausgabe von der Suche mit Scoop:
+
+```bash
+
+PS C:\Users\localadmin> scoop search sql
+Results from local buckets...
+
+Name                          Version         Source Binaries
+----                          -------         ------ --------
+cloud-sql-proxy               2.11.0          main
+csvtosql                      v0.1.1-alpha    main
+go-sqlcmd                     1.6.0           main
+mariadb                       11.3.2          main   mysql.exe | mysqladmin.exe | mysqlbinlog.exe | mysqlcheck.ex...
+mysql-lts                     8.0.36          main
+mysql-workbench               8.0.36          main
+mysql                         8.3.0           main
+octosql                       0.12.2          main
+oracle-instant-client-sqlplus 21.13.0.0.0     main
+postgresql                    16.2            main
+sqlcl                         24.1.0.087.0929 main
+sqldef                        0.17.6          main
+sqlite                        3.45.3          main
+sqlpage                       0.20.4          main
+usql                          0.18.1          main
+aws-nosql-workbench           3.13.0          extras
+falcon-sql-client             4.1.0           extras
+heidisql                      12.6            extras
+sql-workbench                 130             extras
+sqlitebrowser                 3.12.2          extras
+sqlitespy                     1.9.24          extras
+sqlitestudio                  3.4.4           extras
+sqlyog-community              13.2.1          extras
+squirrel-sql                  4.7.1           extras
+tinode-mysql                  0.22.12         extras
+xampp                         8.2.12-0        extras mysql.exe | mysqld.exe
+
+```
 
 ### Installation von MySQL Workbench mit Scoop:
 ```bash
 scoop install mysql-workbench
 ```
+Vóila!
+
+Die Software mysql-workbench lässt sich nutzen um Metriken der Datenbank zu erhalten. Daten zu Manipulieren oder um ein ganzes Backup der Datenbank zu erstellen.
+
+________________________
+
+
+Zunächst müssen die Ports auf dem Server nicht geöffnet werden, wenn SSH-Tunneling verwendet wird, da die Verbindung über den sicheren SSH-Kanal läuft. Der SSH-Port (üblicherweise Port 22) muss jedoch offen und erreichbar sein.
+
+Um einen neuen MySQL-Benutzer zu erstellen und diesem Benutzer Berechtigungen zu erteilen, werden die folgenden Befehle verwendet. Dies sollte auf dem Server ausgeführt werden, auf dem die MySQL-Datenbank läuft, üblicherweise über die MySQL-Konsole.
+
+```bash
+# Anmeldung am MySQL-Server. Der Nutzer artwork zu root-Zugriff auf die Datenbank
+mysql -u artwork -p
+```
+Die folgenden Befehl müssen in der MySQL-Shell ZEILENWEISE! eingegen werden und mit einem Semikolon ` ; ` beendet und mit ENTER bestätigt werden.
+
+Dies erstellt einen neuen Nutzer der Datenbank mit einem Passwort. Danach wird der Zugang zur Datenbank dem neuen Nutzer gewährt. Zum Schluss werden die neuen Berechtigungen in der Datenbank ausgerollt. (flushed)
+
+Mit `quit` wird die MySQL-Shell beendet
+
+Die folgenden Angaben:
+
+`neuerBenutzer`
+
+`EinSicheresPasswort123!`
+unbedingt ändern!
+
+```sql
+
+-- Erstellung eines neuen Benutzers und Gewährung von Admin-Rechten
+
+CREATE USER 'neuerBenutzer'@'%' IDENTIFIED BY 'EinSicheresPasswort123!';
+
+GRANT ALL PRIVILEGES ON artwork_tools.* TO 'neuerBenutzer'@'%';
+
+FLUSH PRIVILEGES;
+
+exit
+
+```
+
+
+**Wichtig:**
+Die Verwendung von `'%'` als Host erlaubt Verbindungen von jedem Host aus. Dies kann ein Sicherheitsrisiko darstellen. Der Host sollte auf eine spezifische IP-Adresse beschränkt oder SSH-Tunneling verwendet werden
+
+### Entfernte MySQL-Datenbank per SSH-Tunneling lokal erreichen
+
+In der Powershell muss ein SSH-Tunnel zum artwork-Server aufbebaut werden, um die Datenbank zu erreichen.
+
+```bash
+ssh -L 3307:localhost:3306 art@artwork.meine-firma.de -N
+```
+Nach der Eingabe des Passworts und erfolgreicher Authentifizierung scheint es, als ob nichts weiter passiert, weil der Befehl mit der Option -N ausgeführt wird, die verhindert, dass ein Remote-Shell-Zugriff geöffnet wird. Tatsächlich wird jedoch eine dauerhafte Portweiterleitung im Hintergrund eingerichtet, die es ermöglicht, den MySQL-Server des entfernten Systems so zu nutzen, als wäre er lokal auf dem eigenen Rechner verfügbar. 
+Das Fenster mit der SSH-Shell muss geöffnet bleiben, damit die Verbindung funktioniert. Der SSH-Tunnel ermöglicht eine sichere Verbindung zum MySQL-Server über den lokalen Port 3307, solange das Terminalfenster aktiv ist. Dies stellt sicher, dass alle Datenübertragungen zwischen dem lokalen System und dem entfernten MySQL-Server sicher verschlüsselt sind.
+
+Aus Sicherheitsgründen sollte von diesem Prinzip nicht abgewichen werden, es sei denn, der Backup-Prozess wird automatisiert.
+
+## Verbindung mit entfernten Datenbank mit mysql-workbench
+
+### 1.Schritt
+
+Das Prgrogramm `mysql-workbench` aus der Startleiste unter Windows öffnen.
+
+![workbench 0](workbench0.png)
+
+### 2.Schritt
+
+Im Reiter `Database` die Option `Connect to Database` auswählen.
+
+![workbench 2](workbench2.png)
+
+### 3.Schritt
+Die Zugangsdaten eingeben.
+
+
+Hier eine kurze Anleitung zur Konfiguration einer Verbindung mit der Methode "Standard TCP/IP over SSH" in MySQL Workbench:
+
+1. **SSH Hostname**:
+   - `artwork.meine-firma.de:22` eintragen.
+
+2. **SSH Username**:
+   - `art` eingeben.
+
+3. **SSH Password**:
+   - Option "Store in Vault" wählen, SSH-Passwort eingeben und speichern.
+
+4. **MySQL Hostname**:
+   - `localhost` eintragen.
+
+5. **MySQL Server Port**:
+   - Wert bei `3306` belassen.
+
+6. **Username**:
+   - den neuen MySQL-Username verwenden.
+        (siehe oben)
+7. **Password**:
+   - Option "Store in Vault" wählen, MySQL-Passwort eingeben und speichern.
+
+8. **Default Schema**:
+   - Feld leer lassen, es sei denn, direkte Verbindung zu einem spezifischen Schema gewünscht.
+
+Alle erforderlichen Informationen korrekt eingeben, um Verbindungsprobleme zu vermeiden.
+
+![workbench 3](workbench3.png)
+
+### MySQL- Datenbank Metriken
+
+Die Überwachung von einer MySQL-Datenbank in Echtzeit ist mit mysql-workbench während des produtiven Betriebs möglich.
+Diese Metriken helfen, Leistungsengpässe zu identifizieren und die Serverantwortzeiten einzusehen.
+
+
+![workbench 1](workbench1.png)
+
+
+### Backups erstellen
+
+Mit der Funktion Data-Export kann die gesamte Datenbank als `Dump` exportiert werden.  
+Ein `Dump` im Kontext von Datenbanken ist eine Datei, die alle Daten und auch die Struktur einer Datenbank enthält. Dies ermöglicht ein vollständiges Backup um die Datenbank an einem anderen Ort oder zu einem anderen Zeitpunkt komplett wiederherzustellen.
+
+
+![workbench 4](workbench4.png)
+
