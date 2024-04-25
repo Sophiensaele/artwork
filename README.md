@@ -1071,9 +1071,9 @@ Das Fenster mit der SSH-Shell muss geöffnet bleiben, damit die Verbindung funkt
 
 Aus Sicherheitsgründen sollte von diesem Prinzip nicht abgewichen werden, es sei denn, der Backup-Prozess wird automatisiert.
 
-## Verbindung mit entfernten Datenbank mit mysql-workbench
+## Verbindung mit einer entfernten Datenbank mit mysql-workbench
 
-### 1.Schritt
+### 1.Schritt - mysql-workbench öffnen
 
 Das Prgrogramm `mysql-workbench` aus der Startleiste unter Windows öffnen.
 
@@ -1085,8 +1085,7 @@ Im Reiter `Database` die Option `Connect to Database` auswählen.
 
 ![workbench 2](workbench2.png)
 
-### 3.Schritt
-Die Zugangsdaten eingeben.
+### 3.Schritt - Zugangsdaten eingeben.
 
 
 Hier eine kurze Anleitung zur Konfiguration einer Verbindung mit der Methode "Standard TCP/IP over SSH" in MySQL Workbench:
@@ -1119,7 +1118,7 @@ Alle erforderlichen Informationen korrekt eingeben, um Verbindungsprobleme zu ve
 
 ![workbench 3](workbench3.png)
 
-### MySQL- Datenbank Metriken
+### 4. Schritt -  MySQL- Datenbank Metriken
 
 Die Überwachung von einer MySQL-Datenbank in Echtzeit ist mit mysql-workbench während des produtiven Betriebs möglich.
 Diese Metriken helfen, Leistungsengpässe zu identifizieren und die Serverantwortzeiten einzusehen.
@@ -1128,7 +1127,7 @@ Diese Metriken helfen, Leistungsengpässe zu identifizieren und die Serverantwor
 ![workbench 1](workbench1.png)
 
 
-### Backups erstellen
+### 5.Schritt - Backups erstellen
 
 Mit der Funktion Data-Export kann die gesamte Datenbank als `Dump` exportiert werden.  
 Ein `Dump` im Kontext von Datenbanken ist eine Datei, die alle Daten und auch die Struktur einer Datenbank enthält. Dies ermöglicht ein vollständiges Backup um die Datenbank an einem anderen Ort oder zu einem anderen Zeitpunkt komplett wiederherzustellen.
