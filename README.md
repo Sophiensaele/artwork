@@ -1068,6 +1068,8 @@ exit
 **Wichtig:**
 Die Verwendung von `'%'` als Host erlaubt Verbindungen von jedem Host aus. Dies kann ein Sicherheitsrisiko darstellen. Der Host sollte auf eine spezifische IP-Adresse beschränkt oder SSH-Tunneling verwendet werden
 
+________________________
+
 ### Entfernte MySQL-Datenbank per SSH-Tunneling lokal erreichen
 
 In der Powershell muss ein SSH-Tunnel zum artwork-Server aufbebaut werden, um die Datenbank zu erreichen.
