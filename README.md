@@ -1028,11 +1028,21 @@ Um einen neuen MySQL-Benutzer zu erstellen und diesem Benutzer Berechtigungen zu
 # Anmeldung am MySQL-Server. Der Nutzer artwork zu root-Zugriff auf die Datenbank
 mysql -u artwork -p
 ```
+Dies ist der Datenbank-Nutzer, der während der Installation von `artwork` angelegt wurde.  
+  
+Das Passwort zu diesem Nutzer befindet sich in der .env-Datei unter `/var/www/html/.env `
+
+```bash
+sudo cat /var/www/html/.env
+```
+offenbart dieses Passwort.
+
+
 Die folgenden Befehl müssen in der MySQL-Shell ZEILENWEISE! eingegen werden und mit einem Semikolon ` ; ` beendet und mit ENTER bestätigt werden.
 
 Dies erstellt einen neuen Nutzer der Datenbank mit einem Passwort. Danach wird der Zugang zur Datenbank dem neuen Nutzer gewährt. Zum Schluss werden die neuen Berechtigungen in der Datenbank ausgerollt. (flushed)
 
-Mit `quit` wird die MySQL-Shell beendet
+Mit `exit` wird die MySQL-Shell beendet
 
 Die folgenden Angaben:
 
