@@ -363,7 +363,7 @@ whoami
 ```
 
 ____________________
-
+____________________
 
 
 ## Erste Schritte auf einem VPS
@@ -578,7 +578,7 @@ Es wird dringend davon abgeraten, den Installer mehrmals auszuführen, da einige
 - SSL Zertifikate
 
 ___________
-
+______________
 
 ## SSL-Zertifikatinstallation für Artwork auf einem Ubuntu-Server
 
@@ -785,7 +785,7 @@ SOKETI_SSL_PASS= # Optional, wenn ein Passwort für den Schlüssel benötigt wir
 ```
 __________
 
-
+_____________
 
 
 
@@ -803,7 +803,7 @@ MAIL_PASSWORD=your-email-password
 MAIL_ENCRYPTION=tls
 
 ```
-
+_________________
 _______________  
   
   ## Updateprozess der Standalone-Installation
@@ -854,6 +854,7 @@ sudo systemctl restart artwork-worker
 
 ```
 
+
 ### Hauptaufgaben des Skripts `update.sh`:
 
 #### Betriebssystem aktualisieren:
@@ -893,3 +894,60 @@ sudo systemctl restart artwork-worker
    
   Nachdem alle Updates durchgeführt wurden, wird der spezifische Dienst der Anwendung (ein Background Worker) neu gestartet, um alle Änderungen zu übernehmen und die Anwendung neu zu starten.
 ________________________  
+___________________________
+
+## Backup-Management in `artwork`
+
+Backups sind entscheidend für die Absicherung von Daten und deren Wiederherstellung nach Datenverlust durch Systemfehler oder Datenkorruption. Für die MySQL-Datenbank der Software `Artwork` sollte ein regelmäßiges Backup erstellt werden. In einer produktiven Umgebung sollte dies in festen Invervallen geschehen.
+
+Das hier beschriebene Verfahren ermöglicht das Exportieren von Backups der "Artwork"-Datenbank und die Archivierung lokal. Diese Anleitung demonstriert, wie ein manuelles Backup erstellt wird. Um menschliche Fehler zu minimieren, wird empfohlen, den Backup-Prozess per Skript zu automatisieren.
+
+### Werkzeugkette Datenbank-Management
+
+
+### Grafische Benutzeroberflächen (GUIs) für Datenbanksysteme:
+
+1. **MySQL Workbench**: [MySQL Workbench Webseite](https://www.mysql.com/products/workbench/)
+2. **phpMyAdmin**: [phpMyAdmin Webseite](https://www.phpmyadmin.net/)
+3. **DBeaver**: [DBeaver Webseite](https://dbeaver.io/)
+  
+_______________  
+
+### Installation mit dem Paketmanager Scoop unter Windows
+
+**Scoop** ist ein Kommandozeilen-Installer für Windows, der das Installieren und Verwalten von Anwendungen vereinfacht.
+
+**Projektwebseite**: [Scoop Webseite](https://scoop.sh/)
+
+### Installation von Scoop Paketmanager:
+PowerShell öffnen und folgenden Befehl ausführen:
+```bash
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+iwr -useb get.scoop.sh | iex
+```
+
+### Installieren von Git mit Scoop
+
+```bash
+scoop install git
+```
+Git wird für die scoop Paketverwaltung benötigt.
+
+
+
+### Hinzufügen des Extras-Buckets in Scoop:
+```bash
+scoop bucket add extras
+```
+
+### Suche nach Paketen mit Scoop:
+```bash
+scoop search sql
+```
+
+Diese Suche gibt alle Software aus, die mit scoop zu installieren ist. Dabei auch MySQL - Workbench.  
+
+### Installation von MySQL Workbench mit Scoop:
+```bash
+scoop install mysql-workbench
+```
