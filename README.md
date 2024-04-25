@@ -1019,8 +1019,7 @@ Die Software mysql-workbench lässt sich nutzen um Metriken der Datenbank zu erh
 
 ________________________
 
-
-Zunächst müssen die Ports auf dem Server nicht geöffnet werden, wenn SSH-Tunneling verwendet wird, da die Verbindung über den sicheren SSH-Kanal läuft. Der SSH-Port (üblicherweise Port 22) muss jedoch offen und erreichbar sein.
+### Artwork- Datenbank einen neuen Remote-User hinzufügen
 
 Um einen neuen MySQL-Benutzer zu erstellen und diesem Benutzer Berechtigungen zu erteilen, werden die folgenden Befehle verwendet. Dies sollte auf dem Server ausgeführt werden, auf dem die MySQL-Datenbank läuft, üblicherweise über die MySQL-Konsole.
 
