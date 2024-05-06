@@ -8,9 +8,8 @@ Ziel dieser Anleitung ist es, Artwork innerhalb weniger Stunden einsatzbereit zu
 
 Dank der Konfiguration über eine öffentliche IP-Adresse kann die Installation auf einer eigenen Domain zugänglich gemacht werden. Dies ermöglicht es, die Software sowohl intern als auch extern für Zugriffe verfügbar zu machen. 
 
- >**Diese Dokumentation bezeiht sich auf eine Installation von artwork für eine produktive Nutzung in prototypischer Form.**
+ >**Diese Dokumentation bezeiht sich auf eine Installation von artwork für eine Nutzung in prototypischer Form.**
 
-Es wird darauf hingewiesen, dass diese Dokumentation noch in Bearbeitung ist und kontinuierlich erweitert wird.
 
 Diese Anleitung wird auf Deutsch verfasst.  
 
