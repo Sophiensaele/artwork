@@ -6,7 +6,7 @@ Die Sophiensaele beteiligen sich an der Weiterentwicklung dieser Software. Im Si
 ## Motivation
 Ziel dieser Anleitung ist es, Artwork innerhalb weniger Stunden einsatzbereit zu bekommen. Eine Methode dafür ist die Nutzung eines Virtual Private Servers (VPS) - ein virtualisierter Rechenknoten mit softwaredefinierter begrenzter Rechenleistung. Bei einem VPS teilen sich mehrere Nutzer die gleiche Hardware auf der Serveranwendungen ausgeführt werden. Im Gegensatz zu einem dezidierten Server wo ein Nutzer das Gerät alleine nutzt, stellt ein VPS eine  kostengünstige Alternative dar.
 
-Dank der Konfiguration über eine öffentliche IP-Adresse kann die Installation auf einer eigenen Domain zugänglich gemacht werden. Dies ermöglicht es, die Software sowohl intern als auch extern für Zugriffe verfügbar zu machen. Dies ist auch für eine artwork-Testumgebung nützlich.
+Dank der Konfiguration über eine öffentliche IP-Adresse kann die Installation auf einer eigenen Domain zugänglich gemacht werden. Dies ermöglicht es, die Software sowohl intern als auch extern für Zugriffe verfügbar zu machen. 
 
  >**Diese Dokumentation bezeiht sich auf eine Installation von artwork für eine produktive Nutzung in prototypischer Form.**
 
@@ -547,7 +547,7 @@ __________
 ```
 ___________
 ### Ausführen des Installationsskripts
-   - Das Installationsskript ausführen:
+
 ```bash
      ./ubuntu-install.sh
 ```
@@ -900,7 +900,7 @@ ___________________________
 
 Backups sind entscheidend für die Absicherung von Daten und deren Wiederherstellung nach Datenverlust durch Systemfehler oder Datenkorruption. Für die `MySQL-Datenbank` der Software `Artwork` sollte ein regelmäßiges Backup erstellt werden. In einer produktiven Umgebung sollte dies in festen Invervallen geschehen.
 
-Das hier beschriebene Verfahren ermöglicht das Exportieren von Backups der "Artwork"-Datenbank und dessen Archivierung lokal. Diese Anleitung demonstriert, wie ein manuelles Backup erstellt wird. Um menschliche Fehler zu minimieren, wird empfohlen, den Backup-Prozess per Skript zu automatisieren.
+Das hier beschriebene Verfahren ermöglicht das Exportieren von Backups der "Artwork"-Datenbank und dessen Archivierung lokal. Diese Anleitung demonstriert, wie ein manuelles Backup erstellt wird. Der Backup-Prozess sollte per Skript automatisiert werden.
 
 ### Werkzeugkette Datenbank-Management
 
@@ -1078,9 +1078,9 @@ In der Powershell muss ein SSH-Tunnel zum artwork-Server aufbebaut werden, um di
 ssh -L 3307:localhost:3306 art@artwork.meine-firma.de -N
 ```
 Nach der Eingabe des Passworts und erfolgreicher Authentifizierung scheint es, als ob nichts weiter passiert, weil der Befehl mit der Option -N ausgeführt wird, die verhindert, dass ein Remote-Shell-Zugriff geöffnet wird. Tatsächlich wird jedoch eine dauerhafte Portweiterleitung im Hintergrund eingerichtet, die es ermöglicht, den MySQL-Server des entfernten Systems so zu nutzen, als wäre er lokal auf dem eigenen Rechner verfügbar. 
-Das Fenster mit der SSH-Shell muss geöffnet bleiben, damit die Verbindung funktioniert. Der SSH-Tunnel ermöglicht eine sichere Verbindung zum MySQL-Server über den lokalen Port 3307, solange das Terminalfenster aktiv ist. Dies stellt sicher, dass alle Datenübertragungen zwischen dem lokalen System und dem entfernten MySQL-Server sicher verschlüsselt sind.
+Das Fenster mit der SSH-Shell muss geöffnet bleiben, damit die Verbindung funktioniert. Der SSH-Tunnel ermöglicht eine sichere Verbindung zum MySQL-Server über den lokalen Port 3307, solange das Terminalfenster aktiv ist. 
 
-Aus Sicherheitsgründen sollte von diesem Prinzip nicht abgewichen werden, es sei denn, der Backup-Prozess wird automatisiert.
+
 
 ## Verbindung mit einer entfernten Datenbank mit mysql-workbench
 
@@ -1145,4 +1145,6 @@ Ein `Dump` im Kontext von Datenbanken ist eine Datei, die alle Daten und auch di
 
 
 ![workbench 4](workbench4.png)
+
+### 6.Schritt - Überprüfung des Exports
 
