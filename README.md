@@ -284,7 +284,7 @@ Image("hetzner5.jpg")
 
 
 _____________________
-## Setzen von DNS-Records bei einem Domain-Register
+##  DNS-Records bei einem Domain-Register
 
 Für eine IPv4 - Adresse muss mindestesn ein `A - Record` bei einem Domain-Register gesetzt werden.
 
