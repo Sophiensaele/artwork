@@ -4,7 +4,7 @@ Dies ist ein Fork des Projektmanagement-Tools artwork.
 Die Sophiensaele beteiligen sich an der Weiterentwicklung dieser Software. Im Sinne der AGPL-3.0 Lizenz, kommen Änderungen und weitere Entwicklungen dem Projekt zugute.
 
 ## Motivation
-Ziel dieser Anleitung ist es, Artwork innerhalb weniger Stunden einsatzbereit zu bekommen. Eine Methode dafür ist die Nutzung eines Virtual Private Servers (VPS) - ein virtualisierter Rechenknoten mit softwaredefinierter begrenzter Rechenleistung. Bei einem VPS teilen sich mehrere Nutzer die gleiche Hardware auf der Serveranwendungen ausgeführt werden. Im Gegensatz zu einem dezidierten Server wo ein Nutzer das Gerät alleine nutzt, stellt ein VPS eine  kostengünstige Alternative dar.
+Ziel dieser Anleitung ist es, Artwork innerhalb weniger Stunden einsatzbereit zu bekommen. Eine Methode dafür ist die Nutzung eines Virtual Private Servers (VPS) - ein virtualisierter Rechenknoten mit softwaredefinierter begrenzter Rechenleistung. Bei einem VPS teilen sich mehrere Nutzer die gleiche Hardware auf der Serveranwendungen ausgeführt werden. Im Gegensatz zu einem dezidierten Server wo ein Nutzer das Gerät alleine nutzt, stellt ein VPS eine  kostengünstige Alternative dar. 
 
 Dank der Konfiguration über eine öffentliche IP-Adresse kann die Installation auf einer eigenen Domain zugänglich gemacht werden. Dies ermöglicht es, die Software sowohl intern als auch extern für Zugriffe verfügbar zu machen. 
 
@@ -13,21 +13,26 @@ Dank der Konfiguration über eine öffentliche IP-Adresse kann die Installation 
 
 Diese Anleitung wird auf Deutsch verfasst.  
 
-______________________
+Die Entwicklungswerkzeuge von Artwork werden zu Beginn vorgestellt.
 
-`Hinweis: Die Installation der Tool-Chain (Visual Basic, VS Code, Docker, Laravel etc) für eine Weiterentwicklung von artwork ist in Arbeit.`
+
+
 
 ________________
 
 ## Was ist Artwork ? 
 
+
+Artwork ist ein Werkzeug zur Projektorganisation, das die Planung von Projekten mit mehreren Ereignissen, Aufgaben und Verantwortlichkeiten ermöglicht. 
+
 > https://github.com/artwork-software/artwork
 
-*Eine Übersetzung des offiziellen Git-Repo von Artwork.*
+
+
+Dank an Caldero Systems (https://caldero-systems.de/) die Open-Source-Veröffentlichung von Artwork.
 
 
 
-Artwork ist ein Werkzeug zur Projektorganisation, das die Planung von Projekten mit mehreren Ereignissen, Aufgaben und Verantwortlichkeiten ermöglicht. Es soll dabei helfen, alle wesentlichen Komponenten der Projekte im Blick zu behalten.
 
 ## Was ist [Laravel](https://laravel.com/) ?
 
@@ -61,20 +66,868 @@ _______________________________
 
 ## Entwicklungpfade von Artwork ( Branches )
 
+> artwork: a free project management software for the arts 
+>  
+>offical :
+> https://github.com/artwork-software/artwork?tab=readme-ov-file
+
+
+
+
 - **Entwicklungszweig (dev Branch)**: Dient als primärer Entwicklungsast, auf dem Entwickler ihre Bausteine testen. Er wird genutzt, um neue Funktionen und Experimente zu integrieren.
 
 - **Staging-Zweig (staging Branch)**: Funktioniert als Testserverumgebung und kann als Betaversion betrachtet werden. Er wird für Tests vor der Veröffentlichung verwendet.
 
 - **Hauptzweig (main Branch)**: Dieser Zweig ist der stabile Entwicklungspfad und sollte als Grundlage für alle Produktionssysteme genutzt werden. Es enthält die zuverlässigste und am gründlichsten getestete Version des Codes.
-
-
-`Die vorliegende Anleitung bezieht sich auf den Inhalt im Hauptentwicklungszweig „main“.`
+`
   
   
-Im offizielen Repository befinden sich weitere Entwicklungspfade (Branches), die von einzellnen Entwicklern im Projekt genutzt werden.
+
+______________________
+
+`Hinweis: Die Installation der Tool-Chain (Visual Basic, VS Code, Docker, Laravel etc) für eine Weiterentwicklung von artwork ist in Arbeit.`
+
+
+
+## Entwicklungswerkzeuge von Artwork
+
+
+### WSL : Windows subsystem for Linux
+
+#### Was ist WSL?
+
+________________
+
+WSL steht für Windows Subsystem for Linux. Es ist eine Kompatibilitätsschicht, die von Microsoft entwickelt wurde, um einen Linux-Kernel innerhalb von Windows auszuführen. WSL ermöglicht es Benutzern, Linux-basierte Anwendungen direkt auf Windows zu nutzen, ohne die Notwendigkeit einer traditionellen virtuellen Maschine oder eines Dual-Boot-Setups. 
+
+**Es existieren zwei Versionen von WSL:**
+
+- WSL 1 verwendet eine Übersetzungsschicht, um Linux-Aufrufe in Windows-Systemaufrufe umzuwandeln.
+- WSL 2 bietet eine verbesserte Version, die eine echte Linux-Kernel-Instanz verwendet, die vollständige Systemaufruf-Kompatibilität bietet.
+
+WSL wird häufig von Entwicklern genutzt, die auf Windows-Plattformen arbeiten, aber Linux-spezifische Software oder Entwicklungsumgebungen benötigen. WSL kann über die Windows-Funktionen installiert werden, und verschiedene Linux-Distributionen können aus dem Microsoft Store heruntergeladen und installiert werden.
+
+__________________
+
+Diese Anleitung lässt den Microsoft Store aus.
+
+
+_____________________
+
+Es integriert sich nahtlos in Windows, wobei Dateisysteme zwischen Windows und Linux geteilt und Anwendungen zwischen den Betriebssystemen gestartet werden können.
+
+
+Um das Windows Subsystem for Linux (WSL) auf einem Windows-System zu installieren, ohne dass WSL bereits installiert ist, sind folgende Schritte erforderlich:
+
+_________________  
+
+
+###  Windows-Features für WSL aktivieren
+
+Zuerst müssen die notwendigen Features über die PowerShell aktiviert werden.
+
+
+
+![wsl 3](wsl3.png)
+
+
+
+
+
+
+
+
+
+Hierfür ist es notwendig, die PowerShell als Administrator zu starten und die folgenden Befehle einzugeben:
+
+
+
+
+
+
+
+```powershell
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+```
+
+Diese Befehle aktivieren das "Windows-Subsystem für Linux" und die "Plattform für virtuelle Computer". Ein Neustart des Systems ist anschließend erforderlich.
+
+__________________________
+
+
+#### WSL installieren mit alternativer Methode per GUI
+
+
+![wsl 1](wsl1.png)
+
+
+
+
+![wsl 2](wsl2.png)
+
+
+
+
+
+
+
+```bash
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+```
+  
+  
+
+
+Der Befehl dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart wird in der PowerShell mit Administratorrechten ausgeführt. Er aktiviert die "Virtual Machine Platform", eine Funktion, die für virtuelle Maschinen erforderlich ist und von WSL 2 (Windows Subsystem for Linux) zur Unterstützung von Linux-Distributionen genutzt wird. Der Befehl sorgt dafür, dass diese Funktion sofort verfügbar wird, ohne dass ein Neustart des Systems erforderlich ist.
+
+
+
+<div style="background-color: red; border-left: 6px solid #4caf50; padding: 8px; margin-top: 5px; margin-bottom: 5px;">
+    <strong>Hinweis</strong> Den PC trotzdem neu starten
+</div>
+
+
+
+________________________
+
+
+
+
+
+___________________  
+
+
+### WSL Version prüfen: 
+
+Um die aktuell installierte WSL-Version zu überprüfen, kann folgender Befehl verwendet werden:
+
+  ```powershell
+  wsl --status
+  ```
+  
+  
+  
+  
+  
+  ____________
+  
+  
+###  WSL-Update 
+
+
+
+
+__________________________
+
+
+  
+  
+  
+  
+  
+  
+###  WSL-Version festlegen
+
+Falls eine spezifische WSL-Version benötigt wird, kann die Standardversion auf WSL 2 eingestellt werden. Dazu werden folgende Befehle in der PowerShell als Administrator ausgeführt:
+
+```powershell
+wsl --set-default-version 2
+```
+
+Dieser Befehl legt WSL 2 als Standardversion fest, welche vollständige Systemaufruf-Kompatibilität bietet.
+
+
+
+___________
+
+
+  
+  
+
+###  WSL-Linux-Distributionen auflisten
+
+Nach der Initialisierung von WSL können Linux-Distributionen über den Microsoft Store hinzugefügt werden. Im Microsoft Store wird nach der gewünschten Linux-Distribution gesucht (z.B. Ubuntu, Debian, Fedora) und diese installiert.
+
+
+Die folgende Anleitung zeigt wie es mit der Powershell gelingt WSL zu installieren.
+
+Der folgende Befehl listet alle verfügbaren WSL-Versionen.
+
+```powershell
+wsl --list --online
+```
+
+
+
+```powershell
+
+PS C:\Users\localadmin> wsl --list --online
+Nachstehend finden Sie eine Liste der gültigen Distributionen, die installiert werden können.
+Führen Sie die Installation mithilfe des Befehls „wsl.exe --install <Distro>“ aus.
+
+NAME                                   FRIENDLY NAME
+Ubuntu                                 Ubuntu
+Debian                                 Debian GNU/Linux
+kali-linux                             Kali Linux Rolling
+Ubuntu-18.04                           Ubuntu 18.04 LTS
+Ubuntu-20.04                           Ubuntu 20.04 LTS
+Ubuntu-22.04                           Ubuntu 22.04 LTS
+Ubuntu-24.04                           Ubuntu 24.04 LTS
+OracleLinux_7_9                        Oracle Linux 7.9
+OracleLinux_8_7                        Oracle Linux 8.7
+OracleLinux_9_1                        Oracle Linux 9.1
+openSUSE-Leap-15.5                     openSUSE Leap 15.5
+SUSE-Linux-Enterprise-Server-15-SP4    SUSE Linux Enterprise Server 15 SP4
+SUSE-Linux-Enterprise-15-SP5           SUSE Linux Enterprise 15 SP5
+openSUSE-Tumbleweed                    openSUSE Tumbleweed
+PS C:\Users\localadmin>
+
+```
+
+______________________
+
+###  Linux-Distribution installieren
+
+
+Mit folgendem Befehl ist die Ubunte 22.04 LTS Distribution zu installieren:
+
+```powershell
+wsl --install -d Ubuntu-22.04
+```
+
+
+```powershell
+PS C:\Users\localadmin\WSL2-Linux-Kernel> wsl --install -d Ubuntu-22.04
+Der angeforderte Vorgang erfordert erhöhte Rechte.
+Optionale Windows-Komponente wird installiert: VirtualMachinePlatform
+
+Tool zur Imageverwaltung für die Bereitstellung
+Version: 10.0.19041.3636
+
+Abbildversion: 10.0.19045.4291
+
+Features werden aktiviert
+[==========================100.0%==========================]
+Der Vorgang wurde erfolgreich beendet.
+Der angeforderte Vorgang wurde erfolgreich abgeschlossen. Änderungen werden erst nach einem Neustart des Systems wirksam
+.
+Wird installiert: Ubuntu 22.04 LTS
+Ubuntu 22.04 LTS wurde installiert.
+Der angeforderte Vorgang wurde erfolgreich abgeschlossen. Änderungen werden erst nach einem Neustart des Systems wirksam.
+PS C:\Users\localadmin\WSL2-Linux-Kernel>
+
+```
+
+
+
+
+<div style="background-color: red; border-left: 6px solid #4caf50; padding: 8px; margin-top: 5px; margin-bottom: 5px;">
+    <strong>Hinweis</strong> Den PC noch einmal neu starten
+</div>
+
+
+______________
+
+### Ubuntu via Startmenü verfügbar
+
+
+Nach dem Neustart ist eine Ubuntu-Umgebung via Startmenü als Windows-App verfügbar. Mit ENTER startet eine Ubuntu-Shell.
+
+
+![wsl 5](wsl5.png)
+
+
+________________________
+
+
+### Ubuntu-Nutzer anlegen:
+
+Bei der ersten Nutzung der Ubuntu-Distribution als Linux Subsystem muss ein Nutzername und Kennwort vergeben werden.
+
+
+
+
+![wsl 4](wsl4.png)
+
+
+```powershell
+Installing, this may take a few minutes...
+Please create a default UNIX user account. The username does not need to match your Windows username.
+For more information visit: https://aka.ms/wslusers
+Enter new UNIX username: art
+``` 
+
+Hier wird der User `art` verwendet.
+
+
+
 
 
 ___________________________
+
+
+
+###  WSL neu starten:
+
+Um im laufenen Betrieb alle laufenden WSL-Instanzen zu beenden und das Subsystem neu zu starten, kann der folgende Befehl eingesetzt werden:
+
+  ```powershell
+  wsl --shutdown
+  ```
+
+
+______________________
+
+
+#### WSL : Updates und installieren von Ubuntu 22.04
+
+```bash
+PS C:\Users\localadmin\WSL2-Linux-Kernel> wsl --update
+Installation: Windows-Subsystem für Linux
+Windows-Subsystem für Linux wurde installiert.
+
+PS C:\Users\localadmin\WSL2-Linux-Kernel> wsl --install -d Ubuntu-22.04
+Der angeforderte Vorgang erfordert erhöhte Rechte.
+Optionale Windows-Komponente wird installiert: VirtualMachinePlatform
+
+Tool zur Imageverwaltung für die Bereitstellung
+Version: 10.0.19041.3636
+
+Abbildversion: 10.0.19045.4291
+
+Features werden aktiviert
+[==========================100.0%==========================]
+Der Vorgang wurde erfolgreich beendet.
+Der angeforderte Vorgang wurde erfolgreich abgeschlossen. Änderungen werden erst nach einem Neustart des Systems wirksam
+.
+Wird installiert: Ubuntu 22.04 LTS
+Ubuntu 22.04 LTS wurde installiert.
+Der angeforderte Vorgang wurde erfolgreich abgeschlossen. Änderungen werden erst nach einem Neustart des Systems wirksam.
+PS C:\Users\localadmin\WSL2-Linux-Kernel>
+```  
+
+
+
+____________________  
+
+
+### Welcome to Ubuntu mit WSL
+
+```bash
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.146.1-microsoft-standard-WSL2 x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+
+This message is shown once a day. To disable it please create the
+/home/art/.hushlogin file.
+art@LAPTOP-123:~$
+
+``` 
+
+
+
+   
+### Docker-Installation auf Ubuntu 22.04 für Laravel Sail
+
+> artwork: a free project management software for the arts 
+>  
+>offical :
+> https://github.com/artwork-software/artwork?tab=readme-ov-file
+
+
+- Unterstützte Systeme: macOS, Linux, Windows **(via WSL2).**
+
+- **Erforderliche Installationen:**
+
+  - **Docker:** Zur Erstellung und Verwaltung der Docker-Container.
+  
+  - **Composer:** Zum Verwalten der PHP-Abhängigkeiten.
+
+
+________________
+
+
+  
+
+#### Überblick
+Laravel Sail wird vier Docker-Images erstellen:
+
+- **PHP-Projekt**
+
+- **MySQL-Instanz:** Für die Datenbank.
+
+- **Meilisearch-Instanz:** Ermöglicht Fuzzy-Suche.
+
+- **Mailpit-Instanz:** Zum Vorschau der gesendeten E-Mails.
+
+**Hinweis:** 
+Stellenstellen, dass  keine Dienste auf den Ports 80 und 3306 laufen.
+
+#### Installationsprozess
+1. **Klonen des Git-Repository:**
+   ```bash
+   git clone https://github.com/artwork-software/artwork.git
+   ```
+_______________
+
+
+
+#### Wechseln Sie in das Projektverzeichnis und bereiten Sie die Umgebungsvariablen vor:**
+   ```bash
+   cd artwork
+   cp .env.example .env
+   ```
+   
+
+
+
+
+
+___________
+
+
+#### Installieren der PHP-Abhängigkeiten mit Composer:
+
+   ```bash
+   composer install --ignore-platform-reqs
+   ```
+   
+#### Starten der Docker-Container mit Laravel Sail:**
+   ```bash
+   ./vendor/bin/sail up
+   ```
+   Die Docker-Images werden nun erstellt. Es ist empfehlenswert, den Befehl `./vendor/bin/sail` durch einen Shell-Alias zu ersetzen. Die entsprechende Anleitung finden Sie in der Dokumentation. Im weiteren Verlauf wird das Alias `sail` verwendet.
+
+### Zusätzliche Hilfsmittel für eine lokale Entwicklungsumgebung
+
+- **Visual Studio Code oder ein anderer geeigneter Code-Editor.**
+
+- **Postman oder Insomnia für API-Tests.**
+
+- **My-SQL Workbench**
+  
+
+   
+
+____________________
+
+## Installationsanleitung für Entwicklungswerkzeuge auf Ubuntu 22.04 (WSL 2)
+
+#### Paketlisten aktualisieren:
+
+   ```bash
+   sudo apt update
+   ```
+   
+   
+#### Paketlisten aktualisieren:
+
+   ```bash
+   sudo apt upgrade
+   ```
+   _________________
+   
+#### Grundlegende Entwicklungswerkzeuge installieren:
+
+   ```bash
+   sudo apt install build-essential
+   ```
+   
+   _________________
+   
+   
+#### Notwendige Pakete für Docker installieren:
+
+   ```bash
+   sudo apt install apt-transport-https ca-certificates curl software-properties-common
+   ```
+   
+   _________________
+   
+#### Netzwerktools installieren:
+
+   ```bash
+   sudo apt install net-tools
+   ```
+   
+   _________________
+   
+#### Docker und Docker Compose und den Composer installieren:
+
+   ```bash
+   sudo apt install docker
+   sudo apt install docker-compose
+   sudo apt install composer
+   ```
+   
+   _________________
+   
+#### Versionskontrollsystem Git installieren:
+
+   ```bash
+   sudo apt install git
+   ```
+   
+   _________________
+
+#### Python und Pip installieren:
+
+   ```bash
+   sudo apt install python3
+   sudo apt install python3-pip
+  ```
+   Python ist immer nützlich. ;) 
+   
+   
+
+#### Node.js installieren:
+
+   ```bash
+   sudo apt install nodejs
+   sudo apt install node
+   sudo apt install npm
+   ```
+   
+________________________
+
+
+#### php installieren:
+
+```bash  
+sudo apt install php php-cli php-common php-curl php-gd php-mbstring php-xml php-zip php-json php-mysql php-sqlite3 php-pgsql php-bcmath php-intl php-mbstring php-xmlrpc php-soap php-gmp php-imap php-ldap php-pdo php-dom php-simplexml
+```
+
+```bash
+sudo apt update
+```  
+  
+
+
+_________________
+
+#### php restart:
+
+```bash
+sudo systemctl restart php
+```
+  
+  ________________
+
+
+
+
+
+##### Benutzer zur Docker-Gruppe hinzufügen:
+
+   ```bash
+   sudo usermod -aG docker ${USER}
+   ```
+   
+   ______________  
+
+### **Port 80 Belegt**
+
+Um den Port 80 freizugeben, der von eventuell von `apache2` belegt ist, sind folgende Schritte erforderlich:
+
+#### Identifikation der Prozesse, die Port 80 verwenden:
+
+   ```bash
+   sudo lsof -i :80
+   ```
+   Dieser Befehl listet alle Prozesse auf, die Port 80 belegen. 
+______________________
+
+#### Stoppen des Apache2-Services:
+
+
+```bash
+sudo systemctl stop apache2
+```
+   
+Durch diesen Befehl wird der Apache2-Dienst gestoppt, was den Port 80 freigibt.
+   
+   ```bash
+   sudo systemctl stop nginx
+   ```
+   
+   
+   Alternativ wird der ngnix Dienst gestoppt, was den Port 80 freigibt.
+   
+___________________________
+
+#### Überprüfung, ob Port 80 freigegeben wurde:
+
+   ```bash
+   sudo lsof -i :80
+   ```
+   
+   Keine Ausgabe - kein Port belegt.
+______________________  
+
+#### Fin.
+
+____________________________
+   
+   
+   
+### Composer Update
+
+```bash
+composer update --ignore-platform-reqs
+```
+   
+
+   
+   
+## 
+
+ <div style="background-color: green; border-left: 6px solid #4caf50; padding: 8px; margin-top: 5px; margin-bottom: 5px;">
+    <strong>Hinweis</strong> Nach einem update mit `composer` gelingt das Ausführen mit Lavarel Sail in WSL2  
+</div>
+
+##
+ ______________
+  
+   
+## **Starten der Laravel-Anwendung** <3
+   
+```bash
+./vendor/bin/sail up
+``` 
+
+
+```bash
+art@LAPTOP-IUD4SC6D:~/artwork$ ./vendor/bin/sail up
+artwork_laravel.test_1   start-container   Exit 128
+Shutting down old Sail processes...
+Creating network "artwork_sail" with driver "bridge"
+Creating artwork_mailpit_1     ... done
+Creating artwork_mysql_1       ... done
+Creating artwork_meilisearch_1 ... done
+Creating artwork_laravel.test_1 ... done
+Attaching to artwork_meilisearch_1, artwork_mailpit_1, artwork_mysql_1, artwork_laravel.test_1
+```
+
+
+### Mailpit
+   
+
+- Zugriff auf Mailpit erfolgt über die URL: `http://localhost:8025/`
+- Bietet eine Web-basierte Oberfläche, um E-Mails, die von der Anwendung gesendet werden, zu erfassen und anzuzeigen.
+
+   
+   ![wsl 7](wsl7.png)
+   
+_____________
+
+
+### Melisearch 
+
+- Zugriff auf Meilisearch erfolgt über die URL: `http://127.0.0.1:7700/`
+- Meilisearch ist eine Suchmaschine, die für Suchanfragen innerhalb der Anwendung.
+
+
+![wsl 8](wsl8.png)
+
+
+
+________________
+
+
+
+### Laravel Anwendung auf Port 80
+
+
+
+![wsl 9](wsl9.png)
+
+
+- Die auf Port 80 laufende Laravel-Anwendung zeigt eine Fehlermeldung an:
+
+`Illuminate\Encryption\MissingAppKeyException`
+
+
+- Dieser Fehler weist darauf hin, dass kein Anwendungsschlüssel festgelegt wurde, was für die Verschlüsselung von Sitzungen notwendig ist.
+
+
+![wsl 10](wsl10.png)
+
+![wsl 11](wsl11.png)
+
+
+
+_________________________________________
+__________________________________________
+
+### Laravel Frontend-Installation
+
+
+
+> artwork: a free project management software for the arts 
+>  
+>offical :
+> https://github.com/artwork-software/artwork?tab=readme-ov-file
+
+
+In das Git-Arbeitverzeichnis wechseln:
+
+```bash
+cd artwork
+```
+
+
+
+#### Sail-Installation
+
+Um sicherzustellen, dass `sail` installiert ist, den vollständigen Pfad bis zum ausführbaren Sail-Skript verwenden:
+
+```bash
+./vendor/bin/sail npm install
+```
+
+Nach der Installation können Sicherheitsprobleme behoben werden mit:
+```bash
+npm audit fix --force
+```
+
+____________
+
+#### Anwendungsschlüssel generieren
+
+Einen Anwendungsschlüssel für die Verschlüsselung erzeugen:
+
+```bash
+./vendor/bin/sail artisan key:generate
+```
+
+
+
+
+Wenn dieser Befehl erfolgreich ist, erscheint eine Bestätigung:
+
+```bash
+INFO  Application key set successfully.
+```
+
+
+
+Doppelt hält beeser.
+
+____________
+
+#### Datenbank mit Testdaten migrieren
+
+
+```bash
+./vendor/bin/sail artisan migrate:fresh --seed
+```
+
+
+
+
+
+
+
+____________
+
+#### Aktuelle Datenbank löschen
+
+
+```bash
+./vendor/bin/sail artisan migrate:fresh
+```
+
+____________
+
+#### Produktionsdatenbank ohne Testdaten einrichten
+
+Die Produktionsdatenbank ohne Testdaten einrichten und die notwendigen Tabellen erstellen:
+```bash
+./vendor/bin/sail artisan db:seed:production
+```
+
+____________
+
+#### Warteschlangen starten
+
+```bash
+./vendor/bin/sail artisan queue:work
+```
+
+____________
+
+#### Frontend starten
+
+Das Frontend mit diesem Befehl starten:
+```bash
+./vendor/bin/sail npm run dev
+```
+
+____________
+
+#### Storage-Ordner veröffentlichen
+
+Den `storage`-Ordner veröffentlichen, um das Anwendungslogo sichtbar zu machen:
+```bash
+./vendor/bin/sail artisan storage:link
+```
+
+
+
+
+______________________
+
+### http://localhost
+
+Eine Instanz von Artwork steht lokal verfügbar.
+
+Mit einem Browser aus der lokalen Maschine `http://localhost` aufrufen.
+
+
+![wsl 12](wsl12.png)
+
+____________
+
+### Artwork Test-Instanz mit Laravel
+
+Wenn die Docker-Installation genutzt wurde und die Datenbank mit Testdaten gefüllt ist, können folgende Anmeldedaten für die Test-Instanz verwendet werden:
+
+
+> https://github.com/artwork-software/artwork?tab=readme-ov-file
+
+
+Für das Admin-Konto (mit allen Berechtigungen):
+- **Mail**: `anna.musterfrau@artwork.software`
+- **Passwort**: `TestPass1234!$`
+
+Für das Benutzerkonto (mit eingeschränkten Berechtigungen):
+- **Mail**: `lisa.musterfrau@artwork.software`
+- **Passwort**: `TestPass1234!$`
+
+____________
+
+
+
+
+
+
+
+
+   ____________________
+   ______________________
+   ________________________
+   
+   
+   
+   
+   
+
+# Installation von Artwork im Standalone-Betrieb auf einem VPS
+
 
 
 
@@ -120,7 +973,7 @@ Hier wird **CCX23** gewählt.
 | Modell | vCPU  Kerne  | RAM    | NVMe SSD | Traffic | IPv4 | Standorte | Preis pro Stunde | Preis pro Monat |
 |--------|--------|--------|----------|---------|------|-----------|------------------|-----------------|
 | CCX13  | 2 AMD  | 8 GB   | 80 GB    | 20 TB   | IPv4 |           | 0,0238 €         | 14,86 €         |
-|  **★** CCX23  **★** | 4 AMD  | 16 GB  | 160 GB   | 20 TB   | IPv4 |           | 0,0466 €         | 29,14 €         |
+|  **★**CX23**★** | 4 AMD  | 16 GB  | 160 GB   | 20 TB   | IPv4 |           | 0,0466 €         | 29,14 €         |
 | CCX33  | 8 AMD  | 32 GB  | 240 GB   | 30 TB   | IPv4 |           | 0,0925 €         | 57,70 €         |
 | CCX43  | 16 AMD | 64 GB  | 360 GB   | 40 TB   | IPv4 |           | 0,1840 €         | 114,82 €        |
 | CCX53  | 32 AMD | 128 GB | 600 GB   | 50 TB   | IPv4 |           | 0,3671 €         | 229,06 €        |
