@@ -335,7 +335,7 @@ ______________
 Nach dem Neustart ist eine Ubuntu-Umgebung via Startmenü als Windows-App verfügbar. Mit ENTER startet eine Ubuntu-Shell.
 
 
-![wsl 5](wsl5.png)
+![wsl 5](wsl5.jpg)
 
 
 ________________________
