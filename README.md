@@ -377,36 +377,6 @@ Um im laufenen Betrieb alle laufenden WSL-Instanzen zu beenden und das Subsystem
   ```
 
 
-______________________
-
-
-#### WSL : Updates und installieren von Ubuntu 22.04
-
-```bash
-PS C:\Users\localadmin\WSL2-Linux-Kernel> wsl --update
-Installation: Windows-Subsystem für Linux
-Windows-Subsystem für Linux wurde installiert.
-
-PS C:\Users\localadmin\WSL2-Linux-Kernel> wsl --install -d Ubuntu-22.04
-Der angeforderte Vorgang erfordert erhöhte Rechte.
-Optionale Windows-Komponente wird installiert: VirtualMachinePlatform
-
-Tool zur Imageverwaltung für die Bereitstellung
-Version: 10.0.19041.3636
-
-Abbildversion: 10.0.19045.4291
-
-Features werden aktiviert
-[==========================100.0%==========================]
-Der Vorgang wurde erfolgreich beendet.
-Der angeforderte Vorgang wurde erfolgreich abgeschlossen. Änderungen werden erst nach einem Neustart des Systems wirksam
-.
-Wird installiert: Ubuntu 22.04 LTS
-Ubuntu 22.04 LTS wurde installiert.
-Der angeforderte Vorgang wurde erfolgreich abgeschlossen. Änderungen werden erst nach einem Neustart des Systems wirksam.
-PS C:\Users\localadmin\WSL2-Linux-Kernel>
-```  
-
 
 
 ____________________  
@@ -428,7 +398,7 @@ art@LAPTOP-123:~$
 
 ``` 
 
-
+____________________________
 
    
 ### Docker-Installation auf Ubuntu 22.04 für Laravel Sail
