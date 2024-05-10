@@ -1968,5 +1968,95 @@ Ein `Dump` im Kontext von Datenbanken ist eine Datei, die alle Daten und auch di
 
 ![workbench 4](workbench4.png)
 
-### 6.Schritt - Überprüfung des Exports
+
+
+
+
+
+
+
+___________________________
+
+
+## Storage   -  Backup
+
+ Mediendateien wie Bilder, PDFs werden nicht direkt in einer Datenbank zu gespeichert. Stattdessen werden diese Dateien im Dateisystem unter `/var/www/html/storage` gespeichert und ihre Pfade oder Referenzen werden in der Datenbank hinterlegt.
+ 
+ ___________________
+ 
+
+### Anleitung für Remote-Backup-Storage von Ubuntu auf Windows
+
+
+#### Voraussetzungen:
+
+- SSH-Zugang zum Ubuntu-Server.
+- Ein SCP-Client auf dem Windows-System (z.B. WinSCP oder das SCP-Kommando in Powershell/ Git Bash/WSL).
+
+_______________________
+
+
+#### WinSCP mit scoop installieren
+
+```bash 
+scoop search scp
+```
+
+Die korekte WinSCP Version mir Scoop installieren.
+
+_____________________________
+
+
+### Erstellung und Übertragung des Backups:
+
+#### Backup auf Ubuntu erstellen und komprimieren
+
+
+In das Home-Verzeichnis wechseln. Bitte Verzeichnispfade überprüfen und tatsächliche Nutzernamen verwenden.
+
+```bash
+cd 
+```
+  
+
+
+   Im `storage`-Verzeichnis eine Backup-Datei mit Zeitstempel erstellen:
+  
+  
+   ```bash
+   TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
+   tar -cvjf storage_backup_$TIMESTAMP.tar.bz2 /var/www/html/storage
+   ```
+
+#### Backup-Datei auf Windows übertragen
+
+   - **Mit SCP in Git Bash oder WSL:**  
+     Die Backup-Datei mit dem folgenden Befehl auf das lokale Windows-System übertragen:
+
+     ```bash
+     scp art@artwork.flashz.directory:/home/art/storage_backup_2024-05-10_16-27-12.tar.bz2 /mnt/c/Users/<Benutzername>/
+     ```
+
+
+- **Mit SCP in Powershell:**  
+     Die Backup-Datei mit dem folgenden Befehl auf das lokale Windows-System übertragen:
+
+ ```bash
+scp "art@artwork.flashz.directory:/home/art/storage_backup_2024-05-10_16-27-12.tar.bz2" "C:\Users\<Benutzername>"
+ ```
+
+__________________
+
+
+
+### Mit WinSCP: 
+
+Über WinSCP eine Verbindung zum Server herstellen, zum Backup-Verzeichnis navigieren und die Datei per Drag-and-Drop auf den lokalen Computer ziehen.
+
+_________________________
+
+
+#### Backup-Datei auf Windows überprüfen
+
+   Im Datei-Explorer zum Speicherort navigieren (z.B. Desktop), die Datei entpacken und den Inhalt prüfen.
 
