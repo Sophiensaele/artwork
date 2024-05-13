@@ -1,7 +1,7 @@
 # Hands on Artwork
 
 Dies ist ein Fork des Projektmanagement-Tools artwork.
-Die Sophiensaele beteiligen sich an der Weiterentwicklung dieser Software. Im Sinne der AGPL-3.0 Lizenz, kommen Änderungen und weitere Entwicklungen dem Projekt zugute.
+Die Sophiensaele beteiligen sich an der Weiterentwicklung dieser Software. Im Sinne der AGPL-3.0 Lizenaz, kommen Änderungen und weitere Entwicklungen dem Projekt zugute.
 
 ## Motivation
 Ziel dieser Anleitung ist es, Artwork innerhalb weniger Stunden einsatzbereit zu bekommen. Eine Methode dafür ist die Nutzung eines Virtual Private Servers (VPS) - ein virtualisierter Rechenknoten mit softwaredefinierter begrenzter Rechenleistung. Bei einem VPS teilen sich mehrere Nutzer die gleiche Hardware auf der Serveranwendungen ausgeführt werden. Im Gegensatz zu einem dezidierten Server wo ein Nutzer das Gerät alleine nutzt, stellt ein VPS eine  kostengünstige Alternative dar. 
@@ -601,7 +601,7 @@ sudo systemctl restart php
 
 ### **Port 80 Belegt**
 
-Um den Port 80 freizugeben, der von eventuell von `apache2` belegt ist, sind folgende Schritte erforderlich:
+Um den Port 80 freizugeben, der von eventuell von `nginx` belegt ist, sind folgende Schritte erforderlich:
 
 #### Identifikation der Prozesse, die Port 80 verwenden:
 
