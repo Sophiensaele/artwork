@@ -11,7 +11,7 @@ Die Installationsanleitungen befinden sich unter:
 
 ______________
 
-## Standalone Dokumentation:
+## Standalone-Installation - Dokumentation
 
 [Installation Artwork Standalone-Betrieb VPS](https://sophiensaele.github.io/artwork/Installation_Artwork%20_Standalone-Betrieb_VPS.html)
 
@@ -19,14 +19,14 @@ ________________
 
 
 
-## Enwicklungswerkzeuge
+## Enwicklungswerkzeuge - Dokumentation
 
 
 [Artwork Tools WSL](https://sophiensaele.github.io/artwork/artwork_tools_WSL.html)
 
 ____________
 
-## Artwork unter Windows 
+## Artwork unter Windows - Dokumentation
 
 
 [Artwork Windows](https://sophiensaele.github.io/artwork/artwork_windows.html)
