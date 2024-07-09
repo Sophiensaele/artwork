@@ -3,18 +3,30 @@
 Dies ist ein Fork des Projektmanagement-Tools artwork.
 Die Sophiensaele beteiligen sich an der Weiterentwicklung dieser Software. Im Sinne der AGPL-3.0 Lizenaz, kommen Änderungen und weitere Entwicklungen dem Projekt zugute.
 
-## Motivation
+### Motivation
 Die Sophiensaele beteiligen sich auf der User-Seite in der Entwicklung von der Software Artwork.
  Die folgende Dokumentation gibt einen umfangreichen Einblick in die Schritte zur Installation von Artwork. Es ist die Installation unter einem Ubuntu-Server, 
  einer lokalen WSL Installation und zeigt einen Weg Artwork unter Windows zu installieren.
 Die Installationsanleitungen befinden sich unter:
 
+______________
 
+## Standalone Dokumentation:
 
 [Installation Artwork Standalone-Betrieb VPS](https://sophiensaele.github.io/artwork/Installation_Artwork%20_Standalone-Betrieb_VPS.html)
 
+________________
+
+
+
+## Enwicklungswerkzeuge
+
 
 [Artwork Tools WSL](https://sophiensaele.github.io/artwork/artwork_tools_WSL.html)
+
+____________
+
+## Artwork unter Windows 
 
 
 [Artwork Windows](https://sophiensaele.github.io/artwork/artwork_windows.html)
