@@ -1,0 +1,11 @@
+title: Sophiensaele & Artwork
+description: Artwork Projektmanagement für die Künste - Installationsanleitung erstellt von Sophiensaele GmbH
+
+# Build-Einstellungen
+theme: minima
+permalink: pretty  # Erzeugt saubere URLs für Seiten
+
+# Exkludieren von Dateien
+exclude:
+  - README.md
+  - LICENSE
