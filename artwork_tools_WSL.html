@@ -484,7 +484,7 @@ xref {
 <body>
 <div id="MainContent">
     <!-- Markdown Monster Content -->
-    <h1 id="entwicklungswerkzeuge-von-artwork">Entwicklungswerkzeuge von Artwork</h1>
+    <h1 id="entwicklungswerkzeuge---artwork">Entwicklungswerkzeuge - Artwork</h1>
 <blockquote>
 <p>Sophiensaele GmbH</p>
 </blockquote>
@@ -498,6 +498,93 @@ xref {
 <blockquote>
 <p>Letztes Update: 14.06.2024</p>
 </blockquote>
+<h2 id="inhalt">Inhalt</h2>
+<hr>
+<ul>
+<li><a href="#entwicklungswerkzeuge---artwork">Entwicklungswerkzeuge - Artwork</a>
+<ul>
+<li><a href="#inhalt">Inhalt</a>
+<ul>
+<li><a href="#wsl--windows-subsystem-for-linux">WSL : Windows subsystem for Linux</a>
+<ul>
+<li><a href="#was-ist-wsl">Was ist WSL?</a></li>
+</ul>
+</li>
+<li><a href="#windows-features-f%C3%BCr-wsl-aktivieren">Windows-Features für WSL aktivieren</a>
+<ul>
+<li><a href="#wsl-installieren-mit-alternativer-methode-per-gui">WSL installieren mit alternativer Methode per GUI</a></li>
+</ul>
+</li>
+<li><a href="#wsl-version-pr%C3%BCfen">WSL Version prüfen:</a></li>
+<li><a href="#wsl-update">WSL-Update</a></li>
+<li><a href="#wsl-version-festlegen">WSL-Version festlegen</a></li>
+<li><a href="#wsl-linux-distributionen-auflisten">WSL-Linux-Distributionen auflisten</a></li>
+<li><a href="#linux-distribution-installieren">Linux-Distribution installieren</a></li>
+<li><a href="#ubuntu-via-startmen%C3%BC-verf%C3%BCgbar">Ubuntu via Startmenü verfügbar</a></li>
+<li><a href="#ubuntu-nutzer-anlegen">Ubuntu-Nutzer anlegen:</a></li>
+<li><a href="#wsl-neu-starten">WSL neu starten:</a></li>
+<li><a href="#welcome-to-ubuntu-mit-wsl">Welcome to Ubuntu mit WSL</a></li>
+<li><a href="#docker-installation-auf-ubuntu-2204-f%C3%BCr-laravel-sail">Docker-Installation auf Ubuntu 22.04 für Laravel Sail</a>
+<ul>
+<li><a href="#%C3%BCberblick">Überblick</a></li>
+<li><a href="#installationsprozess">Installationsprozess</a></li>
+<li><a href="#wechseln-sie-in-das-projektverzeichnis-und-bereiten-sie-die-umgebungsvariablen-vor">Wechseln Sie in das Projektverzeichnis und bereiten Sie die Umgebungsvariablen vor:**</a></li>
+<li><a href="#installieren-der-php-abh%C3%A4ngigkeiten-mit-composer">Installieren der PHP-Abhängigkeiten mit Composer:</a></li>
+<li><a href="#starten-der-docker-container-mit-laravel-sail">Starten der Docker-Container mit Laravel Sail:**</a></li>
+</ul>
+</li>
+<li><a href="#zus%C3%A4tzliche-hilfsmittel-f%C3%BCr-eine-lokale-entwicklungsumgebung">Zusätzliche Hilfsmittel für eine lokale Entwicklungsumgebung</a></li>
+<li><a href="#installationsanleitung-f%C3%BCr-entwicklungswerkzeuge-auf-ubuntu-2204-wsl-2">Installationsanleitung für Entwicklungswerkzeuge auf Ubuntu 22.04 (WSL 2)</a>
+<ul>
+<li><a href="#paketlisten-aktualisieren">Paketlisten aktualisieren</a></li>
+<li><a href="#paketlisten-aktualisieren">Paketlisten aktualisieren</a></li>
+<li><a href="#grundlegende-entwicklungswerkzeuge-installieren">Grundlegende Entwicklungswerkzeuge installieren</a></li>
+<li><a href="#notwendige-pakete-f%C3%BCr-docker-installieren">Notwendige Pakete für Docker installieren</a></li>
+<li><a href="#netzwerktools-installieren">Netzwerktools installieren</a></li>
+<li><a href="#docker-und-docker-compose-und-den-composer-installieren">Docker und Docker Compose und den Composer installieren</a></li>
+<li><a href="#versionskontrollsystem-git-installieren">Versionskontrollsystem Git installieren</a></li>
+<li><a href="#python-und-pip-installieren">Python und Pip installieren</a></li>
+<li><a href="#nodejs-installieren">Node.js installieren</a></li>
+<li><a href="#php-installieren">php installieren</a></li>
+<li><a href="#php-restart">php restart</a></li>
+</ul>
+</li>
+<li><a href="#port-80-belegt">Port 80 Belegt</a>
+<ul>
+<li><a href="#identifikation-der-prozesse-die-port-80-verwenden">Identifikation der Prozesse, die Port 80 verwenden</a></li>
+<li><a href="#stoppen-des-apache2-services">Stoppen des Apache2-Services</a></li>
+<li><a href="#check-port-80">Check Port 80</a></li>
+<li><a href="#fin">Fin.</a></li>
+</ul>
+</li>
+<li><a href="#composer-update">Composer Update</a></li>
+</ul>
+</li>
+<li><a href="#starten-der-laravel-anwendung-">Starten der Laravel-Anwendung ❤️</a>
+<ul>
+<li><a href="#mailpit">Mailpit</a></li>
+<li><a href="#melisearch">Melisearch</a></li>
+<li><a href="#laravel-anwendung-auf-port-80">Laravel Anwendung auf Port 80</a></li>
+<li><a href="#laravel-frontend-installation">Laravel Frontend-Installation</a>
+<ul>
+<li><a href="#sail-installation">Sail-Installation</a></li>
+<li><a href="#anwendungsschl%C3%BCssel-generieren">Anwendungsschlüssel generieren</a></li>
+<li><a href="#datenbank-mit-testdaten-migrieren">Datenbank mit Testdaten migrieren</a></li>
+<li><a href="#aktuelle-datenbank-l%C3%B6schen">Aktuelle Datenbank löschen</a></li>
+<li><a href="#produktionsdatenbank-ohne-testdaten-einrichten">Produktionsdatenbank ohne Testdaten einrichten</a></li>
+<li><a href="#warteschlangen-starten">Warteschlangen starten</a></li>
+<li><a href="#frontend-starten">Frontend starten</a></li>
+<li><a href="#storage-ordner-ver%C3%B6ffentlichen">Storage-Ordner veröffentlichen</a></li>
+</ul>
+</li>
+<li><a href="#httplocalhost">http://localhost</a></li>
+<li><a href="#artwork-test-instanz-mit-laravel">Artwork Test-Instanz mit Laravel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>_____________-</p>
 <h3 id="wsl--windows-subsystem-for-linux">WSL : Windows subsystem for Linux</h3>
 <h4 id="was-ist-wsl">Was ist WSL?</h4>
 <hr>
@@ -672,12 +759,9 @@ art@LAPTOP-123:~$
 <p><strong>Hinweis:</strong>
 Stellenstellen, dass  keine Dienste auf den Ports 80 und 3306 laufen.</p>
 <h4 id="installationsprozess">Installationsprozess</h4>
-<ol>
-<li><strong>Klonen des Git-Repository:</strong>
+<p><strong>Klonen des Git-Repository:</strong></p>
 <pre><code class="language-bash">git clone https://github.com/artwork-software/artwork.git
 </code></pre>
-</li>
-</ol>
 <hr>
 <h4 id="wechseln-sie-in-das-projektverzeichnis-und-bereiten-sie-die-umgebungsvariablen-vor">Wechseln Sie in das Projektverzeichnis und bereiten Sie die Umgebungsvariablen vor:**</h4>
 <pre><code class="language-bash">cd artwork
@@ -692,78 +776,73 @@ cp .env.example .env
 </code></pre>
 <p>Die Docker-Images werden nun erstellt. Es ist empfehlenswert, den Befehl <code>./vendor/bin/sail</code> durch einen Shell-Alias zu ersetzen. Die entsprechende Anleitung finden Sie in der Dokumentation. Im weiteren Verlauf wird das Alias <code>sail</code> verwendet.</p>
 <h3 id="zusätzliche-hilfsmittel-für-eine-lokale-entwicklungsumgebung">Zusätzliche Hilfsmittel für eine lokale Entwicklungsumgebung</h3>
-<ul>
-<li><p><strong>Visual Studio Code oder ein anderer geeigneter Code-Editor.</strong></p>
-</li>
-<li><p><strong>Postman oder Insomnia für API-Tests.</strong></p>
-</li>
-<li><p><strong>My-SQL Workbench</strong></p>
-</li>
-</ul>
+<p><strong>Visual Studio Code oder ein anderer geeigneter Code-Editor.</strong></p>
+<p><strong>Postman oder Insomnia für API-Tests.</strong></p>
+<p><strong>My-SQL Workbench</strong></p>
 <hr>
-<h2 id="installationsanleitung-für-entwicklungswerkzeuge-auf-ubuntu-2204-wsl-2">Installationsanleitung für Entwicklungswerkzeuge auf Ubuntu 22.04 (WSL 2)</h2>
-<h4 id="paketlisten-aktualisieren">Paketlisten aktualisieren:</h4>
+<h3 id="installationsanleitung-für-entwicklungswerkzeuge-auf-ubuntu-2204-wsl-2">Installationsanleitung für Entwicklungswerkzeuge auf Ubuntu 22.04 (WSL 2)</h3>
+<h4 id="paketlisten-aktualisieren">Paketlisten aktualisieren</h4>
 <pre><code class="language-bash">sudo apt update
 </code></pre>
-<h4 id="paketlisten-aktualisieren-1">Paketlisten aktualisieren:</h4>
+<h4 id="paketlisten-aktualisieren-1">Paketlisten aktualisieren</h4>
 <pre><code class="language-bash">sudo apt upgrade
 </code></pre>
 <hr>
-<h4 id="grundlegende-entwicklungswerkzeuge-installieren">Grundlegende Entwicklungswerkzeuge installieren:</h4>
+<h4 id="grundlegende-entwicklungswerkzeuge-installieren">Grundlegende Entwicklungswerkzeuge installieren</h4>
 <pre><code class="language-bash">sudo apt install build-essential
 </code></pre>
 <hr>
-<h4 id="notwendige-pakete-für-docker-installieren">Notwendige Pakete für Docker installieren:</h4>
+<h4 id="notwendige-pakete-für-docker-installieren">Notwendige Pakete für Docker installieren</h4>
 <pre><code class="language-bash">sudo apt install apt-transport-https ca-certificates curl software-properties-common
 </code></pre>
 <hr>
-<h4 id="netzwerktools-installieren">Netzwerktools installieren:</h4>
+<h4 id="netzwerktools-installieren">Netzwerktools installieren</h4>
 <pre><code class="language-bash">sudo apt install net-tools
 </code></pre>
 <hr>
-<h4 id="docker-und-docker-compose-und-den-composer-installieren">Docker und Docker Compose und den Composer installieren:</h4>
+<h4 id="docker-und-docker-compose-und-den-composer-installieren">Docker und Docker Compose und den Composer installieren</h4>
 <pre><code class="language-bash">sudo apt install docker
 sudo apt install docker-compose
 sudo apt install composer
 </code></pre>
 <hr>
-<h4 id="versionskontrollsystem-git-installieren">Versionskontrollsystem Git installieren:</h4>
+<h4 id="versionskontrollsystem-git-installieren">Versionskontrollsystem Git installieren</h4>
 <pre><code class="language-bash">sudo apt install git
 </code></pre>
 <hr>
-<h4 id="python-und-pip-installieren">Python und Pip installieren:</h4>
+<h4 id="python-und-pip-installieren">Python und Pip installieren</h4>
 <pre><code class="language-bash">sudo apt install python3
 sudo apt install python3-pip
 </code></pre>
 <p>Python ist immer nützlich. 😉</p>
-<h4 id="nodejs-installieren">Node.js installieren:</h4>
+<h4 id="nodejs-installieren">Node.js installieren</h4>
 <pre><code class="language-bash">sudo apt install nodejs
 sudo apt install node
 sudo apt install npm
 </code></pre>
 <hr>
-<h4 id="php-installieren">php installieren:</h4>
+<h4 id="php-installieren">php installieren</h4>
 <pre><code class="language-bash">sudo apt install php php-cli php-common php-curl php-gd php-mbstring php-xml php-zip php-json php-mysql php-sqlite3 php-pgsql php-bcmath php-intl php-mbstring php-xmlrpc php-soap php-gmp php-imap php-ldap php-pdo php-dom php-simplexml
 </code></pre>
 <pre><code class="language-bash">sudo apt update
 </code></pre>
 <hr>
-<h4 id="php-restart">php restart:</h4>
+<h4 id="php-restart">php restart</h4>
 <pre><code class="language-bash">sudo systemctl restart php
 </code></pre>
 <hr>
-<h5 id="benutzer-zur-docker-gruppe-hinzufügen">Benutzer zur Docker-Gruppe hinzufügen:</h5>
+<h5 id="benutzer-zur-docker-gruppe-hinzufügen">Benutzer zur Docker-Gruppe hinzufügen</h5>
 <pre><code class="language-bash">sudo usermod -aG docker ${USER}
 </code></pre>
 <hr>
-<h3 id="port-80-belegt"><strong>Port 80 Belegt</strong></h3>
+<h3 id="port-80-belegt">Port 80 Belegt</h3>
 <p>Um den Port 80 freizugeben, der von eventuell von <code>nginx</code> belegt ist, sind folgende Schritte erforderlich:</p>
-<h4 id="identifikation-der-prozesse-die-port-80-verwenden">Identifikation der Prozesse, die Port 80 verwenden:</h4>
+<h4 id="identifikation-der-prozesse-die-port-80-verwenden">Identifikation der Prozesse, die Port 80 verwenden</h4>
 <pre><code class="language-bash">sudo lsof -i :80
 </code></pre>
 <p>Dieser Befehl listet alle Prozesse auf, die Port 80 belegen.</p>
 <hr>
-<h4 id="stoppen-des-apache2-services">Stoppen des Apache2-Services:</h4>
+<h4 id="stoppen-des-apache2-services">Stoppen des Apache2-Services</h4>
 <pre><code class="language-bash">sudo systemctl stop apache2
 </code></pre>
 <p>Durch diesen Befehl wird der Apache2-Dienst gestoppt, was den Port 80 freigibt.</p>
@@ -771,7 +850,7 @@ sudo apt install npm
 </code></pre>
 <p>Alternativ wird der ngnix Dienst gestoppt, was den Port 80 freigibt.</p>
 <hr>
-<h4 id="überprüfung-ob-port-80-freigegeben-wurde">Überprüfung, ob Port 80 freigegeben wurde:</h4>
+<h4 id="check-port-80">Check Port 80</h4>
 <pre><code class="language-bash">sudo lsof -i :80
 </code></pre>
 <p>Keine Ausgabe - kein Port belegt.</p>
