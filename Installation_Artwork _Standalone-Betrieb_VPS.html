@@ -861,6 +861,347 @@ logpath = /var/log/auth.log
 maxretry = 3
 
 </code></pre>
+<h2 id="serverkonfiguration-per-ssh-schlüssel">Serverkonfiguration per SSH-Schlüssel</h2>
+<h3 id="ssh-zugang">SSH-Zugang</h3>
+<p>Der Serveranbieter schaltet eine Maschine frei und normalerweise erhält man eine E-Mail mit dem Root-Passwort. Bei der Einrichtung eines Cloud-Servers besteht auch die Möglichkeit, direkt einen SSH-Schlüssel zu übermitteln.</p>
+<pre><code class="language-bash">ssh root@deine-bereitgestellte-ip
+</code></pre>
+<p>Nach dem Einloggen sollte als Erstes das Root-Passwort geändert werden. Hierfür verwendet man ein starkes Passwort:</p>
+<pre><code class="language-bash">passwd
+</code></pre>
+<h3 id="system-aktualisieren">System aktualisieren</h3>
+<p>Mit dem Paketmanager &quot;apt&quot; das System auf den neuesten Stand bringen.</p>
+<pre><code class="language-bash">apt-get update
+apt-get upgrade
+</code></pre>
+<p>Falls <code>sudo</code> nicht verfügbar ist, wird es installiert:</p>
+<pre><code class="language-bash">apt install sudo
+</code></pre>
+<h3 id="benutzerkonto-anlegen">Benutzerkonto anlegen</h3>
+<p>Ein neues Benutzerkonto für das System erstellen.</p>
+<pre><code class="language-bash">adduser dein-benutzername
+
+</code></pre>
+<h3 id="datei-sudoers-bearbeiten">Datei sudoers bearbeiten:</h3>
+<p>Mit dem Texteditor <code>nano</code> die Datei <code>sudoers</code> im Verzeichnis <code>/etc</code> bearbeiten.</p>
+<pre><code class="language-bash">nano /etc/sudoers
+
+
+  root    ALL=(ALL:ALL) ALL
+  art    ALL=(ALL) ALL    &lt;--- hinzufügen!
+</code></pre>
+<h4 id="root-allallall"><strong>root ALL=(ALL:ALL)</strong></h4>
+<p>ALL erlaubt dem Benutzer root, als beliebiger Benutzer (der erste ALL nach dem Gleichheitszeichen) und Gruppe (der zweite ALL in Klammern) beliebige Befehle (das letzte ALL) auszuführen.</p>
+<h4 id="art-allall"><strong>art ALL=(ALL)</strong></h4>
+<p>ALL gestattet dem Benutzer art, als jeder andere Benutzer (nach dem Gleichheitszeichen ALL), jedoch ohne explizite Angabe einer Gruppe, alle Befehle auszuführen.</p>
+<p>Diese Einträge bieten erweiterte Systemzugriffsrechte und sollten mit Bedacht eingesetzt werden.</p>
+<h2 id="oder">oder</h2>
+<h4 id="füge-dann-die-folgende-zeile-hinzu-um-dem-nutzer-art-zu-erlauben-befehle-ohne-passwortabfrage-auszuführen"><strong>Füge dann die folgende Zeile hinzu, um dem Nutzer <code>art</code> zu erlauben, Befehle ohne Passwortabfrage auszuführen</strong></h4>
+<h2 id="nur-wenn-der-ssh-schlüssel-ein-starkes-passwort-hat">Nur wenn der SSH-Schlüssel ein starkes Passwort hat</h2>
+<pre><code class="language-bash">
+art ALL=(ALL) NOPASSWD: ALL
+</code></pre>
+<p>Hier fügt man eine Zeile für den neuen Benutzer hinzu. Danach wird mit STRG + X die Datei gespeichert und der Editor verlassen.</p>
+<h3 id="alternative-zu-nano---visudo">Alternative zu nano - visudo</h3>
+<p>Bei der Veränderung von <code>/etc/sudoers</code> ist es möglich, bei fehlerhaften Eingaben, sich selbst vom System auszusperren. Deshalb wird die Nutzung von <code>visudo</code> für das Ändern der <code>sudoers</code>Datei empfohlen, hier aber nicht beschrieben</p>
+<hr>
+<h3 id="zu-benutzer-art-wechseln-1">Zu Benutzer <code>art</code> wechseln</h3>
+<ul>
+<li>Zum neuen Benutzerkonto wechseln mit:</li>
+</ul>
+<pre><code class="language-bash">su art
+</code></pre>
+<hr>
+<h3 id="paketquellen-aktualisieren-1">Paketquellen aktualisieren</h3>
+<ul>
+<li>Paketquellen des Systems aktualisieren:</li>
+</ul>
+<pre><code class="language-bash">sudo apt update
+</code></pre>
+<h3 id="ssh-schlüsselpaar-erstellen">SSH-Schlüsselpaar erstellen</h3>
+<p>Ein SSH-Schlüsselpaar erstellen und den öffentlichen Schlüssel auf den Server kopieren.</p>
+<div style="background-color: grey; border-left: 6px solid #4caf50; padding: 8px; margin-top: 5px; margin-bottom: 5px;">
+    <strong>Hinweis</strong> Dieser Schritt muss auf dem lokalen PC ausgeführt werden.    Es wird ein öffentlicher Schlüssel auf dem Remote-Server hinterlegt.
+</div>
+<pre><code class="language-bash">ssh-keygen -t rsa
+</code></pre>
+<pre><code class="language-bash">PS C:\Users\localadmin&gt; ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (C:\Users\localadmin/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in C:\Users\localadmin/.ssh/id_rsa.
+Your public key has been saved in C:\Users\localadmin/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:Y8WaCtb8A2NWTPIwZW3BaAiWrRU+DC2UnyG5P7Rsln0 localadmin@LAPTOP-IUD4SC6D
+The keys randomart image is:
++---[RSA 3072]----+
+|   .=B=+++..     |
+|   .*+*Oo.+      |
+|     B+++.o      |
+|    oo+o +       |
+|    o+B+S        |
+|   . +O*..E      |
+|     o..o.       |
+|         .       |
+|                 |
++----[SHA256]-----+
+PS C:\Users\localadmin&gt;
+</code></pre>
+<hr>
+<h3 id="öffentlicher-ssh-schlüssel-auf-remote-server-kopieren">öffentlicher SSH-Schlüssel auf Remote-Server kopieren</h3>
+<pre><code class="language-bash">ssh-copy-id -i ~/.ssh/key.pub dein-benutzername@deine-ip
+</code></pre>
+<hr>
+<h4 id="verwendung-von-windows-subsystem-für-linux-wsl">Verwendung von Windows Subsystem für Linux (WSL)</h4>
+<p>Falls WSL installiert ist, kann ssh-copy-id in einer Linux-Umgebung verwendet werden, genau wie auf einem Linux- oder Mac-System.</p>
+<hr>
+<h4 id="verwendung-eines-bash-skripts-unter-windows">Verwendung eines Bash-Skripts unter Windows</h4>
+<p>Man kann auch ein einfaches Bash-Skript in Git Bash oder einem ähnlichen Tool ausführen, das ssh-copy-id simuliert:</p>
+   <div style="background-color: grey; border-left: 6px solid #4caf50; padding: 8px; margin-top: 5px; margin-bottom: 5px;">
+    <strong>Hinweis</strong> Korrekten öffentlichen Schlüssel (key.pub) und korrekten Pfad angeben. (auf dem Remote-Server)
+</div>
+<pre><code class="language-bash">
+cat ~/.ssh/testserver.pub | ssh root@128.140.122.23 &quot;mkdir -p /home/BENUTZERNAME/.ssh &amp;&amp; cat &gt;&gt; /home/BENUTZERNAME/.ssh/authorized_keys&quot;
+   
+</code></pre>
+<hr>
+<h3 id="test-der-passwortlosen--ssh-verbindung-unter-windows">Test der passwortlosen  SSH-Verbindung unter Windows</h3>
+<p>Es wurde ein SSH-Schlüsselpaar erstellt und der öffentliche Teil des Schlüsselpaars wurde auf dem Remote-Server hinterlegt.</p>
+<p>Bevor die passwortbasierte Authentifizierungsmethode deaktiviert wird, sollte die Verbindung mit dem SSHSchlüsselpaar getestet werden.</p>
+<p>Dazu muss der private Schlüssel im SSH-Befehl ausgewählt werden.</p>
+<p>Der öffentliche Teil der SSH-Schlüssels wurde im .ssh Verzeichnis der Users <code>art</code> hinterlegt.</p>
+<p>Es muss der User `art``im SSH-Befehl und der Hostname (oder IP-Adresse) genannt werden.</p>
+<pre><code class="language-bash">
+ssh -i .\testserver art@artwork.firma.de
+
+</code></pre>
+<p>Der private Schlüssel liegt im Windows-Verzeichnis <code>\USERS\user\.ssh</code> und wird mit dem SSH-Befehl Flag <code>-i</code>ausgewählt.</p>
+<hr>
+<h3 id="anmeldung-per-ssh-schlüssel-unter-windows">Anmeldung per SSH-Schlüssel unter Windows</h3>
+<pre><code class="language-powershell">Windows PowerShell
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+Lernen Sie das neue plattformübergreifende PowerShell kennen – https://aka.ms/pscore6
+
+PS C:\Users\localadmin&gt; cd .ssh
+PS C:\Users\localadmin\.ssh&gt; ls
+
+
+    Verzeichnis: C:\Users\localadmin\.ssh
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        29.04.2024     18:55            411 id_ed25519
+-a----        29.04.2024     18:55            103 id_ed25519.pub
+-a----        23.06.2024     11:48           3782 known_hosts
+-a----        22.06.2024     19:54           2622 testserver
+-a----        22.06.2024     19:54            581 testserver.pub
+
+
+PS C:\Users\localadmin\.ssh&gt; ssh -i .\testserver art@artwork.firma.de
+Last login: Sun Jun 23 10:18:06 2024 from 84.160.80.53
+art@debian-test:~$
+</code></pre>
+<hr>
+<h3 id="ssh-authentifizierung-am-linux-server-">SSH-Authentifizierung am Linux-Server :</h3>
+<p>Bei der Nutzung von <strong>Hetzner VPS Produkten</strong> , welche zusätzliche SSH-Daemon-Konfigurationsdateien erstellen, sind spezifische Anpassungen erforderlich, um eine <strong>passwortlose Authentifizierungsmethode</strong> zu verwenden:</p>
+   <div style="background-color: red; border-left: 6px solid #4caf50; padding: 8px; margin-top: 5px; margin-bottom: 5px;">
+   <strong>Hinweis</strong> Achtung an dieser Stelle ist es möglich sich von System auszusperren. Vorsicht. Fallback über Web-Console (z.B Hetzner weiterhin möglich)
+    </div>
+<p>Bei einer fehlenden Verbindungsmöglichkeit zum Server:</p>
+<ul>
+<li><strong>Konsolenzugang nutzen:</strong> Viele Cloud-Anbieter stellen über ihre Web-Interfaces einen Konsolenzugang zur Verfügung. Dies ermöglicht den Zugriff auf das System, selbst wenn die SSH-Konfiguration fehlerhaft ist.</li>
+</ul>
+<hr>
+<h4 id="sshd-hauptkonfiguration-und--zusatzkonfigurationen-mit--hetzner">SSHD-Hauptkonfiguration und  Zusatzkonfigurationen mit  <strong>HETZNER</strong></h4>
+<hr>
+<h3 id="anpassungen-in-etcsshsshd_config">Anpassungen in <code>/etc/ssh/sshd_config</code></h3>
+<pre><code class="language-bash">
+sudo nano /etc/ssh/sshd_config
+
+</code></pre>
+<h4 id="inhalt-von-etcsshsshd_config">Inhalt von /etc/ssh/sshd_config:</h4>
+<pre><code class="language-bash"># This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/local/bin:/usr/bin:/bin:/usr/games
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+Include /etc/ssh/sshd_config.d/*.conf
+
+#Port 22
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+#SyslogFacility AUTH
+#LogLevel INFO
+
+# Authentication:
+
+#LoginGraceTime 2m
+PermitRootLogin without-password
+#StrictModes yes
+#MaxAuthTries 6
+#MaxSessions 10
+
+PubkeyAuthentication yes
+
+# Expect .ssh/authorized_keys2 to be disregarded by default in future.
+AuthorizedKeysFile      .ssh/authorized_keys .ssh/authorized_keys2
+
+#AuthorizedPrincipalsFile none
+
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+#IgnoreUserKnownHosts no
+# Don't read the user's ~/.rhosts and ~/.shosts files
+#IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication no
+#PermitEmptyPasswords no
+
+# Change to yes to enable challenge-response passwords (beware issues with
+# some PAM modules and threads)
+KbdInteractiveAuthentication no
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+#KerberosGetAFSToken no
+
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+#GSSAPIStrictAcceptorCheck yes
+#GSSAPIKeyExchange no
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the KbdInteractiveAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via KbdInteractiveAuthentication may bypass
+# the setting of &quot;PermitRootLogin prohibit-password&quot;.
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and KbdInteractiveAuthentication to 'no'.
+UsePAM no
+
+#AllowAgentForwarding yes
+#AllowTcpForwarding yes
+#GatewayPorts no
+X11Forwarding yes
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PermitTTY yes
+PrintMotd no
+#PrintLastLog yes
+#TCPKeepAlive yes
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#UseDNS no
+#PidFile /run/sshd.pid
+#MaxStartups 10:30:100
+#PermitTunnel no
+#ChrootDirectory none
+#VersionAddendum none
+
+# no default banner path
+#Banner none
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+Subsystem       sftp    /usr/lib/openssh/sftp-server
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#       X11Forwarding no
+#       AllowTcpForwarding no
+#       PermitTTY no
+#       ForceCommand cvs server
+
+</code></pre>
+<h4 id="änderungen-in-etcsshsshd_config">Änderungen in /etc/ssh/sshd_config:</h4>
+<pre><code class="language-bash">PasswordAuthentication no
+PermitRootLogin without-password
+PubkeyAuthentication yes
+UsePAM no
+</code></pre>
+<ul>
+<li><p><strong>PermitRootLogin without-password</strong>: Stellt sicher, dass der Root-Benutzer sich nicht mit einem Passwort anmelden kann, nur mit einem SSH-Schlüssel.</p>
+</li>
+<li><p><strong>PubkeyAuthentication yes</strong>: Aktiviert die Authentifizierung über öffentliche SSH-Schlüssel.</p>
+</li>
+<li><p><strong>PasswordAuthentication no</strong>: Deaktiviert die Passwortauthentifizierung serverweit.</p>
+</li>
+<li><p><strong>UsePam</strong>: Verwendung des Pluggable Authentication Module (PAM) für die SSH-Authentifizierung (Hardware-Authentification)</p>
+</li>
+</ul>
+<hr>
+<hr>
+<h3 id="anpassungen-in-etcsshsshd_configd50-cloud-initconf">Anpassungen in <code>/etc/ssh/sshd_config.d/50-cloud-init.conf</code></h3>
+<pre><code class="language-bash">   sudo nano /etc/ssh/sshd_config.d/50-cloud-init.conf
+</code></pre>
+<hr>
+<h4 id="inhalt-von-etcsshsshd_configd50-cloud-initconf">Inhalt von /etc/ssh/sshd_config.d/50-cloud-init.conf</h4>
+<p>SAME.</p>
+<pre><code class="language-bash">PasswordAuthentication yes
+</code></pre>
+<hr>
+<h4 id="änderungen-von-etcsshsshd_configd50-cloud-initconf">Änderungen von /etc/ssh/sshd_config.d/50-cloud-init.conf</h4>
+<pre><code class="language-bash">PasswordAuthentication no
+PermitRootLogin without-password
+PubkeyAuthentication yes
+UsePAM no
+</code></pre>
+<ul>
+<li><p>Datei bearbeitet, um <code>PasswordAuthentication no</code> zu setzen, was die Passwortauthentifizierung spezifisch für Konfigurationen, die durch <code>cloud-init</code> verwaltet werden, deaktiviert.</p>
+</li>
+<li><p>Sämtliche Einstellungen zur Benutzerauthentifizierung überprüft und sicher gestellt, dass keine widersprüchlichen Anweisungen vorliegen.</p>
+</li>
+</ul>
+<hr>
+<h4 id="neustart-von-ssh-diensten">Neustart von SSH-Diensten</h4>
+<pre><code class="language-bash">sudo systemctl restart sshd
+sudo systemctl daemon-reload
+</code></pre>
+<hr>
+<p>Durch die Deaktivierung der Passwortauthentifizierung und das Erzwingen der Schlüsselauthentifizierung wurde die Sicherheit des SSH-Zugangs erhöht. Die Überprüfung der Konfigurationsdateien stellt sicher, dass keine älteren oder übersehenen Einstellungen die Sicherheit beeinträchtigen.</p>
+<p>.</p>
+<hr>
+<h3 id="ssh-verbindung-mit-passwort-deaktiviert">SSH-Verbindung mit Passwort deaktiviert</h3>
+<p>Ein Vesuch sich ohne Schlüssel anzumelden gibt ein <code>PERMISSION DENIED</code> zurück.</p>
+<pre><code class="language-bash">PS C:\Users\localadmin&gt; ssh tilt@io.flashz.directory
+tilt@io.flashz.directory: Permission denied (publickey).
+PS C:\Users\localadmin&gt;
+</code></pre>
+<p>.</p>
+<p>FIN.</p>
 <hr>
 <hr>
 <h2 id="installation-von-artwork-auf-einem-ubuntu-server">Installation von Artwork auf einem Ubuntu-Server</h2>
