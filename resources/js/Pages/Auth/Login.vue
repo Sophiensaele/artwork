@@ -2,7 +2,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
         <div class="flex flex-col items-center justify-center h-screen">
-            <div class="">
+            <div class="min-h-96">
                 <div class="">
                     <div class="text-2xl mb-8 font-bold text-black">
                         <img :src="$page.props.big_logo" class="max-w-lg h-fit"/>
@@ -42,7 +42,7 @@
                 </form>
 
             </div>
-            <div class="absolute bottom-0 mb-20 text-secondary subpixel-antialiased text-sm tracking-wide">
+            <div class="absolute bottom-10 text-secondary subpixel-antialiased text-sm tracking-wide">
                 <a v-if="this.$page.props.impressumLink !== ''" target="_blank" :href="this.$page.props.impressumLink">
                     {{$t('Imprint')}}
                 </a>
@@ -130,11 +130,11 @@ import JetInput from '@/Jetstream/Input.vue'
 import JetCheckbox from '@/Jetstream/Checkbox.vue'
 import JetLabel from '@/Jetstream/Label.vue'
 import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
-import {Head, Link} from '@inertiajs/inertia-vue3';
-import Checkbox from "@/Layouts/Components/Checkbox";
-import SvgCollection from "@/Layouts/Components/SvgCollection";
+import {Head, Link} from '@inertiajs/vue3';
+import Checkbox from "@/Layouts/Components/Checkbox.vue";
+import SvgCollection from "@/Layouts/Components/SvgCollection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import BaseButton from "@/Layouts/Components/General/Buttons/BaseButton.vue";
 
 

@@ -8,6 +8,18 @@ use JsonSerializable;
 
 abstract class BaseDto implements JsonSerializable, Arrayable
 {
+    final public function __construct(array $data = [])
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+    }
+
+    final public static function newInstance(): static
+    {
+        return new static();
+    }
+
     /**
      * To pass the object as response argument which automatically is encoded to json then
      * @return array<string, mixed>
@@ -16,7 +28,7 @@ abstract class BaseDto implements JsonSerializable, Arrayable
     {
         //late static binding means: the last overwriting method is used. If ClassA derives from BaseDto
         //and Class B derives from Class A, Class B's toArray implementation is used if it exists
-        return static::toArray();
+        return $this->toArray();
     }
 
     /**

@@ -31,7 +31,7 @@
                                    class="w-48 shadow-sm placeholder-darkInputText bg-darkInputBg focus:outline-none focus:ring-0 border-secondary focus:border-1 text-sm"
                                    placeholder="Name des Filters"/>
                             <button
-                                class="rounded-full bg-buttonBlue cursor-pointer px-5 py-2 align-middle flex mb-1 ml-2">
+                                class="rounded-full bg-artwork-buttons-create cursor-pointer px-5 py-2 align-middle flex mb-1 ml-2">
                                 <label @click="saveFilter"
                                        class="cursor-pointer text-white text-xs">{{$t('Save')}}</label>
                             </button>
@@ -42,7 +42,7 @@
                         <hr class="border-gray-500 mt-4 mb-4">
                     </div>
                     <button
-                        class="rounded-full bg-buttonBlue cursor-pointer px-5 py-2 align-middle flex mb-1"
+                        class="rounded-full bg-artwork-buttons-create cursor-pointer px-5 py-2 align-middle flex mb-1"
                         v-for="filter in localPersonalFilters">
                         <label @click="applyFilter(filter)"
                                class="cursor-pointer text-white">{{ filter.name }}</label>
@@ -271,9 +271,9 @@ import {
 import {ChevronDownIcon, DocumentTextIcon,} from '@heroicons/vue/outline';
 import BaseFilter from "@/Layouts/Components/BaseFilter.vue";
 import {XIcon} from "@heroicons/vue/solid";
-import {Inertia} from "@inertiajs/inertia";
-import Permissions from "@/mixins/Permissions.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import {router} from "@inertiajs/vue3";
+import Permissions from "@/Mixins/Permissions.vue";
+import IconLib from "@/Mixins/IconLib.vue";
 
 export default {
     name: "IndividualCalendarFilterComponent",
@@ -588,7 +588,7 @@ export default {
             }
         },
         reloadChanges() {
-            Inertia.patch(route('update.user.calendar.filter', this.$page.props.user.id), {
+            router.patch(route('update.user.calendar.filter', this.$page.props.user.id), {
                 is_loud: this.returnNullIfFalse(this.filterArray.eventAttributes.isLoud.checked),
                 is_not_loud: this.returnNullIfFalse(this.filterArray.eventAttributes.isNotLoud.checked),
                 adjoining_no_audience: this.returnNullIfFalse(this.filterArray.adjoining.adjoiningNoAudience.checked),

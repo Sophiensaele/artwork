@@ -1,6 +1,6 @@
 <template>
     <div @click="openProjectHistoryModal(notification.history)"
-         class="xxsLight cursor-pointer items-center flex text-buttonBlue">
+         class="xxsLight cursor-pointer items-center flex text-artwork-buttons-create">
         <ChevronRightIcon class="h-5 w-4 -mr-0.5"/>
         Verlauf ansehen
     </div>
@@ -16,7 +16,7 @@
 import {ChevronRightIcon} from "@heroicons/vue/solid";
 import ProjectHistoryComponent from "@/Layouts/Components/MoneySourceHistoryComponent.vue";
 import ProjectHistoryWithoutBudgetComponent from "@/Layouts/Components/ProjectHistoryWithoutBudgetComponent.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 
 export default {
     mixins: [Permissions],

@@ -1,5 +1,5 @@
 <template>
-    <ToolSettingsHeader>
+    <ToolSettingsHeader :title="$t('Branding')">
         <form @submit.prevent="changeLogos">
             <div v-if="this.$page.props.flash.success"
                  class="w-full font-bold text-sm border-1 border-green-600 rounded bg-green-600 p-2 text-white mb-3">
@@ -131,7 +131,7 @@ import ToolSettingsHeader from "@/Pages/ToolSettings/ToolSettingsHeader.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import SvgCollection from "@/Layouts/Components/SvgCollection.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
 
 export default defineComponent({

@@ -1,12 +1,12 @@
 <template>
     <BaseFilter onlyIcon="true">
         <div class="inline-flex border-none justify-end w-full">
-            <button class="flex" @click="resetCalendarFilter">
-                <IconX stroke-width="1.5" class="w-3 mr-1 mt-0.5"/>
+            <button class="flex items-center" @click="resetCalendarFilter">
+                <IconX stroke-width="1.5" class="w-3 mr-1"/>
                 <label class="text-xs cursor-pointer">{{ $t('Reset')}}</label>
             </button>
-            <button class="flex ml-4" @click="saving = !saving">
-                <IconFileText stroke-width="1.5" class="w-3 mr-1 mt-0.5"/>
+            <button class="flex items-center ml-4" @click="saving = !saving">
+                <IconFileText stroke-width="1.5" class="w-3 mr-1"/>
                 <label class="text-xs cursor-pointer">{{ $t('Save')}}</label>
             </button>
         </div>
@@ -32,7 +32,7 @@
                                    class="shadow-sm placeholder-darkInputText bg-darkInputBg focus:outline-none focus:ring-0 border-secondary focus:border-1 text-sm"
                                    :placeholder="$t('Name of the filter')"/>
                             <button
-                                class="rounded-full bg-buttonBlue cursor-pointer px-5 py-2 align-middle flex mb-1 ml-2">
+                                class="rounded-full bg-artwork-buttons-create cursor-pointer px-5 py-2 align-middle flex mb-1 ml-2">
                                 <label @click="saveFilter"
                                        class="cursor-pointer text-white text-xs">{{ $t('Save')}}</label>
                             </button>
@@ -40,7 +40,7 @@
                         <hr class="border-gray-500 mt-4 mb-4">
                     </div>
                     <button
-                        class="rounded-full bg-buttonBlue cursor-pointer px-5 py-2 align-middle flex mb-1"
+                        class="rounded-full bg-artwork-buttons-create cursor-pointer px-5 py-2 align-middle flex mb-1"
                         v-for="filter in localPersonalFilters">
                         <label @click="applyFilter(filter)"
                                class="cursor-pointer text-white">{{ filter.name }}</label>
@@ -81,7 +81,7 @@
             <!-- Event Filter Section -->
             <Disclosure v-slot="{ open }">
                 <DisclosureButton
-                    class="flex w-full py-2 justify-between rounded-lg bg-primary text-left text-sm focus:outline-none focus-visible:ring-purple-500"
+                    class="flex w-full py-2 justify-between rounded-lg text-left text-sm focus:outline-none focus-visible:ring-purple-500"
                 >
                                 <span
                                     :class="open ? 'font-bold text-white' : 'font-medium text-secondary'">{{ $t('Events')}}</span>
@@ -93,8 +93,7 @@
                 <DisclosurePanel class="pt-2 pb-2 text-sm text-white">
                     <hr class="border-gray-500 mt-2 mb-2">
                     <Disclosure v-slot="{ open }">
-                        <DisclosureButton
-                            class="flex w-full py-2 justify-between rounded-lg bg-primary text-left text-sm font-medium focus:outline-none focus-visible:ring-purple-500"
+                        <DisclosureButton class="flex w-full py-2 justify-between rounded-lg text-left text-sm font-medium focus:outline-none focus-visible:ring-purple-500"
                         >
                             <span :class="open ? 'font-bold text-white' : 'font-medium text-secondary'">{{$t('Event type')}}</span>
                             <IconChevronDown stroke-width="1.5"
@@ -114,6 +113,8 @@
                     </Disclosure>
                 </DisclosurePanel>
             </Disclosure>
+            <hr class="border-secondary rounded-full border-2 mt-2 mb-2">
+            <CraftFilter :crafts="crafts" v-if="crafts.length > 0" />
 
         </div>
     </BaseFilter>
@@ -136,14 +137,16 @@ import {
 import {ChevronDownIcon, DocumentTextIcon,} from '@heroicons/vue/outline';
 import BaseFilter from "@/Layouts/Components/BaseFilter.vue";
 import {XIcon} from "@heroicons/vue/solid";
-import {Inertia} from "@inertiajs/inertia";
-import Permissions from "@/mixins/Permissions.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import {router} from "@inertiajs/vue3";
+import Permissions from "@/Mixins/Permissions.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import CraftFilter from "@/Components/Filter/CraftFilter.vue";
 
 export default {
     name: "ShiftPlanFilter",
     mixins: [Permissions, IconLib],
     components: {
+        CraftFilter,
         SwitchLabel,
         Switch,
         SwitchGroup,
@@ -164,7 +167,8 @@ export default {
         'filterOptions',
         'personalFilters',
         'atAGlance',
-        'user_filters'
+        'user_filters',
+        'crafts'
     ],
     mounted() {
            this.initFilter()
@@ -305,7 +309,7 @@ export default {
             }
         },
         reloadChanges() {
-            Inertia.patch(route('update.user.shift.calendar.filter', this.$page.props.user.id), {
+            router.patch(route('update.user.shift.calendar.filter', this.$page.props.user.id), {
                 rooms: this.arrayToIds(this.filterArray.rooms),
                 event_types: this.arrayToIds(this.filterArray.eventTypes),
             })

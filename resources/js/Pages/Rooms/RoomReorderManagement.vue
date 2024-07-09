@@ -1,5 +1,5 @@
 <template>
-    <AppLayout>
+    <AppLayout :title="$t('Sort rooms')">
         <div class="max-w-screen-xl my-12 ml-14">
             <div class="flex-wrap">
                 <div class="flex mb-2">
@@ -34,9 +34,9 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import draggable from "vuedraggable";
 import {IconCopy, IconDotsVertical, IconEdit, IconTrash} from "@tabler/icons-vue";
-import {Link} from "@inertiajs/inertia-vue3";
+import {Link} from "@inertiajs/vue3";
 import UserPopoverTooltip from "@/Layouts/Components/UserPopoverTooltip.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
 import Tabs from "@/Pages/Areas/Components/Tabs.vue";
 
 export default {

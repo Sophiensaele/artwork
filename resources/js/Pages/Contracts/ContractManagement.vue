@@ -1,5 +1,5 @@
 <template>
-    <app-layout>
+    <app-layout :title="$t('Contracts')">
         <div class="">
             <div class="max-w-screen-2xl mb-40 flex flex-row ml-14 mr-40">
                 <div class="flex flex-1 flex-wrap">
@@ -16,7 +16,7 @@
                                                     <label class="text-xs">{{ $t('Reset') }}</label>
                                                 </button>
                                             </div>
-                                            <div class="mx-auto w-full max-w-md rounded-2xl bg-primary border-none mt-2">
+                                            <div class="mx-auto w-full max-w-md rounded-2xl bg-artwork-navigation-background border-none mt-2">
                                                 <BaseFilterDisclosure :title="$t('Additional costs')">
                                                     <div v-for="(filter, index) in filter.costsFilter">
                                                         <div class="relative flex items-center">
@@ -97,8 +97,12 @@
                                     />
                                     <ContractDeleteModal :show="showContractDeleteModal === contract?.id"
                                                          :close-modal="closeContractDeleteModal" :contract="contract"/>
-                                    <ContractEditModal :contract-types="contract_types" :currencies="currencies" :company-types="company_types" :show="showContractEditModal === contract?.id"
-                                                       :close-modal="closeContractEditModal" :contract="contract"/>
+                                    <ContractEditModal :contract-types="contract_types"
+                                                       :currencies="currencies"
+                                                       :company-types="company_types"
+                                                       :show="showContractEditModal === contract?.id"
+                                                       :close-modal="closeContractEditModal" :contract="contract"
+                                    />
                                     <hr class="text-secondary">
                                 </div>
 
@@ -128,12 +132,12 @@
 
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue'
-import BaseSidenav from "@/Layouts/Components/BaseSidenav";
-import ContractListItem from "@/Layouts/Components/ContractListItem";
-import ContractModuleSidenav from "@/Layouts/Components/ContractModuleSidenav";
-import ContractFilter from "@/Layouts/Components/ContractFilter";
-import BaseFilterTag from "@/Layouts/Components/BaseFilterTag";
-import Permissions from "@/mixins/Permissions.vue";
+import BaseSidenav from "@/Layouts/Components/BaseSidenav.vue";
+import ContractListItem from "@/Layouts/Components/ContractListItem.vue";
+import ContractModuleSidenav from "@/Layouts/Components/ContractModuleSidenav.vue";
+import ContractFilter from "@/Layouts/Components/ContractFilter.vue";
+import BaseFilterTag from "@/Layouts/Components/BaseFilterTag.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import ContractUploadModal from "@/Layouts/Components/ContractUploadModal.vue";
 import ContractDeleteModal from "@/Layouts/Components/ContractDeleteModal.vue";
 import ContractEditModal from "@/Layouts/Components/ContractEditModal.vue";

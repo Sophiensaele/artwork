@@ -4,7 +4,7 @@
             <h3 class="sDark">{{ $t('Documents') }}</h3>
         </div>
         <div
-            v-if="this.canEditComponent && ($role('artwork admin') || projectWriteIds.includes(this.$page.props.user.id))">
+            v-if="this.canEditComponent && ($role('artwork admin') || projectWriteIds?.includes(this.$page.props.user.id))">
             <input
                 @change="uploadChosenDocuments"
                 class="hidden"
@@ -15,8 +15,8 @@
             />
             <div @click="selectNewFiles" @dragover.prevent
                  @drop.stop.prevent="uploadDraggedDocuments($event)"
-                 class="mb-4 w-full flex justify-center items-center border-buttonBlue border-dotted border-2 h-40 bg-colorOfAction p-2 cursor-pointer">
-                <p class="text-buttonBlue font-bold text-center"
+                 class="mb-4 w-full flex justify-center items-center border-artwork-buttons-create border-dotted border-2 h-40 bg-colorOfAction p-2 cursor-pointer">
+                <p class="text-artwork-buttons-create font-bold text-center"
                    v-html="$t('Drag document here to upload or click in the field')">
                 </p>
             </div>
@@ -24,7 +24,7 @@
         </div>
         <div class="mb-3">
             <div class="space-y-1"
-                 v-if="$role('artwork admin') || projectWriteIds.includes(this.$page.props.user.id) || projectManagerIds.includes(this.$page.props.user.id)">
+                 v-if="$role('artwork admin') || projectWriteIds?.includes(this.$page.props.user.id) || projectManagerIds?.includes(this.$page.props.user.id)">
                 <div v-for="project_file in project.project_files_tab"
                      class="cursor-pointer group flex items-center">
                     <div :data-tooltip-target="project_file.name" class="flex truncate">
@@ -33,7 +33,7 @@
                             {{ project_file.name }}</p>
 
                         <IconCircleX
-                            v-if="this.canEditComponent && ($role('artwork admin') || projectWriteIds.includes(this.$page.props.user.id) || projectManagerIds.includes(this.$page.props.user.id))"
+                            v-if="this.canEditComponent && ($role('artwork admin') || projectWriteIds?.includes(this.$page.props.user.id) || projectManagerIds?.includes(this.$page.props.user.id))"
                             @click="openConfirmDeleteModal(project_file)"
                             class="ml-2 my-auto hidden group-hover:block h-5 w-5 flex-shrink-0 text-error"
                             aria-hidden="true"/>
@@ -63,10 +63,10 @@
 <script>
 import {defineComponent} from "vue";
 import JetInputError from "@/Jetstream/InputError.vue";
-import IconLib from "@/mixins/IconLib.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import ConfirmDeleteModal from "@/Layouts/Components/ConfirmDeleteModal.vue";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 
 export default defineComponent({
     mixins: [

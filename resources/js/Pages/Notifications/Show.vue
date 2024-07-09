@@ -1,5 +1,5 @@
 <template>
-    <app-layout>
+    <app-layout :title="$t('Notifications')">
         <div class="flex">
             <!-- Greetings Div -->
             <div class="mr-2 w-4/6">
@@ -13,19 +13,19 @@
                 <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
                     <li class="mr-2" role="presentation">
                         <button
-                            :class="[openTab === 'notifications' ? 'border-buttonBlue text-buttonBlue' : 'border-transparent text-secondary hover:text-gray-600 hover:border-gray-300', 'py-4 px-2 border-b-2 font-semibold uppercase']"
+                            :class="[openTab === 'notifications' ? 'border-artwork-buttons-create text-artwork-buttons-create' : 'border-transparent text-secondary hover:text-gray-600 hover:border-gray-300', 'py-4 px-2 border-b-2 font-semibold uppercase']"
                             @click="openTab = 'notifications'">{{$t('Notifications')}}
                         </button>
                     </li>
                     <li class="mr-2" role="presentation">
                         <button
-                            :class="[openTab === 'mailSettings' ? 'border-buttonBlue text-buttonBlue' : 'border-transparent text-secondary hover:text-gray-600 hover:border-gray-300', 'py-4 px-2 border-b-2 font-semibold uppercase']"
+                            :class="[openTab === 'mailSettings' ? 'border-artwork-buttons-create text-artwork-buttons-create' : 'border-transparent text-secondary hover:text-gray-600 hover:border-gray-300', 'py-4 px-2 border-b-2 font-semibold uppercase']"
                             @click="openTab = 'mailSettings'">{{$t('E-mail settings')}}
                         </button>
                     </li>
                     <li class="mr-2" role="presentation">
                         <button
-                            :class="[openTab === 'pushSettings' ? 'border-buttonBlue text-buttonBlue' : 'border-transparent text-secondary hover:text-gray-600 hover:border-gray-300', 'py-4 px-2 border-b-2 font-semibold uppercase']"
+                            :class="[openTab === 'pushSettings' ? 'border-artwork-buttons-create text-artwork-buttons-create' : 'border-transparent text-secondary hover:text-gray-600 hover:border-gray-300', 'py-4 px-2 border-b-2 font-semibold uppercase']"
                             @click="openTab = 'pushSettings'">{{ $t('Push settings')}}
                         </button>
                     </li>
@@ -187,27 +187,27 @@ import {
     MenuItem,
     MenuItems
 } from '@headlessui/vue'
-import Button from "@/Jetstream/Button";
-import JetButton from "@/Jetstream/Button";
-import JetDialogModal from "@/Jetstream/DialogModal";
-import JetInput from "@/Jetstream/Input";
-import JetInputError from "@/Jetstream/InputError";
-import JetSecondaryButton from "@/Jetstream/SecondaryButton";
-import Checkbox from "@/Layouts/Components/Checkbox";
+import Button from "@/Jetstream/Button.vue";
+import JetButton from "@/Jetstream/Button.vue";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
+import JetInput from "@/Jetstream/Input.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import Checkbox from "@/Layouts/Components/Checkbox.vue";
 import {
     Link,
     useForm
-} from "@inertiajs/inertia-vue3";
-import SvgCollection from "@/Layouts/Components/SvgCollection";
-import UserTooltip from "@/Layouts/Components/UserTooltip";
-import TeamIconCollection from "@/Layouts/Components/TeamIconCollection";
-import InputComponent from "@/Layouts/Components/InputComponent";
-import NotificationUserIcon from "@/Layouts/Components/NotificationUserIcon";
-import NotificationFrequencySettings from "@/Layouts/Components/NotificationFrequencySettings";
-import NotificationSectionComponent from "@/Layouts/Components/NotificationSectionComponent";
-import NotificationPushSettings from "@/Layouts/Components/NotificationPushSettings";
-import AnswerEventRequestComponent from "@/Layouts/Components/AnswerEventRequestComponent";
-import Permissions from "@/mixins/Permissions.vue";
+} from "@inertiajs/vue3";
+import SvgCollection from "@/Layouts/Components/SvgCollection.vue";
+import UserTooltip from "@/Layouts/Components/UserTooltip.vue";
+import TeamIconCollection from "@/Layouts/Components/TeamIconCollection.vue";
+import InputComponent from "@/Layouts/Components/InputComponent.vue";
+import NotificationUserIcon from "@/Layouts/Components/NotificationUserIcon.vue";
+import NotificationFrequencySettings from "@/Layouts/Components/NotificationFrequencySettings.vue";
+import NotificationSectionComponent from "@/Layouts/Components/NotificationSectionComponent.vue";
+import NotificationPushSettings from "@/Layouts/Components/NotificationPushSettings.vue";
+import AnswerEventRequestComponent from "@/Layouts/Components/AnswerEventRequestComponent.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import GlobalNotificationModal from "@/Pages/Notifications/Components/GlobalNotificationModal.vue";
 import SecondaryButton from "@/Layouts/Components/General/Buttons/SecondaryButton.vue";
 import NotificationBlock from "@/Layouts/Components/NotificationComponents/NotificationBlock.vue";

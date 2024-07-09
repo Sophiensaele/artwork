@@ -2,37 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\BudgetTypesEnum;
-use App\Enums\NotificationConstEnum;
-use App\Enums\PermissionNameEnum;
-use App\Enums\RoleNameEnum;
-use App\Enums\TabComponentEnums;
-use App\Exports\ProjectBudgetExport;
-use App\Exports\ProjectBudgetsByBudgetDeadlineExport;
-use App\Http\Requests\SearchRequest;
-use App\Http\Requests\StoreProjectRequest;
-use App\Http\Requests\UpdateProjectRequest;
-use App\Http\Resources\DepartmentIndexResource;
-use App\Http\Resources\EventTypeResource;
-use App\Http\Resources\ProjectEditResource;
-use App\Http\Resources\ProjectIndexResource;
-use App\Http\Resources\ProjectIndexShowResource;
-use App\Http\Resources\UserResourceWithoutShifts;
-use App\Models\Category;
-use App\Models\CollectingSociety;
-use App\Models\CompanyType;
-use App\Models\ContractType;
-use App\Models\CostCenter;
-use App\Models\Currency;
-use App\Models\EventType;
-use App\Models\Freelancer;
-use App\Models\Genre;
-use App\Models\MoneySource;
-use App\Models\Sector;
-use App\Models\ServiceProvider;
-use App\Models\User;
-use App\Support\Services\MoneySourceThresholdReminderService;
-use App\Support\Services\NotificationService;
+use Artwork\Core\Http\Requests\SearchRequest;
+use Artwork\Modules\Area\Services\AreaService;
+use Artwork\Modules\Budget\Enums\BudgetTypeEnum;
+use Artwork\Modules\Budget\Exports\BudgetExport;
 use Artwork\Modules\Budget\Models\BudgetSumDetails;
 use Artwork\Modules\Budget\Models\CellCalculation;
 use Artwork\Modules\Budget\Models\Column;
@@ -62,33 +35,84 @@ use Artwork\Modules\Budget\Services\SumCommentService;
 use Artwork\Modules\Budget\Services\SumMoneySourceService;
 use Artwork\Modules\Budget\Services\TableService;
 use Artwork\Modules\BudgetColumnSetting\Services\BudgetColumnSettingService;
+use Artwork\Modules\Calendar\Services\CalendarService;
+use Artwork\Modules\Category\Models\Category;
+use Artwork\Modules\Category\Services\CategoryService;
 use Artwork\Modules\Change\Services\ChangeService;
 use Artwork\Modules\Checklist\Services\ChecklistService;
+use Artwork\Modules\CollectingSociety\Models\CollectingSociety;
+use Artwork\Modules\CollectingSociety\Services\CollectingSocietyService;
+use Artwork\Modules\CompanyType\Models\CompanyType;
+use Artwork\Modules\CompanyType\Services\CompanyTypeService;
+use Artwork\Modules\ContractType\Models\ContractType;
+use Artwork\Modules\ContractType\Services\ContractTypeService;
+use Artwork\Modules\CostCenter\Models\CostCenter;
+use Artwork\Modules\Craft\Services\CraftService;
+use Artwork\Modules\Currency\Models\Currency;
+use Artwork\Modules\Currency\Services\CurrencyService;
+use Artwork\Modules\Department\Http\Resources\DepartmentIndexResource;
 use Artwork\Modules\Department\Models\Department;
 use Artwork\Modules\Event\Models\Event;
 use Artwork\Modules\Event\Services\EventService;
 use Artwork\Modules\EventComment\Services\EventCommentService;
+use Artwork\Modules\EventType\Http\Resources\EventTypeResource;
+use Artwork\Modules\EventType\Models\EventType;
+use Artwork\Modules\EventType\Services\EventTypeService;
+use Artwork\Modules\Filter\Services\FilterService;
+use Artwork\Modules\Freelancer\Models\Freelancer;
+use Artwork\Modules\Freelancer\Services\FreelancerService;
+use Artwork\Modules\Genre\Models\Genre;
+use Artwork\Modules\Genre\Services\GenreService;
+use Artwork\Modules\MoneySource\Models\MoneySource;
+use Artwork\Modules\MoneySource\Services\MoneySourceCalculationService;
+use Artwork\Modules\MoneySourceReminder\Services\MoneySourceThresholdReminderService;
+use Artwork\Modules\Notification\Enums\NotificationEnum;
+use Artwork\Modules\Notification\Services\NotificationService;
+use Artwork\Modules\Permission\Enums\PermissionEnum;
+use Artwork\Modules\Project\Exports\BudgetsByBudgetDeadlineExport;
+use Artwork\Modules\Project\Http\Requests\ProjectCreateSettingRequest;
+use Artwork\Modules\Project\Http\Requests\StoreProjectRequest;
+use Artwork\Modules\Project\Http\Requests\UpdateProjectRequest;
+use Artwork\Modules\Project\Http\Resources\ProjectEditResource;
+use Artwork\Modules\Project\Http\Resources\ProjectIndexResource;
 use Artwork\Modules\Project\Models\Project;
+use Artwork\Modules\Project\Models\ProjectCreateSettings;
+use Artwork\Modules\Project\Models\ProjectRole;
 use Artwork\Modules\Project\Models\ProjectStates;
 use Artwork\Modules\Project\Services\CommentService;
 use Artwork\Modules\Project\Services\ProjectFileService;
 use Artwork\Modules\Project\Services\ProjectService;
+use Artwork\Modules\Project\Services\ProjectSettingsService;
+use Artwork\Modules\Project\Services\ProjectStateService;
+use Artwork\Modules\ProjectTab\Enums\ProjectTabComponentEnum;
 use Artwork\Modules\ProjectTab\Models\ProjectTab;
 use Artwork\Modules\ProjectTab\Services\ProjectTabService;
+use Artwork\Modules\Role\Enums\RoleEnum;
 use Artwork\Modules\Room\Models\Room;
 use Artwork\Modules\Room\Services\RoomService;
+use Artwork\Modules\RoomAttribute\Services\RoomAttributeService;
+use Artwork\Modules\RoomCategory\Services\RoomCategoryService;
 use Artwork\Modules\Sage100\Services\Sage100Service;
 use Artwork\Modules\SageApiSettings\Services\SageApiSettingsService;
+use Artwork\Modules\Scheduling\Services\SchedulingService;
+use Artwork\Modules\Sector\Models\Sector;
+use Artwork\Modules\Sector\Services\SectorService;
+use Artwork\Modules\ServiceProvider\Models\ServiceProvider;
+use Artwork\Modules\ServiceProvider\Services\ServiceProviderService;
 use Artwork\Modules\Shift\Services\ShiftFreelancerService;
 use Artwork\Modules\Shift\Services\ShiftService;
 use Artwork\Modules\Shift\Services\ShiftServiceProviderService;
 use Artwork\Modules\Shift\Services\ShiftsQualificationsService;
 use Artwork\Modules\Shift\Services\ShiftUserService;
 use Artwork\Modules\ShiftQualification\Services\ShiftQualificationService;
-use Artwork\Modules\SubEvents\Services\SubEventService;
-use Artwork\Modules\Tasks\Services\TaskService;
+use Artwork\Modules\SubEvent\Services\SubEventService;
+use Artwork\Modules\Task\Services\TaskService;
+use Artwork\Modules\Timeline\Http\Requests\UpdateTimelinesRequest;
 use Artwork\Modules\Timeline\Models\Timeline;
 use Artwork\Modules\Timeline\Services\TimelineService;
+use Artwork\Modules\User\Http\Resources\UserWithoutShiftsResource;
+use Artwork\Modules\User\Models\User;
+use Artwork\Modules\User\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
@@ -106,7 +130,8 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 use Intervention\Image\Facades\Image;
-use JsonException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use stdClass;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -115,13 +140,20 @@ class ProjectController extends Controller
 {
     public function __construct(
         private readonly NotificationService $notificationService,
-        private readonly SchedulingController $schedulingController,
+        private readonly SchedulingService $schedulingService,
         private readonly ProjectService $projectService,
         private readonly BudgetService $budgetService,
         private readonly BudgetColumnSettingService $budgetColumnSettingService,
         private readonly ChecklistService $checklistService,
         private readonly ProjectTabService $projectTabService,
-        private readonly ChangeService $changeService
+        private readonly ChangeService $changeService,
+        private readonly EventService $eventService,
+        private readonly ProjectSettingsService $projectSettingsService,
+        private readonly UserService $userService,
+        private readonly ProjectStateService $projectStateService,
+        private readonly CategoryService $categoryService,
+        private readonly GenreService $genreService,
+        private readonly SectorService $sectorService,
     ) {
     }
 
@@ -143,52 +175,36 @@ class ProjectController extends Controller
         return $returnUser;
     }
 
+
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
     public function index(): Response|ResponseFactory
     {
-        $projects = Project::query()
-            ->with([
-                'checklists.tasks.checklist.project',
-                'access_budget',
-                'categories',
-                'comments.user',
-                'departments.users.departments',
-                'genres',
-                'managerUsers',
-                'project_files',
-                'sectors',
-                'users.departments',
-                'writeUsers',
-                'state',
-                'delete_permission_users'
-            ])
-            ->orderBy('id', 'DESC')
-            ->get();
+        $entitiesPerPage = request()->get('entitiesPerPage', 10);
+        $projectsQuery = \request()->has('search') ?
+            $this->projectService->scoutSearch(request()->get('search')) :
+            $this->projectService->getProjects();
 
         return inertia('Projects/ProjectManagement', [
-            'projects' => ProjectIndexShowResource::collection($projects)->resolve(),
-            'states' => ProjectStates::all(),
-            'projectGroups' => Project::where('is_group', 1)->with('groups')->get(),
-
-            'users' => User::all(),
-
-            'categories' => Category::query()->with('projects')->get()->map(fn($category) => [
-                'id' => $category->id,
-                'name' => $category->name,
-                'projects' => $category->projects
-            ]),
-
-            'genres' => Genre::query()->with('projects')->get()->map(fn($genre) => [
-                'id' => $genre->id,
-                'name' => $genre->name,
-                'projects' => $genre->projects
-            ]),
-
-            'sectors' => Sector::query()->with('projects')->get()->map(fn($sector) => [
-                'id' => $sector->id,
-                'name' => $sector->name,
-                'projects' => $sector->projects
-            ]),
+            'projects' => $this->projectService->paginateProjects($projectsQuery, $entitiesPerPage),
+            'pinnedProjects' => $this->projectService->pinnedProjects(),
+            'first_project_tab_id' => $this->projectTabService->findFirstProjectTab()?->id,
+            'states' => $this->projectStateService->getAll(),
+            'projectGroups' => $this->projectService->getProjectGroups(),
+            'categories' => $this->categoryService->getAll(),
+            'genres' => $this->genreService->getAll(),
+            'sectors' => $this->sectorService->getAll(),
+            'createSettings' => app(ProjectCreateSettings::class),
         ]);
+    }
+
+    public function updateSettings(ProjectCreateSettingRequest $request): RedirectResponse
+    {
+        $settings = app(ProjectCreateSettings::class);
+        $this->projectSettingsService->store($request, $settings);
+        return Redirect::back();
     }
 
     /**
@@ -201,10 +217,10 @@ class ProjectController extends Controller
         return [
             //only show departments (teams) if corresponding permission is given, admins are handle by Gate::before
             //in AuthServiceProvider already, can will return true then
-            'departments' => Auth::user()->can(PermissionNameEnum::TEAM_UPDATE->value) ?
+            'departments' => Auth::user()->can(PermissionEnum::TEAM_UPDATE->value) ?
                 Department::nameLike($query)->get() :
                 [],
-            'users' => UserResourceWithoutShifts::collection(User::nameOrLastNameLike($query)->get())->resolve()
+            'users' => UserWithoutShiftsResource::collection(User::nameOrLastNameLike($query)->get())->resolve()
         ];
     }
 
@@ -250,59 +266,67 @@ class ProjectController extends Controller
         SageApiSettingsService $sageApiSettingsService
     ): JsonResponse|RedirectResponse {
         if (
-            !Auth::user()->canAny(
-                [
-                    PermissionNameEnum::ADD_EDIT_OWN_PROJECT->value,
-                    PermissionNameEnum::WRITE_PROJECTS->value,
-                    PermissionNameEnum::PROJECT_MANAGEMENT->value
-                ]
-            )
+            !Auth::user()->canAny([
+            PermissionEnum::ADD_EDIT_OWN_PROJECT->value,
+            PermissionEnum::WRITE_PROJECTS->value,
+            PermissionEnum::PROJECT_MANAGEMENT->value
+            ])
         ) {
             return response()->json(['error' => 'Not authorized to assign users to a project.'], 403);
         }
 
-        $departments = collect($request->assigned_departments)
-            ->map(fn($department) => Department::query()->findOrFail($department['id']));
-        //@todo how did this line ever work?
-        //->map(fn(Department $department) => $this->authorize('update', $department));
-
-
-
-        //$this->projectService->storeByRequest($request);
-
+        $departments = Department::whereIn('id', collect($request->assigned_departments)->pluck('id'))->get();
 
         $project = Project::create([
             'name' => $request->name,
             'number_of_participants' => $request->number_of_participants,
-            'budget_deadline' => $request->budgetDeadline
         ]);
 
-        $project->users()->save(
-            Auth::user(),
-            ['access_budget' => true, 'is_manager' => false, 'can_write' => true, 'delete_permission' => true]
-        );
+        $is_manager = in_array(Auth::id(), $request->assignedUsers, true);
+
+        $project->users()->attach(Auth::id(), [
+            'access_budget' => true,
+            'is_manager' => $is_manager,
+            'can_write' => true,
+            'delete_permission' => true
+        ]);
+
+        if (!empty($request->assignedUsers)) {
+            $usersToAttach = collect($request->assignedUsers)->filter(fn($user) => $user !== Auth::id())
+                ->mapWithKeys(fn($user) => [$user => [
+                    'access_budget' => false,
+                    'is_manager' => true,
+                    'can_write' => false,
+                    'delete_permission' => false
+                ]]);
+
+            $project->users()->attach($usersToAttach);
+        }
+
+        $project->update([
+            'budget_deadline' => !empty($request->budgetDeadline) ?
+                Carbon::parse($request->budgetDeadline)->format('Y-m-d') : null,
+            'state' => $request->state ?? null,
+            'cost_center_id' => !empty($request->cost_center) ?
+                CostCenter::firstOrCreate(['name' => $request->cost_center])->id : null
+        ]);
 
         if ($request->isGroup) {
             $project->is_group = true;
-            $project->groups()->sync(collect($request->projects));
-            $project->save();
-        }
-
-        if (!$request->isGroup && !empty($request->selectedGroup)) {
+            $project->groups()->sync($request->projects);
+        } elseif (!empty($request->selectedGroup)) {
             $group = Project::find($request->selectedGroup['id']);
             $group->groups()->syncWithoutDetaching($project->id);
         }
 
         if ($request->assigned_user_ids) {
-            $project->users()->sync(collect($request->assigned_user_ids));
+            $project->users()->sync($request->assigned_user_ids);
         }
 
         $project->categories()->sync($request->assignedCategoryIds);
         $project->sectors()->sync($request->assignedSectorIds);
         $project->genres()->sync($request->assignedGenreIds);
         $project->departments()->sync($departments->pluck('id'));
-
-        //$this->generateBasicBudgetValues($project);
 
         $this->budgetService->generateBasicBudgetValues(
             $project,
@@ -313,11 +337,12 @@ class ProjectController extends Controller
             $sageApiSettingsService
         );
 
-        $eventRelevantEventTypeIds = EventType::where('relevant_for_shift', true)->pluck('id')->toArray();
-        $project->shiftRelevantEventTypes()->sync(collect($eventRelevantEventTypeIds));
+        $eventRelevantEventTypeIds = EventType::where('relevant_for_shift', true)->pluck('id');
+        $project->shiftRelevantEventTypes()->sync($eventRelevantEventTypeIds);
 
         return Redirect::route('projects', $project);
     }
+
 
     public function generateBasicBudgetValues(Project $project): void
     {
@@ -357,17 +382,17 @@ class ProjectController extends Controller
         ]);
 
         $costMainPosition = $table->mainPositions()->create([
-            'type' => BudgetTypesEnum::BUDGET_TYPE_COST,
+            'type' => BudgetTypeEnum::BUDGET_TYPE_COST,
             'name' => 'Hauptpostion',
             'position' => $table->mainPositions()
-                    ->where('type', BudgetTypesEnum::BUDGET_TYPE_COST)->max('position') + 1
+                    ->where('type', BudgetTypeEnum::BUDGET_TYPE_COST)->max('position') + 1
         ]);
 
         $earningMainPosition = $table->mainPositions()->create([
-            'type' => BudgetTypesEnum::BUDGET_TYPE_EARNING,
+            'type' => BudgetTypeEnum::BUDGET_TYPE_EARNING,
             'name' => 'Hauptpostion',
             'position' => $table->mainPositions()
-                    ->where('type', BudgetTypesEnum::BUDGET_TYPE_EARNING)->max('position') + 1
+                    ->where('type', BudgetTypeEnum::BUDGET_TYPE_EARNING)->max('position') + 1
         ]);
 
         $costSubPosition = $costMainPosition->subPositions()->create([
@@ -483,12 +508,12 @@ class ProjectController extends Controller
 
             $this->notificationService->setTitle($notificationTitle);
             $this->notificationService->setIcon('green');
-            $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_PROJECT);
+            $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_PROJECT);
             $this->notificationService->setBroadcastMessage($broadcastMessage);
             $this->notificationService->setNotificationTo($user);
             $this->notificationService->createNotification();
         }
-        $mainPosition->update(['is_verified' => BudgetTypesEnum::BUDGET_VERIFIED_TYPE_REQUESTED]);
+        $mainPosition->update(['is_verified' => BudgetTypeEnum::BUDGET_VERIFIED_TYPE_REQUESTED]);
         $notificationTitle = __(
             'notifications.project.budget.new_verify_request',
             [],
@@ -497,7 +522,7 @@ class ProjectController extends Controller
         $budgetData = new stdClass();
         $budgetData->position_id = $mainPosition->id;
         $budgetData->requested_by = Auth::id();
-        $budgetData->changeType = BudgetTypesEnum::BUDGET_VERIFICATION_REQUEST;
+        $budgetData->changeType = BudgetTypeEnum::BUDGET_VERIFICATION_REQUEST;
         $broadcastMessage = [
             'id' => rand(1, 1000000),
             'type' => 'success',
@@ -524,7 +549,7 @@ class ProjectController extends Controller
         ];
         $this->notificationService->setTitle($notificationTitle);
         $this->notificationService->setIcon('blue');
-        $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
+        $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
         $this->notificationService->setBroadcastMessage($broadcastMessage);
         $this->notificationService->setButtons(['calculation_check', 'delete_request']);
         $this->notificationService->setBudgetData($budgetData);
@@ -556,7 +581,7 @@ class ProjectController extends Controller
 
         $budgetData = new stdClass();
         $budgetData->requested_by = Auth::id();
-        $budgetData->changeType = BudgetTypesEnum::BUDGET_VERIFICATION_TAKE_BACK;
+        $budgetData->changeType = BudgetTypeEnum::BUDGET_VERIFICATION_TAKE_BACK;
         if ($request->type === 'main') {
             $mainPosition = MainPosition::find($request->position['id']);
             $verifiedRequest = $mainPosition->verified()->first();
@@ -596,7 +621,7 @@ class ProjectController extends Controller
             $this->notificationService->setTitle($notificationTitle);
             $this->notificationService->setIcon('red');
             $this->notificationService
-                ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
+                ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
             $this->notificationService->setBroadcastMessage($broadcastMessage);
             $this->notificationService->setBudgetData($budgetData);
             $this->notificationService->setProjectId($project->id);
@@ -604,7 +629,7 @@ class ProjectController extends Controller
             $this->notificationService->setNotificationTo(User::find($verifiedRequest->requested));
             $this->notificationService->createNotification();
             $verifiedRequest->forceDelete();
-            $mainPosition->update(['is_verified' => BudgetTypesEnum::BUDGET_VERIFIED_TYPE_NOT_VERIFIED]);
+            $mainPosition->update(['is_verified' => BudgetTypeEnum::BUDGET_VERIFIED_TYPE_NOT_VERIFIED]);
 
             $this->changeService->saveFromBuilder(
                 $this->changeService
@@ -658,14 +683,14 @@ class ProjectController extends Controller
             $this->notificationService->setTitle($notificationTitle);
             $this->notificationService->setIcon('red');
             $this->notificationService
-                ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
+                ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
             $this->notificationService->setBroadcastMessage($broadcastMessage);
             $this->notificationService->setBudgetData($budgetData);
             $this->notificationService->setProjectId($project->id);
             $this->notificationService->setNotificationTo(User::find($verifiedRequest->requested));
             $this->notificationService->setDescription($notificationDescription);
             $this->notificationService->createNotification();
-            $subPosition->update(['is_verified' => BudgetTypesEnum::BUDGET_VERIFIED_TYPE_NOT_VERIFIED]);
+            $subPosition->update(['is_verified' => BudgetTypeEnum::BUDGET_VERIFIED_TYPE_NOT_VERIFIED]);
             $verifiedRequest->forceDelete();
 
             $this->changeService->saveFromBuilder(
@@ -686,7 +711,7 @@ class ProjectController extends Controller
         DatabaseNotification::query()
             ->whereJsonContains("data->budgetData->position_id", $positionId)
             ->whereJsonContains("data->budgetData->requested_by", $requestedId)
-            ->whereJsonContains("data->budgetData->changeType", BudgetTypesEnum::BUDGET_VERIFICATION_REQUEST)
+            ->whereJsonContains("data->budgetData->changeType", BudgetTypeEnum::BUDGET_VERIFICATION_REQUEST)
             ->delete();
     }
 
@@ -695,7 +720,7 @@ class ProjectController extends Controller
 
         $budgetData = new stdClass();
         $budgetData->requested_by = Auth::id();
-        $budgetData->changeType = BudgetTypesEnum::BUDGET_VERIFICATION_DELETED;
+        $budgetData->changeType = BudgetTypeEnum::BUDGET_VERIFICATION_DELETED;
 
         if ($request->type === 'main') {
             $mainPosition = MainPosition::find($request->position['id']);
@@ -735,14 +760,14 @@ class ProjectController extends Controller
             $this->notificationService->setIcon('red');
             $this->notificationService->setPriority(2);
             $this->notificationService
-                ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
+                ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
             $this->notificationService->setBroadcastMessage($broadcastMessage);
             $this->notificationService->setBudgetData($budgetData);
             $this->notificationService->setProjectId($project->id);
             $this->notificationService->setNotificationTo(User::find($verifiedRequest->requested));
             $this->notificationService->setDescription($notificationDescription);
             $this->notificationService->createNotification();
-            $mainPosition->update(['is_verified' => BudgetTypesEnum::BUDGET_VERIFIED_TYPE_NOT_VERIFIED]);
+            $mainPosition->update(['is_verified' => BudgetTypeEnum::BUDGET_VERIFIED_TYPE_NOT_VERIFIED]);
             $verifiedRequest->forceDelete();
 
             $this->changeService->saveFromBuilder(
@@ -796,14 +821,14 @@ class ProjectController extends Controller
             $this->notificationService->setIcon('red');
             $this->notificationService->setPriority(2);
             $this->notificationService
-                ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
+                ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
             $this->notificationService->setBroadcastMessage($broadcastMessage);
             $this->notificationService->setBudgetData($budgetData);
             $this->notificationService->setProjectId($project->id);
             $this->notificationService->setNotificationTo(User::find($verifiedRequest->requested));
             $this->notificationService->setDescription($notificationDescription);
             $this->notificationService->createNotification();
-            $subPosition->update(['is_verified' => BudgetTypesEnum::BUDGET_VERIFIED_TYPE_NOT_VERIFIED]);
+            $subPosition->update(['is_verified' => BudgetTypeEnum::BUDGET_VERIFIED_TYPE_NOT_VERIFIED]);
             $verifiedRequest->forceDelete();
 
             $this->changeService->saveFromBuilder(
@@ -862,13 +887,13 @@ class ProjectController extends Controller
             $this->notificationService->setIcon('red');
             $this->notificationService->setPriority(2);
             $this->notificationService
-                ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
+                ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
             $this->notificationService->setBroadcastMessage($broadcastMessage);
             $this->notificationService->setNotificationTo($user);
             $this->notificationService->setDescription($notificationDescription);
             $this->notificationService->createNotification();
         }
-        $subPosition->update(['is_verified' => BudgetTypesEnum::BUDGET_VERIFIED_TYPE_REQUESTED]);
+        $subPosition->update(['is_verified' => BudgetTypeEnum::BUDGET_VERIFIED_TYPE_REQUESTED]);
         $notificationTitle = __(
             'notifications.project.budget.new_verify_request',
             [],
@@ -877,7 +902,7 @@ class ProjectController extends Controller
         $budgetData = new stdClass();
         $budgetData->position_id = $subPosition->id;
         $budgetData->requested_by = Auth::id();
-        $budgetData->changeType = BudgetTypesEnum::BUDGET_VERIFICATION_REQUEST;
+        $budgetData->changeType = BudgetTypeEnum::BUDGET_VERIFICATION_REQUEST;
         $broadcastMessage = [
             'id' => rand(1, 1000000),
             'type' => 'success',
@@ -904,7 +929,7 @@ class ProjectController extends Controller
         $this->notificationService->setTitle($notificationTitle);
         $this->notificationService->setIcon('blue');
         $this->notificationService->setPriority(1);
-        $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
+        $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
         $this->notificationService->setBroadcastMessage($broadcastMessage);
         $this->notificationService->setNotificationTo(User::find($request->user));
         $this->notificationService->setButtons(['calculation_check', 'delete_request']);
@@ -941,7 +966,7 @@ class ProjectController extends Controller
         DatabaseNotification::query()
             ->whereJsonContains("data->budgetData->position_id", $subPosition->id)
             ->whereJsonContains("data->budgetData->requested_by", $verifiedRequest->requested)
-            ->whereJsonContains("data->budgetData->changeType", BudgetTypesEnum::BUDGET_VERIFICATION_REQUEST)
+            ->whereJsonContains("data->budgetData->changeType", BudgetTypeEnum::BUDGET_VERIFICATION_REQUEST)
             ->delete();
 
         $this->changeService->saveFromBuilder(
@@ -967,7 +992,7 @@ class ProjectController extends Controller
         $budgetData = new stdClass();
         $budgetData->position_id = $subPosition->id;
         $budgetData->requested_by = Auth::id();
-        $budgetData->changeType = BudgetTypesEnum::BUDGET_VERIFICATION_REQUEST;
+        $budgetData->changeType = BudgetTypeEnum::BUDGET_VERIFICATION_REQUEST;
 
         foreach ($project->access_budget()->get() as $user) {
             $notificationTitle = __(
@@ -1002,7 +1027,7 @@ class ProjectController extends Controller
             $this->notificationService->setIcon('red');
             $this->notificationService->setPriority(2);
             $this->notificationService
-                ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
+                ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
             $this->notificationService->setBroadcastMessage($broadcastMessage);
             $this->notificationService->setBudgetData($budgetData);
             $this->notificationService->setDescription($notificationDescription);
@@ -1033,7 +1058,7 @@ class ProjectController extends Controller
         $budgetData = new stdClass();
         $budgetData->position_id = $subPosition->id;
         $budgetData->requested_by = Auth::id();
-        $budgetData->changeType = BudgetTypesEnum::BUDGET_VERIFICATION_REQUEST;
+        $budgetData->changeType = BudgetTypeEnum::BUDGET_VERIFICATION_REQUEST;
 
         foreach ($project->access_budget()->get() as $user) {
             $notificationTitle = __(
@@ -1069,7 +1094,7 @@ class ProjectController extends Controller
             $this->notificationService->setIcon('red');
             $this->notificationService->setPriority(2);
             $this->notificationService
-                ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
+                ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_BUDGET_STATE_CHANGED);
             $this->notificationService->setBroadcastMessage($broadcastMessage);
             $this->notificationService->setBudgetData($budgetData);
             $this->notificationService->setDescription($notificationDescription);
@@ -1195,7 +1220,7 @@ class ProjectController extends Controller
         DatabaseNotification::query()
             ->whereJsonContains("data->budgetData->position_id", $mainPosition->id)
             ->whereJsonContains("data->budgetData->requested_by", $verifiedRequest->requested)
-            ->whereJsonContains("data->budgetData->changeType", BudgetTypesEnum::BUDGET_VERIFICATION_REQUEST)
+            ->whereJsonContains("data->budgetData->changeType", BudgetTypeEnum::BUDGET_VERIFICATION_REQUEST)
             ->delete();
 
         $this->changeService->saveFromBuilder(
@@ -1263,7 +1288,8 @@ class ProjectController extends Controller
 
     public function updateCellSource(
         Request $request,
-        MoneySourceThresholdReminderService $moneySourceThresholdReminderService
+        MoneySourceThresholdReminderService $moneySourceThresholdReminderService,
+        MoneySourceCalculationService $moneySourceCalculationService
     ): void {
         ColumnCell::find($request->cell_id)
             ->update([
@@ -1273,7 +1299,11 @@ class ProjectController extends Controller
 
         if ($request->money_source_id) {
             $moneySourceThresholdReminderService
-                ->handleThresholdReminders(MoneySource::find($request->money_source_id));
+                ->handleThresholdReminders(
+                    MoneySource::find($request->money_source_id),
+                    $moneySourceCalculationService,
+                    $this->notificationService
+                );
         }
     }
 
@@ -1445,7 +1475,7 @@ class ProjectController extends Controller
                 $secondColumn = ColumnCell::where('column_id', $request->second_column_id)
                     ->where('sub_position_row_id', $firstColumn->sub_position_row_id)
                     ->first();
-                $sum = $firstColumn->value + $secondColumn->value;
+                $sum = (float)$firstColumn->value + (float)$secondColumn->value;
                 ColumnCell::create([
                     'column_id' => $column->id,
                     'sub_position_row_id' => $firstColumn->sub_position_row_id,
@@ -1471,7 +1501,7 @@ class ProjectController extends Controller
                 $secondColumn = ColumnCell::where('column_id', $request->second_column_id)
                     ->where('sub_position_row_id', $firstColumn->sub_position_row_id)
                     ->first();
-                $sum = $firstColumn->value - $secondColumn->value;
+                $sum = (float)$firstColumn->value - (float)$secondColumn->value;
                 ColumnCell::create([
                     'column_id' => $column->id,
                     'sub_position_row_id' => $firstColumn->sub_position_row_id,
@@ -1486,7 +1516,8 @@ class ProjectController extends Controller
 
     public function updateCellValue(
         Request $request,
-        MoneySourceThresholdReminderService $moneySourceThresholdReminderService
+        MoneySourceThresholdReminderService $moneySourceThresholdReminderService,
+        MoneySourceCalculationService $moneySourceCalculationService
     ): void {
         $column = Column::find($request->column_id);
         $project = $column->table()->first()->project()->first();
@@ -1514,7 +1545,9 @@ class ProjectController extends Controller
 
         if ($cell->linked_money_source_id) {
             $moneySourceThresholdReminderService->handleThresholdReminders(
-                MoneySource::find($cell->linked_money_source_id)
+                MoneySource::find($cell->linked_money_source_id),
+                $moneySourceCalculationService,
+                $this->notificationService
             );
         }
     }
@@ -1549,7 +1582,7 @@ class ProjectController extends Controller
             $subPositionRow->cells()->create([
                 'column_id' => $firstThreeColumn->id,
                 'sub_position_row_id' => $subPositionRow->id,
-                'value' => '0,00',
+                'value' => '-',
                 'linked_money_source_id' => null,
                 'verified_value' => ''
             ]);
@@ -1785,201 +1818,148 @@ class ProjectController extends Controller
         $this->setPublicChangesNotification($project->id);
     }
 
-    /**
-     * @throws JsonException
-     */
     //@todo: fix phpcs error - refactor function because complexity is rising
     //phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
     public function projectTab(
+        Request $request,
         Project $project,
         ProjectTab $projectTab,
         SageAssignedDataCommentService $sageAssignedDataCommentService,
         ShiftQualificationService $shiftQualificationService,
         RoomService $roomService,
-        CalendarController $calendarController,
-        SageApiSettingsService $sageApiSettingsService
+        SageApiSettingsService $sageApiSettingsService,
+        ContractTypeService $contractTypeService,
+        CompanyTypeService $companyTypeService,
+        CurrencyService $currencyService,
+        CollectingSocietyService $collectingSocietyService,
+        ProjectService $projectService,
+        UserService $userService,
+        FreelancerService $freelancerService,
+        ServiceProviderService $serviceProviderService,
+        CraftService $craftService,
+        CalendarService $calendarService,
+        FilterService $filterService,
+        FilterController $filterController,
+        RoomCategoryService $roomCategoryService,
+        RoomAttributeService $roomAttributeService,
+        EventTypeService $eventTypeService,
+        AreaService $areaService
     ): Response|ResponseFactory {
         $headerObject = new stdClass(); // needed for the ProjectShowHeaderComponent
         $headerObject->project = $project;
-        // define the relations to load
-        $relationsToLoad = new Collection();
         $loadedProjectInformation = [];
 
-        // Get the project tab content and load the components with the project values for the current project
         $projectTab->load(['components.component.projectValue' => function ($query) use ($project): void {
             $query->where('project_id', $project->id);
         }, 'components' => function ($query): void {
             $query->orderBy('order');
-        }, 'sidebarTabs.componentsInSidebar.component.projectValue'  => function ($query) use ($project): void {
+        }, 'sidebarTabs.componentsInSidebar.component.projectValue' => function ($query) use ($project): void {
             $query->where('project_id', $project->id);
         }]);
 
-        $projectTabComponents = $projectTab->components()->with('component')->get();
-
-        //concat sidebar components with project tab components
-        $projectTabComponents = $projectTabComponents->concat(
-            $projectTab->sidebarTabs
-                ->map(fn ($sidebarTab) => $sidebarTab->componentsInSidebar)
-                ->flatten()
-                ->unique('id')
+        $projectTabComponents = $projectTab->components()->with('component')->get()->concat(
+            $projectTab->sidebarTabs->flatMap->componentsInSidebar->unique('id')
         );
 
         foreach ($projectTabComponents as $componentInTab) {
             $component = $componentInTab->component;
-            if ($component->type === TabComponentEnums::CHECKLIST->value) {
-                $headerObject = $this->checklistService->getProjectChecklists(
-                    $project,
-                    $headerObject,
-                    $componentInTab
-                );
-            }
 
-            if ($component->type === TabComponentEnums::CHECKLIST_ALL->value) {
-                $headerObject = $this->checklistService->getProjectChecklistsAll($project, $headerObject);
-            }
-
-            if ($component->type === TabComponentEnums::COMMENT_TAB->value) {
-                $headerObject->project->comments = $project->comments()->whereIn('tab_id', $componentInTab->scope)
-                    ->with('user')->get();
-            }
-
-            if ($component->type === TabComponentEnums::COMMENT_ALL_TAB->value) {
-                $headerObject->project->comments_all = $project->comments()->with('user')->get();
-            }
-
-            if ($component->type === TabComponentEnums::PROJECT_DOCUMENTS->value) {
-                $headerObject->project->project_files_tab = $project
-                    ->project_files()
-                    ->whereIn('tab_id', $componentInTab->scope)
-                    ->get();
-            }
-
-            if ($component->type === TabComponentEnums::PROJECT_ALL_DOCUMENTS->value) {
-                $headerObject->project->project_files_all = $project->project_files;
-            }
-
-            if ($component->type === TabComponentEnums::PROJECT_STATUS->value) {
-                $headerObject->project->state = ProjectStates::find($project->state);
-            }
-
-            if ($component->type === TabComponentEnums::PROJECT_TEAM->value) {
-                $relationsToLoad->push(['categories',
-                    'departments.users.departments',
-                    'managerUsers',
-                    'writeUsers',
-                    'users.departments',
-                    'delete_permission_users']);
-
-                // add value project_management if project user->can(PermissionNameEnum::PROJECT_MANAGEMENT->value)
-                // is true to the headerObject for the ProjectShowHeaderComponent
-
-
-                $headerObject->project->usersArray = $project->users->map(fn (User $user) => [
-                        'id' => $user->id,
-                        'first_name' => $user->first_name,
-                        'last_name' => $user->last_name,
-                        'profile_photo_url' => $user->profile_photo_url,
-                        'email' => $user->email,
-                        'departments' => $user->departments,
-                        'position' => $user->position,
-                        'business' => $user->business,
-                        'phone_number' => $user->phone_number,
-                        'project_management' => $user->can(PermissionNameEnum::PROJECT_MANAGEMENT->value),
-                        'pivot_access_budget' => (bool)$user->pivot?->access_budget,
-                        'pivot_is_manager' => (bool)$user->pivot?->is_manager,
-                        'pivot_can_write' => (bool)$user->pivot?->can_write,
-                        'pivot_delete_permission' => (bool)$user->pivot?->delete_permission,
-                    ]);
-
-                $headerObject->project->departments = DepartmentIndexResource::collection(
-                    $project->departments
-                )->resolve();
-                $headerObject->project->project_managers = $project->managerUsers;
-                $headerObject->project->write_auth = $project->writeUsers;
-                $headerObject->project->delete_permission_users = $project->delete_permission_users;
-            }
-
-            if ($component->type === TabComponentEnums::CALENDAR->value) {
-                $loadedProjectInformation['CalendarTab'] = $this->projectTabService->getCalendarTab(
-                    $project,
-                    $roomService,
-                    $calendarController
-                );
-            }
-
-            if ($component->type === TabComponentEnums::BUDGET->value) {
-                $loadedProjectInformation = $this->budgetService->getBudgetForProjectTab(
-                    $project,
-                    $loadedProjectInformation,
-                    $sageAssignedDataCommentService,
-                    $sageApiSettingsService
-                );
-            }
-
-            if ($component->type === TabComponentEnums::SHIFT_TAB->value) {
-                $headerObject->project->shift_relevant_event_types = $project->shiftRelevantEventTypes;
-                $headerObject->project->shift_contacts = $project->shift_contact;
-                $headerObject->project->project_managers = $project->managerUsers;
-                $headerObject->project->shiftDescription = $project->shift_description;
-                $headerObject->project->freelancers = Freelancer::all();
-                $headerObject->project->serviceProviders = ServiceProvider::without(['contacts'])->get();
-
-                $loadedProjectInformation["ShiftTab"] = $this->projectTabService->getShiftTab(
-                    $project,
-                    $shiftQualificationService
-                );
-            }
-
-            if ($component->type === TabComponentEnums::SHIFT_CONTACT_PERSONS->value) {
-                $headerObject->project->shift_contacts = $project->shift_contact;
-                $headerObject->project->project_managers = $project->managerUsers;
-            }
-
-            if ($component->type === TabComponentEnums::BUDGET_INFORMATIONS->value) {
-                $loadedProjectInformation = $this->budgetService->getBudgetInformationsForProjectTab(
-                    $project,
-                    $loadedProjectInformation
-                );
+            switch ($component->type) {
+                case ProjectTabComponentEnum::CHECKLIST->value:
+                    $headerObject = $this->checklistService
+                        ->getProjectChecklists($project, $headerObject, $componentInTab);
+                    break;
+                case ProjectTabComponentEnum::CHECKLIST_ALL->value:
+                    $headerObject = $this->checklistService->getProjectChecklistsAll($project, $headerObject);
+                    break;
+                case ProjectTabComponentEnum::COMMENT_TAB->value:
+                    $headerObject->project->comments = $project->comments()
+                        ->whereIn('tab_id', $componentInTab->scope)->with('user')->get();
+                    break;
+                case ProjectTabComponentEnum::COMMENT_ALL_TAB->value:
+                    $headerObject->project->comments_all = $project->comments()->with('user')->get();
+                    break;
+                case ProjectTabComponentEnum::PROJECT_DOCUMENTS->value:
+                    $headerObject->project->project_files_tab = $project->project_files()
+                        ->whereIn('tab_id', $componentInTab->scope)->get();
+                    break;
+                case ProjectTabComponentEnum::PROJECT_ALL_DOCUMENTS->value:
+                    $headerObject->project->project_files_all = $project->project_files;
+                    break;
+                case ProjectTabComponentEnum::PROJECT_STATUS->value:
+                    $headerObject->project->state = ProjectStates::find($project->state);
+                    break;
+                case ProjectTabComponentEnum::PROJECT_TEAM->value:
+                    $this->loadProjectTeamData($headerObject, $project);
+                    break;
+                case ProjectTabComponentEnum::CALENDAR->value:
+                    $loadedProjectInformation['CalendarTab'] = $this->projectTabService->getCalendarTab(
+                        $request->get('startDate') ? Carbon::create($request->get('startDate'))
+                            ->startOfDay() : Carbon::now()->startOfDay(),
+                        $request->get('endDate') ? Carbon::create($request->get('endDate'))
+                            ->endOfDay() : Carbon::now()->addWeeks()->endOfDay(),
+                        $project,
+                        $roomService,
+                        $calendarService,
+                        $projectService,
+                        $userService,
+                        $filterService,
+                        $filterController,
+                        $roomCategoryService,
+                        $roomAttributeService,
+                        $eventTypeService,
+                        $areaService,
+                        $request->get('atAGlance') ?? false
+                    );
+                    break;
+                case ProjectTabComponentEnum::BUDGET->value:
+                    $loadedProjectInformation = $this->budgetService
+                        ->getBudgetForProjectTab(
+                            $project,
+                            $loadedProjectInformation,
+                            $sageAssignedDataCommentService,
+                            $sageApiSettingsService
+                        );
+                    $headerObject->project->users = $this->mapProjectUsers($project);
+                    break;
+                case ProjectTabComponentEnum::SHIFT_TAB->value:
+                    $this->loadShiftTabData($headerObject, $project);
+                    $loadedProjectInformation["ShiftTab"] = $this->projectTabService
+                        ->getShiftTab(
+                            $project,
+                            $shiftQualificationService,
+                            $projectService,
+                            $userService,
+                            $freelancerService,
+                            $serviceProviderService,
+                            $craftService
+                        );
+                    break;
+                case ProjectTabComponentEnum::SHIFT_CONTACT_PERSONS->value:
+                    $headerObject->project->shift_contacts = $project->shift_contact;
+                    $headerObject->project->project_managers = $project->managerUsers;
+                    break;
+                case ProjectTabComponentEnum::BUDGET_INFORMATIONS->value:
+                    $headerObject->project->cost_center = $project->costCenter;
+                    $headerObject->project->collecting_society = $project->collectingSociety;
+                    $loadedProjectInformation['BudgetInformation'] = $this->projectTabService
+                        ->getBudgetInformationDto(
+                            $project,
+                            $contractTypeService,
+                            $companyTypeService,
+                            $currencyService,
+                            $collectingSocietyService
+                        );
+                    break;
             }
         }
 
-        if (!$project->is_group) {
-            $group = DB::table('project_groups')
-                ->select('*')
-                ->where('project_id', '=', $project->id)
-                ->first();
-            if (!empty($group)) {
-                $groupOutput = Project::find($group->group_id);
-            } else {
-                $groupOutput = '';
-            }
-        } else {
-            $groupOutput = '';
-        }
+        $groupOutput = $project->is_group ? '' : $this->getGroupOutput($project);
 
-        // add History to the header object for the ProjectShowHeaderComponent in $headerObject->project
-        $historyArray = [];
-        $historyComplete = $project->historyChanges()->all();
+        $this->addHistoryToHeaderObject($headerObject, $project);
 
-        $headerObject->project_history = [];
-        foreach ($historyComplete as $history) {
-            $headerObject->project_history[] = [
-                'changes' => json_decode($history->changes, false, 512, JSON_THROW_ON_ERROR),
-                'created_at' => $history->created_at->diffInHours() < 24
-                    ? $history->created_at->diffForHumans()
-                    : $history->created_at->format('d.m.Y, H:i'),
-            ];
-        }
-
-        $headerObject->firstEventInProject = $project
-            ->events()
-            ->orderBy('start_time', 'ASC')
-            ->limit(1)
-            ->first();
-        $headerObject->lastEventInProject = $project->events()
-            ->orderBy('end_time', 'DESC')
-            ->limit(1)
-            ->first();
+        $headerObject->firstEventInProject = $project->events()->orderBy('start_time', 'ASC')->first();
+        $headerObject->lastEventInProject = $project->events()->orderBy('end_time', 'DESC')->first();
         $headerObject->roomsWithAudience = Room::withAudience($project->id)->pluck('name', 'id');
         $headerObject->eventTypes = EventTypeResource::collection(EventType::all())->resolve();
         $headerObject->states = ProjectStates::all();
@@ -1995,11 +1975,10 @@ class ProjectController extends Controller
         $headerObject->access_budget = $project->access_budget;
         $headerObject->tabs = ProjectTab::orderBy('order')->get();
         $headerObject->currentTabId = $projectTab->id;
-        $headerObject->currentGruop = $groupOutput;
+        $headerObject->currentGroup = $groupOutput;
         $headerObject->projectManagerIds = $project->managerUsers()->pluck('user_id');
         $headerObject->projectWriteIds = $project->writeUsers()->pluck('user_id');
         $headerObject->projectDeleteIds = $project->delete_permission_users()->pluck('user_id');
-        $headerObject->project->projectSectors = $project->sectors;
         $headerObject->projectCategoryIds = $project->categories()->pluck('category_id');
         $headerObject->projectGenreIds = $project->genres()->pluck('genre_id');
         $headerObject->projectSectorIds = $project->sectors()->pluck('sector_id');
@@ -2015,11 +1994,87 @@ class ProjectController extends Controller
         ]);
     }
 
+    private function loadProjectTeamData(&$headerObject, $project): void
+    {
+        $headerObject->project->usersArray = $project->users->map(fn (User $user) => [
+            'id' => $user->id,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'profile_photo_url' => $user->profile_photo_url,
+            'email' => $user->email,
+            'departments' => $user->departments,
+            'position' => $user->position,
+            'business' => $user->business,
+            'phone_number' => $user->phone_number,
+            'project_management' => $user->can(PermissionEnum::PROJECT_MANAGEMENT->value),
+            'pivot_access_budget' => (bool)$user->pivot?->access_budget,
+            'pivot_is_manager' => (bool)$user->pivot?->is_manager,
+            'pivot_can_write' => (bool)$user->pivot?->can_write,
+            'pivot_delete_permission' => (bool)$user->pivot?->delete_permission,
+            'pivot_roles' => (array)$user->pivot?->roles
+        ]);
+
+        $headerObject->project->departments = DepartmentIndexResource::collection($project->departments)->resolve();
+        $headerObject->project->project_managers = $project->managerUsers;
+        $headerObject->project->write_auth = $project->writeUsers;
+        $headerObject->project->delete_permission_users = $project->delete_permission_users;
+        $headerObject->project->projectRoles = ProjectRole::all();
+    }
+
+    private function loadShiftTabData(&$headerObject, $project): void
+    {
+        $headerObject->project->shift_relevant_event_types = $project->shiftRelevantEventTypes;
+        $headerObject->project->shift_contacts = $project->shift_contact;
+        $headerObject->project->project_managers = $project->managerUsers;
+        $headerObject->project->shiftDescription = $project->shift_description;
+        $headerObject->project->freelancers = Freelancer::all();
+        $headerObject->project->serviceProviders = ServiceProvider::without(['contacts'])->get();
+    }
+
+    private function mapProjectUsers($project)
+    {
+        return $project->users->map(fn (User $user) => [
+            'id' => $user->id,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'profile_photo_url' => $user->profile_photo_url,
+            'email' => $user->email,
+            'departments' => $user->departments,
+            'position' => $user->position,
+            'business' => $user->business,
+            'phone_number' => $user->phone_number,
+            'project_management' => $user->can(PermissionEnum::PROJECT_MANAGEMENT->value),
+            'pivot_access_budget' => (bool)$user->pivot?->access_budget,
+            'pivot_is_manager' => (bool)$user->pivot?->is_manager,
+            'pivot_can_write' => (bool)$user->pivot?->can_write,
+            'pivot_delete_permission' => (bool)$user->pivot?->delete_permission,
+        ]);
+    }
+
+    private function getGroupOutput($project): string
+    {
+        $group = DB::table('project_groups')->select('*')->where('project_id', $project->id)->first();
+        return $group ? Project::find($group->group_id) : '';
+    }
+
+    private function addHistoryToHeaderObject(&$headerObject, $project): void
+    {
+        $historyComplete = $project->historyChanges()->all();
+        $headerObject->project_history = array_map(fn($history) => [
+            'changes' => json_decode($history->changes, false, 512, JSON_THROW_ON_ERROR),
+            'created_at' => $history->created_at->diffInHours() < 24 ? $history->created_at
+                ->diffForHumans() : $history->created_at->format('d.m.Y, H:i'),
+        ], $historyComplete);
+    }
+
+
     public function addTimeLineRow(Event $event, Request $request): void
     {
         $event->timelines()->create(
             $request->validate(
                 [
+                    'start_date' => 'required',
+                    'end_date' => 'required',
                     'start' => 'required',
                     'end' => 'required',
                     'description' => 'nullable'
@@ -2028,15 +2083,21 @@ class ProjectController extends Controller
         );
     }
 
-    public function updateTimeLines(Request $request): void
+    public function updateTimeLines(UpdateTimelinesRequest $request): void
     {
-        foreach ($request->timelines as $timeline) {
+        foreach ($request->collect('timelines') as $timeline) {
             $findTimeLine = Timeline::find($timeline['id']);
             $findTimeLine->update([
+                'start_date' => $timeline['start_date'],
+                'end_date' => $timeline['end_date'],
                 'start' => $timeline['start'],
                 'end' => $timeline['end'],
                 'description' => nl2br($timeline['description_without_html'])
             ]);
+            if ($event = $findTimeLine->event()->first()) {
+                $event->touchQuietly();
+                $this->eventService->save($event);
+            }
         }
     }
 
@@ -2076,20 +2137,20 @@ class ProjectController extends Controller
 
         $projectId = $project->id;
         foreach ($project->users->all() as $user) {
-            $this->schedulingController->create($user->id, 'PROJECT_CHANGES', 'PROJECTS', $projectId);
+            $this->schedulingService->create($user->id, 'PROJECT_CHANGES', 'PROJECTS', $projectId);
         }
         return Redirect::back();
     }
 
     public function updateTeam(Request $request, Project $project): JsonResponse|RedirectResponse
     {
-        if (!Auth::user()->hasRole(RoleNameEnum::ARTWORK_ADMIN->value)) {
+        if (!Auth::user()->hasRole(RoleEnum::ARTWORK_ADMIN->value)) {
             // authorization
             if (
                 !Auth::user()->canAny([
-                    PermissionNameEnum::PROJECT_MANAGEMENT->value,
-                    PermissionNameEnum::ADD_EDIT_OWN_PROJECT->value,
-                    PermissionNameEnum::WRITE_PROJECTS->value
+                    PermissionEnum::PROJECT_MANAGEMENT->value,
+                    PermissionEnum::ADD_EDIT_OWN_PROJECT->value,
+                    PermissionEnum::WRITE_PROJECTS->value
                 ]) &&
                 $project->access_budget->pluck('id')->doesntContain(Auth::id()) &&
                 $project->managerUsers->pluck('id')->doesntContain(Auth::id()) &&
@@ -2332,7 +2393,7 @@ class ProjectController extends Controller
         $project = Project::find($projectId);
         $projectUsers = $project->users()->get();
         foreach ($projectUsers as $projectUser) {
-            $this->schedulingController->create($projectUser->id, 'PUBLIC_CHANGES', 'PROJECTS', $project->id);
+            $this->schedulingService->create($projectUser->id, 'PUBLIC_CHANGES', 'PROJECTS', $project->id);
         }
     }
 
@@ -2462,7 +2523,7 @@ class ProjectController extends Controller
                 $this->notificationService->setTitle($notificationTitle);
                 $this->notificationService->setIcon('green');
                 $this->notificationService->setPriority(3);
-                $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_PROJECT);
+                $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_PROJECT);
                 $this->notificationService->setBroadcastMessage($broadcastMessage);
                 $this->notificationService->setProjectId($project->id);
                 $this->notificationService->setNotificationTo($managerAfter);
@@ -2488,7 +2549,7 @@ class ProjectController extends Controller
                 $this->notificationService->setTitle($notificationTitle);
                 $this->notificationService->setIcon('green');
                 $this->notificationService->setPriority(3);
-                $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_PROJECT);
+                $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_PROJECT);
                 $this->notificationService->setBroadcastMessage($broadcastMessage);
                 $this->notificationService->setProjectId($project->id);
                 $this->notificationService->setNotificationTo($budgetAfter);
@@ -2513,7 +2574,7 @@ class ProjectController extends Controller
                 $this->notificationService->setTitle($notificationTitle);
                 $this->notificationService->setIcon('red');
                 $this->notificationService->setPriority(2);
-                $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_PROJECT);
+                $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_PROJECT);
                 $this->notificationService->setBroadcastMessage($broadcastMessage);
                 $this->notificationService->setProjectId($project->id);
                 $this->notificationService->setNotificationTo($user);
@@ -2534,7 +2595,7 @@ class ProjectController extends Controller
                 $this->notificationService->setTitle($notificationTitle);
                 $this->notificationService->setIcon('red');
                 $this->notificationService->setPriority(2);
-                $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_PROJECT);
+                $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_PROJECT);
                 $this->notificationService->setBroadcastMessage($broadcastMessage);
                 $this->notificationService->setProjectId($project->id);
                 $this->notificationService->setNotificationTo($user);
@@ -2555,7 +2616,7 @@ class ProjectController extends Controller
                 $this->notificationService->setTitle($notificationTitle);
                 $this->notificationService->setIcon('green');
                 $this->notificationService->setPriority(3);
-                $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_PROJECT);
+                $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_PROJECT);
                 $this->notificationService->setBroadcastMessage($broadcastMessage);
                 $this->notificationService->setProjectId($project->id);
                 $this->notificationService->setNotificationTo($user);
@@ -2585,7 +2646,7 @@ class ProjectController extends Controller
                 $this->notificationService->setTitle($notificationTitle);
                 $this->notificationService->setIcon('red');
                 $this->notificationService->setPriority(2);
-                $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_PROJECT);
+                $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_PROJECT);
                 $this->notificationService->setBroadcastMessage($broadcastMessage);
                 $this->notificationService->setProjectId($project->id);
                 $this->notificationService->setNotificationTo($user);
@@ -2613,12 +2674,12 @@ class ProjectController extends Controller
         SageApiSettingsService $sageApiSettingsService
     ): JsonResponse|RedirectResponse {
         // authorization
-        if ($project->users->isNotEmpty() || !Auth::user()->hasRole(RoleNameEnum::ARTWORK_ADMIN->value)) {
+        if ($project->users->isNotEmpty() || !Auth::user()->hasRole(RoleEnum::ARTWORK_ADMIN->value)) {
             if (
                 !Auth::user()->canAny([
-                    PermissionNameEnum::PROJECT_MANAGEMENT->value,
-                    PermissionNameEnum::ADD_EDIT_OWN_PROJECT->value,
-                    PermissionNameEnum::WRITE_PROJECTS->value
+                    PermissionEnum::PROJECT_MANAGEMENT->value,
+                    PermissionEnum::ADD_EDIT_OWN_PROJECT->value,
+                    PermissionEnum::WRITE_PROJECTS->value
                 ]) &&
                 $project->access_budget->pluck('id')->doesntContain(Auth::id()) &&
                 $project->managerUsers->pluck('id')->doesntContain(Auth::id())
@@ -2694,7 +2755,7 @@ class ProjectController extends Controller
             $this->notificationService->setTitle($notificationTitle);
             $this->notificationService->setIcon('red');
             $this->notificationService->setPriority(2);
-            $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_PROJECT);
+            $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_PROJECT);
             $this->notificationService->setBroadcastMessage($broadcastMessage);
             $this->notificationService->setProjectId($project->id);
             $this->notificationService->setNotificationTo($user);
@@ -3132,7 +3193,7 @@ class ProjectController extends Controller
 
     public function projectBudgetExport(Project $project): BinaryFileResponse
     {
-        return (new ProjectBudgetExport($project))
+        return (new BudgetExport($project))
             ->download(
                 sprintf(
                     '%s_budget_stand_%s.xlsx',
@@ -3147,7 +3208,7 @@ class ProjectController extends Controller
         string $startBudgetDeadline,
         string $endBudgetDeadline
     ): BinaryFileResponse {
-        return (new ProjectBudgetsByBudgetDeadlineExport($startBudgetDeadline, $endBudgetDeadline))
+        return (new BudgetsByBudgetDeadlineExport($startBudgetDeadline, $endBudgetDeadline))
             ->download(
                 sprintf(
                     'budgets_export_%s-%s_stand_%s.xlsx',

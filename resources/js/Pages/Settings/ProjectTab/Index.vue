@@ -2,11 +2,11 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import ProjectTabs from "@/Pages/Settings/Components/ProjectTabs.vue";
 import {IconDragDrop} from "@tabler/icons-vue";
-import {Link} from "@inertiajs/inertia-vue3";
+import {Link} from "@inertiajs/vue3";
 import draggable from "vuedraggable";
 import SingleTabComponent from "@/Pages/Settings/Components/SingleTabComponent.vue";
 import DragComponentElement from "@/Pages/Settings/Components/DragComponentElement.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
 import AddEditTabModal from "@/Pages/Settings/Components/AddEditTabModal.vue";
 import PlusButton from "@/Layouts/Components/General/Buttons/PlusButton.vue";
 

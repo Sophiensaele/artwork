@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\NotificationConstEnum;
-use App\Enums\RoleNameEnum;
-use App\Models\User;
-use App\Support\Services\NotificationService;
 use Artwork\Modules\Availability\Models\AvailabilitiesConflict;
 use Artwork\Modules\Availability\Services\AvailabilityConflictService;
 use Artwork\Modules\Change\Services\ChangeService;
 use Artwork\Modules\Event\Models\Event;
+use Artwork\Modules\Event\Services\EventService;
+use Artwork\Modules\Notification\Enums\NotificationEnum;
+use Artwork\Modules\Notification\Services\NotificationService;
 use Artwork\Modules\ProjectTab\Services\ProjectTabService;
 use Artwork\Modules\Shift\Models\Shift;
 use Artwork\Modules\Shift\Services\ShiftCountService;
@@ -18,6 +17,7 @@ use Artwork\Modules\Shift\Services\ShiftService;
 use Artwork\Modules\Shift\Services\ShiftServiceProviderService;
 use Artwork\Modules\Shift\Services\ShiftsQualificationsService;
 use Artwork\Modules\Shift\Services\ShiftUserService;
+use Artwork\Modules\User\Models\User;
 use Artwork\Modules\Vacation\Models\VacationConflict;
 use Artwork\Modules\Vacation\Services\VacationConflictService;
 use Carbon\Carbon;
@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
+use Random\RandomException;
 
 class ShiftController extends Controller
 {
@@ -34,27 +35,28 @@ class ShiftController extends Controller
         private readonly ChangeService $changeService,
         private readonly AvailabilityConflictService $availabilityConflictService,
         private readonly VacationConflictService $vacationConflictService,
-        private readonly ShiftService $shiftService
+        private readonly ShiftService $shiftService,
+        private readonly EventService $eventService
     ) {
     }
 
+    /**
+     * @throws RandomException
+     */
     public function store(
         Request $request,
         Event $event,
         ShiftsQualificationsService $shiftsQualificationsService
     ): void {
-        /** @var Shift $shift */
-        $shift = $event->shifts()->create($request->only([
-            'start_date',
-            'end_date',
-            'start',
-            'end',
-            'break_minutes',
-            'craft_id',
-            'number_employees',
-            'number_masters',
-            'description',
-        ]));
+        if ($request->automaticMode) {
+            $shift = $this->shiftService->createAutomatic(
+                event: $event,
+                craftId: $request->craft_id,
+                data: $request->all(),
+            );
+        } else {
+            $shift = $this->shiftService->createShiftByRequest($request->all(), $event);
+        }
 
         $shift->update([
             'event_start_day' => Carbon::parse($event->start_time)->format('Y-m-d'),
@@ -80,25 +82,12 @@ class ShiftController extends Controller
             /** @var Event $seriesEvent */
             foreach ($seriesEvents as $seriesEvent) {
                 if ($seriesEvent->id != $event->id) {
-                    $newShift = $seriesEvent->shifts()->create(
-                        array_merge(
-                            [
-                                'start_date' => $seriesEvent->start_time,
-                                'end_date' => $seriesEvent->end_time,
-                            ],
-                            $request->only(
-                                [
-                                    'start',
-                                    'end',
-                                    'break_minutes',
-                                    'craft_id',
-                                    'number_employees',
-                                    'number_masters',
-                                    'description',
-                                ]
-                            )
-                        )
+                    $newShift = $this->shiftService->createShiftBySeriesEvent(
+                        $seriesEvent,
+                        $request->all(),
+                        $request->craft_id
                     );
+
                     $newShift->update([
                         'shift_uuid' => $shiftUuid,
                         'event_start_day' => Carbon::parse($seriesEvent->start_time)->format('Y-m-d'),
@@ -121,40 +110,7 @@ class ShiftController extends Controller
         }
 
         if ($shift->infringement) {
-            $this->notificationService->setIcon('blue');
-            $this->notificationService->setPriority(1);
-            $this->notificationService
-                ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_SHIFT_INFRINGEMENT);
-
-            $this->notificationService->setButtons(['change_shift', 'delete_shift_notification']);
-            $this->notificationService->setProjectId($shift->event()->first()->project()->first()->id);
-            $this->notificationService->setEventId($shift->event()->first()->id);
-            $this->notificationService->setShiftId($shift->id);
-            foreach (User::role(RoleNameEnum::ARTWORK_ADMIN->value)->get() as $authUser) {
-                $notificationTitle = __('notification.shift.short_break', [], $authUser->language);
-                $broadcastMessage = [
-                    'id' => rand(1, 1000000),
-                    'type' => 'error',
-                    'message' => $notificationTitle
-                ];
-                $notificationDescription = [
-                    1 => [
-                        'type' => 'string',
-                        'title' => __('notification.keyWords.concerns') .
-                            $shift->event()->first()->project()->first()->name . ' , ' .
-                            $shift->craft()->first()->abbreviation . ' ' .
-                            Carbon::parse($shift->start)->format('d.m.Y H:i') . ' - ' .
-                            Carbon::parse($shift->end)->format('d.m.Y H:i'),
-                        'href' => null
-                    ],
-                ];
-
-                $this->notificationService->setTitle($notificationTitle);
-                $this->notificationService->setBroadcastMessage($broadcastMessage);
-                $this->notificationService->setDescription($notificationDescription);
-                $this->notificationService->setNotificationTo($authUser);
-                $this->notificationService->createNotification();
-            }
+            $this->shiftService->createInfringementNotification($shift);
         }
 
         $this->changeService->saveFromBuilder(
@@ -232,7 +188,7 @@ class ShiftController extends Controller
 
             $this->notificationService->setIcon('red');
             $this->notificationService->setPriority(2);
-            $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_SHIFT_CHANGED);
+            $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_SHIFT_CHANGED);
 
             foreach ($shift->users()->get() as $user) {
                 $notificationTitle = __(
@@ -354,7 +310,7 @@ class ShiftController extends Controller
         $this->notificationService->setIcon('green');
         $this->notificationService->setPriority(3);
         $this->notificationService
-            ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_SHIFT_CHANGED);
+            ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_SHIFT_CHANGED);
         $this->notificationService->setBroadcastMessage($broadcastMessage);
         $this->notificationService->setDescription($notificationDescription);
         $this->notificationService->setNotificationTo($user);
@@ -367,7 +323,7 @@ class ShiftController extends Controller
         $this->notificationService->setIcon('red');
         $this->notificationService->setPriority(2);
         $this->notificationService
-            ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_SHIFT_CONFLICT);
+            ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_SHIFT_CONFLICT);
         $this->notificationService->setButtons(['see_shift']);
         $this->notificationService->setShiftId($shift->id);
     }
@@ -612,7 +568,7 @@ class ShiftController extends Controller
 
             $this->notificationService->setIcon('green');
             $this->notificationService->setPriority(3);
-            $this->notificationService->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_SHIFT_CHANGED);
+            $this->notificationService->setNotificationConstEnum(NotificationEnum::NOTIFICATION_SHIFT_CHANGED);
 
             foreach ($shift->users()->get() as $user) {
                 if (Auth::id() !== $user->id) {
@@ -915,6 +871,13 @@ class ShiftController extends Controller
         if ($shift->is_committed) {
             $shiftService->createRemovedAllUsersFromShiftHistoryEntry($shift, $changeService);
         }
+
+        return Redirect::back();
+    }
+
+    public function updateDescription(Request $request, Shift $shift): RedirectResponse
+    {
+        $shift->update($request->only(['description']));
 
         return Redirect::back();
     }

@@ -2,18 +2,18 @@
 
 namespace Artwork\Modules\Checklist\Services;
 
-use App\Http\Resources\ChecklistIndexResource;
-use App\Http\Resources\ChecklistTemplateIndexResource;
-use App\Models\ChecklistTemplate;
-use App\Models\Task;
-use App\Models\User;
 use Artwork\Core\Database\Models\Model;
 use Artwork\Modules\Checklist\Http\Requests\ChecklistUpdateRequest;
+use Artwork\Modules\Checklist\Http\Resources\ChecklistIndexResource;
 use Artwork\Modules\Checklist\Models\Checklist;
 use Artwork\Modules\Checklist\Repositories\ChecklistRepository;
+use Artwork\Modules\ChecklistTemplate\Http\Resources\ChecklistTemplateIndexResource;
+use Artwork\Modules\ChecklistTemplate\Models\ChecklistTemplate;
 use Artwork\Modules\Project\Models\Project;
 use Artwork\Modules\ProjectTab\Models\ComponentInTab;
-use Artwork\Modules\Tasks\Services\TaskService;
+use Artwork\Modules\Task\Models\Task;
+use Artwork\Modules\Task\Services\TaskService;
+use Artwork\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use stdClass;
@@ -40,11 +40,11 @@ readonly class ChecklistService
         return $this->checklistRepository->save($checklist);
     }
 
-    public function assignUsersById(Checklist $checklist, array $ids, TaskService $taskService): void
+    public function assignUsersById(Checklist $checklist, TaskService $taskService, array $ids): void
     {
         $checklist->users()->sync($ids);
         $taskService->getByChecklist($checklist)->each(function (Task $task) use ($ids, $taskService): void {
-            $taskService->syncTaskUsersWithoutDetach($task, $ids);
+            $taskService->syncTaskUsersWithDetach($task, $ids);
         });
     }
 

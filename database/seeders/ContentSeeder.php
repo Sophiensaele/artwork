@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use App\Http\Controllers\ProjectController;
 use Artwork\Modules\Checklist\Models\Checklist;
-use App\Models\CollectingSociety;
-use App\Models\CompanyType;
-use App\Models\ContractType;
-use App\Models\CostCenter;
-use App\Models\Currency;
+use Artwork\Modules\CollectingSociety\Models\CollectingSociety;
+use Artwork\Modules\CompanyType\Models\CompanyType;
+use Artwork\Modules\ContractType\Models\ContractType;
+use Artwork\Modules\CostCenter\Models\CostCenter;
+use Artwork\Modules\Currency\Models\Currency;
 use Artwork\Modules\Department\Models\Department;
 use Artwork\Modules\Project\Models\Project;
 use Artwork\Modules\ProjectTab\Models\Component;
@@ -31,9 +31,9 @@ class ContentSeeder extends Seeder
         $this->seedGenreAndCategoriesAndAreas();
         $this->seedDepartments();
         $this->seedRooms();
-        $this->seedEventsAndEventTypes();
         $this->seedCostCenters();
         $this->seedProjects();
+        $this->seedEventsAndEventTypes();
         $this->seedRoomCategories();
         $this->seedRoomAttributes();
         $this->seedCurrencies();
@@ -297,7 +297,9 @@ class ContentSeeder extends Seeder
             'event_type_id' => 1,
             'room_id' => 1,
             'project_id' => null,
-            'user_id' => 1
+            'user_id' => 1,
+            'earliest_start_datetime' => Carbon::now()->addDay()->addHours(2),
+            'latest_end_datetime' => Carbon::now()->addDay()->addHours(3)
         ]);
 
         DB::table('events')->insert([
@@ -309,7 +311,9 @@ class ContentSeeder extends Seeder
             'event_type_id' => 1,
             'room_id' => 1,
             'project_id' => 1,
-            'user_id' => 1
+            'user_id' => 1,
+            'earliest_start_datetime' => Carbon::now()->addDay()->subHour(),
+            'latest_end_datetime' => Carbon::now()->addDay()->addHour()
         ]);
 
         DB::table('events')->insert([
@@ -320,12 +324,16 @@ class ContentSeeder extends Seeder
             'event_type_id' => 2,
             'room_id' => 2,
             'project_id' => 1,
-            'user_id' => 1
+            'user_id' => 1,
+            'earliest_start_datetime' => Carbon::now()->addDays(2)->subHours(2),
+            'latest_end_datetime' => Carbon::now()->addDays(2)->subHour()
         ]);
     }
 
     private function seedProjects(): void
     {
+
+
         $project = Project::create([
             'name' => 'Dan Daw Creative Projects',
             'number_of_participants' => null,

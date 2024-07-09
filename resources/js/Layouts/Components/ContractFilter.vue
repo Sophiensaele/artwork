@@ -39,14 +39,14 @@
 
 <script>
 
-import BaseFilter from "@/Layouts/Components/BaseFilter";
+import BaseFilter from "@/Layouts/Components/BaseFilter.vue";
 import {
     XIcon
 } from '@heroicons/vue/outline';
-import BaseFilterDisclosure from "@/Layouts/Components/BaseFilterDisclosure";
-import BaseFilterCheckboxList from "@/Layouts/Components/BaseFilterCheckboxList";
-import Permissions from "@/mixins/Permissions.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import BaseFilterDisclosure from "@/Layouts/Components/BaseFilterDisclosure.vue";
+import BaseFilterCheckboxList from "@/Layouts/Components/BaseFilterCheckboxList.vue";
+import Permissions from "@/Mixins/Permissions.vue";
+import IconLib from "@/Mixins/IconLib.vue";
 export default {
     name: "ContractFilter",
     mixins: [Permissions, IconLib],

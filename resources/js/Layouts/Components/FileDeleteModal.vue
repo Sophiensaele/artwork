@@ -1,7 +1,5 @@
 <template>
-    <jet-dialog-modal :show="show" @close="closeModal">
-        <template #content>
-            <img src="/Svgs/Overlays/illu_warning.svg" class="-ml-6 -mt-8 mb-4" alt="artwork"/>
+    <BaseModal @closed="closeModal" v-if="show" modal-image="/Svgs/Overlays/illu_warning.svg">
             <div class="mx-4">
                 <div class="headline1 my-2">
                     {{$t('Delete document')}}
@@ -21,23 +19,22 @@
                     </div>
                 </div>
             </div>
-
-        </template>
-
-    </jet-dialog-modal>
+    </BaseModal>
 </template>
 
 <script>
 import JetDialogModal from '@/Jetstream/DialogModal.vue'
 import {XIcon} from "@heroicons/vue/outline";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import BaseModal from "@/Components/Modals/BaseModal.vue";
 
 export default {
     name: "ProjectFileDeleteModal",
     mixins: [Permissions, IconLib],
     components: {
+        BaseModal,
         FormButton,
         JetDialogModal,
         XIcon

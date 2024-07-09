@@ -7,7 +7,7 @@
                     <div class="flex gap-5 items-center">
                         <h4 class="sDark">{{ notification.data.title }}</h4>
                         <div class="" v-if="notification.data.showHistory">
-                            <div @click="openHistory" class="xxsLight cursor-pointer items-center flex text-buttonBlue">
+                            <div @click="openHistory" class="xxsLight cursor-pointer items-center flex text-artwork-buttons-create">
                                 <ChevronRightIcon class="h-3 w-3"/>
                                 <span>
                                     {{ $t('View history')}}
@@ -54,6 +54,7 @@
                                      @deleteNotification="setOnRead"
                                      @openProject="openProjectShift(notification.data?.projectId, notification.data?.eventId, notification.data?.shiftId)"
                                      @showInTask="openProjectTasks(notification.data?.taskId)"
+                                     @show-project="openProject(notification.data?.projectId)"
                 />
             </div>
         </div>
@@ -61,7 +62,7 @@
             <img @click="setOnRead" v-show="notification.hovered"
                  v-if="notification.data?.changeType !== 'BUDGET_VERIFICATION_REQUEST' && !isArchive"
                  src="/Svgs/IconSvgs/icon_archive_white.svg"
-                 class="h-6 w-6 p-1 ml-1 flex cursor-pointer bg-buttonBlue rounded-full"
+                 class="h-6 w-6 p-1 ml-1 flex cursor-pointer bg-artwork-buttons-create rounded-full"
                  aria-hidden="true" alt=""/>
         </div>
     </div>
@@ -148,18 +149,18 @@
 <script>
 import NotificationButtons from "@/Layouts/Components/NotificationComponents/NotificationButtons.vue";
 import {ChevronRightIcon} from "@heroicons/vue/solid";
-import {Inertia} from "@inertiajs/inertia";
+import {router} from "@inertiajs/vue3";
 import DeclineEventModal from "@/Layouts/Components/DeclineEventModal.vue";
 import NewUserToolTip from "@/Layouts/Components/NewUserToolTip.vue";
 import ProjectHistoryWithoutBudgetComponent from "@/Layouts/Components/ProjectHistoryWithoutBudgetComponent.vue";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 import EventComponent from "@/Layouts/Components/EventComponent.vue";
 import ConfirmDeleteModal from "@/Layouts/Components/ConfirmDeleteModal.vue";
 import RoomRequestDialogComponent from "@/Layouts/Components/RoomRequestDialogComponent.vue";
 import UserVacationHistoryModal from "@/Pages/Notifications/Components/UserVacationHistoryModal.vue";
 import EventHistoryModal from "@/Pages/Notifications/Components/EventHistoryModal.vue";
 import EventsWithoutRoomComponent from "@/Layouts/Components/EventsWithoutRoomComponent.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 export default {
     name: "NotificationBlock",
     components: {
@@ -211,7 +212,7 @@ export default {
             this.setOnReadForm.patch(route('notifications.setReadAt'));
         },
         openHistory() {
-            Inertia.reload({
+            router.reload({
                 data: {
                     showHistory: true,
                     historyType: this.notification.data?.historyType,
@@ -231,7 +232,7 @@ export default {
             })
         },
         loadEventDataForDecline() {
-            Inertia.reload({
+            router.reload({
                 data: {
                     openDeclineEvent: true,
                     eventId: this.notification.data?.eventId
@@ -245,7 +246,7 @@ export default {
             this.showDeclineEventModal = false;
         },
         loadEventDataForEditAndAccept() {
-            Inertia.reload({
+            router.reload({
                 data: {
                     openEditEvent: true,
                     eventId: this.notification.data?.eventId
@@ -256,7 +257,7 @@ export default {
             })
         },
         loadEventDataForDialog() {
-            Inertia.reload({
+            router.reload({
                 data: {
                     openEditEvent: true,
                     eventId: this.notification.data?.eventId
@@ -267,7 +268,7 @@ export default {
             })
         },
         loadEventDataForEventWithoutRoom(){
-            Inertia.reload({
+            router.reload({
                 data: {
                     openEditEvent: true,
                     eventId: this.notification.data?.eventId
@@ -281,7 +282,7 @@ export default {
             this.createEventComponentIsVisible = false;
             if(bool){
                 this.checkNotificationKey();
-                Inertia.post(route('event.notification.delete', this.notification.data?.notificationKey), {
+                router.post(route('event.notification.delete', this.notification.data?.notificationKey), {
                     notificationKey: this.notification.data?.notificationKey
                 }, {
                     preserveScroll: true,
@@ -293,7 +294,7 @@ export default {
             this.showRoomRequestDialogComponent = false;
             if(bool){
                 this.checkNotificationKey();
-                Inertia.post(route('event.notification.delete', this.notification.data?.notificationKey), {
+                router.post(route('event.notification.delete', this.notification.data?.notificationKey), {
                     notificationKey: this.notification.data?.notificationKey
                 }, {
                     preserveScroll: true,
@@ -306,7 +307,7 @@ export default {
 
             if (bool) {
                 this.checkNotificationKey();
-                Inertia.post(route('event.notification.delete', this.notification.data?.notificationKey), {
+                router.post(route('event.notification.delete', this.notification.data?.notificationKey), {
                     notificationKey: this.notification.data?.notificationKey
                 }, {
                     preserveScroll: true,
@@ -316,7 +317,7 @@ export default {
         },
         finishDeclineEvent(){
             this.checkNotificationKey();
-            Inertia.post(route('event.notification.delete', this.notification.data?.notificationKey), {
+            router.post(route('event.notification.delete', this.notification.data?.notificationKey), {
                 notificationKey: this.notification.data?.notificationKey
             }, {
                 preserveScroll: true,
@@ -346,6 +347,12 @@ export default {
                     }
                 );
             }
+        },
+        openProject(projectId) {
+            window.location.href = route('projects.tab', {
+                project: projectId,
+                projectTab: 1
+            });
         },
         openProjectShift(projectId, eventId, shiftId) {
             if (this.first_project_shift_tab_id) {

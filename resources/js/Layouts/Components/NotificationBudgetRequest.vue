@@ -19,8 +19,8 @@
 <script>
 import Button from "@/Jetstream/Button.vue";
 import {XIcon} from "@heroicons/vue/outline";
-import {Link} from "@inertiajs/inertia-vue3";
-import Permissions from "@/mixins/Permissions.vue";
+import {Link} from "@inertiajs/vue3";
+import Permissions from "@/Mixins/Permissions.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
 
 export default {

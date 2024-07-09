@@ -1,14 +1,9 @@
 <template>
-    <jet-dialog-modal :show="show" @close="emit('close')">
-        <template #content>
-            <img src="/Svgs/Overlays/illu_project_edit.svg" class="-ml-6 -mt-8 mb-4" alt="artwork"/>
+    <BaseModal @closed="emit('close')" v-if="show" modal-image="/Svgs/Overlays/illu_project_edit.svg">
             <div class="mx-4">
                 <div class="headline1 my-2">
                     {{$t('Room properties')}}
                 </div>
-                <XIcon @click="emit('close')"
-                       class="h-5 w-5 right-0 top-0 mr-5 mt-8 flex text-secondary absolute cursor-pointer"
-                       aria-hidden="true"/>
                 <Menu class="relative">
                     <div>
                         <MenuButton @click="attributesOpened = true" class="w-full">
@@ -118,19 +113,19 @@
                     @click="saveRoomData"
                     />
             </div>
-        </template>
-    </jet-dialog-modal>
+        </BaseModal>
 </template>
 
 <script setup>
-import JetDialogModal from "@/Jetstream/DialogModal";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import BaseFilterTag from "@/Layouts/Components/BaseFilterTag.vue";
 import BaseFilterDisclosure from "@/Layouts/Components/BaseFilterDisclosure.vue";
 import {Menu, MenuButton, MenuItems} from "@headlessui/vue";
 import {XIcon, ChevronDownIcon} from "@heroicons/vue/outline";
 import {onMounted, ref} from "vue";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
+import BaseModal from "@/Components/Modals/BaseModal.vue";
 
 const props = defineProps({
     show: Boolean,

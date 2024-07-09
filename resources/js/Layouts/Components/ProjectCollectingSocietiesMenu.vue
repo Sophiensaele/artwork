@@ -12,7 +12,7 @@
         </ListboxButton>
         <ListboxOptions class="w-[85%] bg-primary overflow-y-auto text-sm absolute">
             <ListboxOption v-for="society in collectingSocieties"
-                           class="hover:bg-indigo-800 text-secondary cursor-pointer p-3 flex justify-between "
+                           class="hover:bg-artwork-buttons-create text-secondary cursor-pointer p-3 flex justify-between "
                            :key="society.name"
                            :value="society.name"
                            v-slot="{ active, selected }">
@@ -33,8 +33,8 @@ import {
     ListboxOptions,
     ListboxButton
 } from "@headlessui/vue";
-import BaseFilterDisclosure from "@/Layouts/Components/BaseFilterDisclosure";
-import Permissions from "@/mixins/Permissions.vue";
+import BaseFilterDisclosure from "@/Layouts/Components/BaseFilterDisclosure.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 
 export default {
     name: "ProjectCollectingSocietiesMenu",

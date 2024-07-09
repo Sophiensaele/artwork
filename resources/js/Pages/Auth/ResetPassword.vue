@@ -30,7 +30,7 @@
                                 <jet-input id="password" type="password" class="mt-1 block w-full" v-model="form.password" required autocomplete="new-password" />
                             </div>
                             <div class="flex items-center justify-end mt-4">
-                                <jet-button class="bg-buttonBlue hover:bg-buttonHover" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                                <jet-button class="bg-artwork-buttons-create hover:bg-artwork-buttons-hover" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                                     {{ $t('Reset Password')}}
                                 </jet-button>
                             </div>
@@ -72,14 +72,14 @@
 
 <script>
     import { defineComponent } from 'vue';
-    import {Head, Link} from '@inertiajs/inertia-vue3';
+    import {Head, Link} from '@inertiajs/vue3';
     import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue'
     import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue'
     import JetButton from '@/Jetstream/Button.vue'
     import JetInput from '@/Jetstream/Input.vue'
     import JetLabel from '@/Jetstream/Label.vue'
     import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
-    import Permissions from "@/mixins/Permissions.vue";
+    import Permissions from "@/Mixins/Permissions.vue";
     import JetInputError from "@/Jetstream/InputError.vue";
     import SvgCollection from "@/Layouts/Components/SvgCollection.vue";
     import Checkbox from "@/Layouts/Components/Checkbox.vue";

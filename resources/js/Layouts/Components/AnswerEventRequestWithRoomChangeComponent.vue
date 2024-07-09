@@ -1,7 +1,5 @@
 <template>
-    <jet-dialog-modal :show="true" @close="closeModal(false)">
-        <template #content>
-            <img src="/Svgs/Overlays/illu_appointment.svg" class="-ml-6 -mt-8 mb-4"/>
+    <BaseModal @closed="closeModal(false)" v-if="true" modal-image="/Svgs/Overlays/illu_appointment.svg">
             <div class="mx-4">
                 <div class="headline1 mt-2 mb-8">
                     {{ $t('Event')}}
@@ -71,9 +69,9 @@
                                 </div>
                                 <IconChevronDown stroke-width="1.5" class="h-5 w-5 text-primary" aria-hidden="true"/>
                             </ListboxButton>
-                            <ListboxOptions class="w-10/12 bg-primary max-h-32 overflow-y-auto text-sm absolute">
+                            <ListboxOptions class="w-10/12 bg-artwork-navigation-background max-h-32 overflow-y-auto text-sm absolute">
                                 <ListboxOption v-for="roomOption in rooms"
-                                               class="hover:bg-indigo-800 text-secondary cursor-pointer p-2 flex justify-between "
+                                               class="hover:bg-artwork-buttons-hover text-secondary cursor-pointer p-2 flex justify-between "
                                                :key="roomOption.name"
                                                :value="roomOption"
                                                v-slot="{ active, selected }">
@@ -94,26 +92,27 @@
                     />
                 </div>
             </div>
-        </template>
-    </jet-dialog-modal>
+    </BaseModal>
 </template>
 
 <script>
 
 import 'vue-cal/dist/vuecal.css'
-import JetDialogModal from "@/Jetstream/DialogModal";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import {ChevronDownIcon, XIcon} from '@heroicons/vue/outline';
 import {CheckIcon} from "@heroicons/vue/solid";
-import TagComponent from "@/Layouts/Components/TagComponent";
+import TagComponent from "@/Layouts/Components/TagComponent.vue";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/vue";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import BaseModal from "@/Components/Modals/BaseModal.vue";
 
 export default {
     name: 'AnswerEventRequestWithRoomChangeComponent',
     mixins: [Permissions, IconLib],
     components: {
+        BaseModal,
         FormButton,
         JetDialogModal,
         XIcon,

@@ -2,16 +2,16 @@
 
 namespace Artwork\Modules\Availability\Services;
 
-use App\Enums\NotificationConstEnum;
-use App\Models\Freelancer;
-use App\Models\User;
-use App\Support\Services\NotificationService;
 use Artwork\Modules\Availability\Models\AvailabilitiesConflict;
 use Artwork\Modules\Availability\Repositories\AvailabilityConflictRepository;
+use Artwork\Modules\Freelancer\Models\Freelancer;
+use Artwork\Modules\Notification\Enums\NotificationEnum;
+use Artwork\Modules\Notification\Services\NotificationService;
 use Artwork\Modules\Shift\Models\Shift;
+use Artwork\Modules\User\Models\User;
 use Carbon\Carbon;
 
-readonly class AvailabilityConflictService
+class AvailabilityConflictService
 {
     public function __construct(private AvailabilityConflictRepository $availabilityConflictRepository)
     {
@@ -48,7 +48,6 @@ readonly class AvailabilityConflictService
                 ->get();
         }
 
-
         foreach ($shifts as $shift) {
             $shiftCommittedBy = $shift->committedBy()->first();
             if (!$user) {
@@ -83,7 +82,7 @@ readonly class AvailabilityConflictService
                 $notificationService->setIcon('red');
                 $notificationService->setPriority(2);
                 $notificationService
-                    ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_SHIFT_CONFLICT);
+                    ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_SHIFT_CONFLICT);
                 $notificationService->setBroadcastMessage($broadcastMessage);
                 $notificationService->setDescription($notificationDescription);
                 $notificationService->setButtons(['see_shift']);
@@ -178,7 +177,7 @@ readonly class AvailabilityConflictService
             $notificationService->setIcon('red');
             $notificationService->setPriority(2);
             $notificationService
-            ->setNotificationConstEnum(NotificationConstEnum::NOTIFICATION_SHIFT_CONFLICT);
+            ->setNotificationConstEnum(NotificationEnum::NOTIFICATION_SHIFT_CONFLICT);
             $notificationService->setBroadcastMessage($broadcastMessage);
             $notificationService->setDescription($notificationDescription);
             $notificationService->setButtons(['see_shift']);

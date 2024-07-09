@@ -1,6 +1,6 @@
 <template>
     <div id="bar" class="p-2 top-0 left-16 z-40 bg-secondaryHover flex justify-between items-center" :class="[project ? isPageScrolled ? 'fixed w-[calc(100%-4rem)] ' : 'sticky w-full' : 'fixed  w-[calc(100%-4rem)] ']">
-        <div class="inline-flex items-center">
+        <div class="inline-flex items-center gap-x-3">
             <date-picker-component v-if="dateValue" :project="project" :dateValueArray="dateValue" :is_shift_plan="false"></date-picker-component>
             <div v-if="!project">
                 <div v-if="dateValue && dateValue[0] === dateValue[1]" class="flex items-center">
@@ -20,7 +20,12 @@
                     </button>
                 </div>
             </div>
-
+            <div class="flex items-center">
+                <div @click="showCalendarAboSettingModal = true" class="flex items-center gap-x-1 text-sm group cursor-pointer">
+                    <IconCalendarStar class="h-5 w-5 group-hover:text-yellow-500 duration-150 transition-all ease-in-out"/>
+                    {{ $t('Subscribe to calendar') }}
+                </div>
+            </div>
 
         </div>
 
@@ -89,7 +94,7 @@
                         leave-from-class="transform scale-100 opacity-100"
                         leave-to-class="transform scale-95 opacity-0"
                     >
-                        <MenuItems class="w-80 absolute right-0 top-12 origin-top-right rounded-sm bg-primary ring-1 ring-black p-2 text-white opacity-100 z-50">
+                        <MenuItems class="w-80 absolute right-0 top-12 origin-top-right rounded-sm bg-artwork-navigation-background ring-1 ring-black p-2 text-white opacity-100 z-50">
                             <div class="w-76 p-6">
                                 <div class="flex py-1" v-if="!project">
                                     <input v-model="userCalendarSettings.project_status"
@@ -151,7 +156,7 @@
 
     </div>
 
-    <div class="my-3 w-full">
+    <div class="w-full overflow-y-scroll" :class="activeFilters.length > 0 ? 'mt-10' : 'my-3'">
         <div class="mb-1 ml-4 max-w-7xl">
             <div class="flex">
                 <BaseFilterTag v-for="activeFilter in activeFilters" :filter="activeFilter" @removeFilter="removeFilter"/>
@@ -161,10 +166,20 @@
     </div>
 
     <PdfConfigModal v-if="showPDFConfigModal" @closed="showPDFConfigModal = false" :project="project" :pdf-title="project ? project.name : 'Raumbelegung'"/>
+
+    <GeneralCalendarAboSettingModal
+        v-if="showCalendarAboSettingModal"
+        @close="closeCalendarAboSettingModal"
+        :event-types="filterOptions.eventTypes"
+        :areas="filterOptions.areas"
+        :rooms="filterOptions.rooms"
+    />
+
+    <CalendarAboInfoModal v-if="showCalendarAboInfoModal" @close="showCalendarAboInfoModal = false" />
 </template>
 
 <script>
-import Button from "@/Jetstream/Button";
+import Button from "@/Jetstream/Button.vue";
 import {PlusCircleIcon, CalendarIcon, ZoomInIcon, ZoomOutIcon} from '@heroicons/vue/outline'
 import {Menu, MenuButton, MenuItems, Switch, SwitchGroup, SwitchLabel} from "@headlessui/vue";
 import {ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon} from "@heroicons/vue/solid";
@@ -172,20 +187,24 @@ import IndividualCalendarFilterComponent from "@/Layouts/Components/IndividualCa
 import DatePickerComponent from "@/Layouts/Components/DatePickerComponent.vue";
 import Dropdown from "@/Jetstream/Dropdown.vue";
 import BaseFilterTag from "@/Layouts/Components/BaseFilterTag.vue";
-import Permissions from "@/mixins/Permissions.vue";
-import {useForm, usePage} from "@inertiajs/inertia-vue3";
+import Permissions from "@/Mixins/Permissions.vue";
+import {useForm, usePage} from "@inertiajs/vue3";
 import BaseFilter from "@/Layouts/Components/BaseFilter.vue";
-import {Inertia} from "@inertiajs/inertia";
+import {router} from "@inertiajs/vue3";
 import PdfConfigModal from "@/Layouts/Components/PdfConfigModal.vue";
 import AddButtonSmall from "@/Layouts/Components/General/Buttons/AddButtonSmall.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
 import PlusButton from "@/Layouts/Components/General/Buttons/PlusButton.vue";
+import GeneralCalendarAboSettingModal from "@/Pages/Events/Components/GeneralCalendarAboSettingModal.vue";
+import CalendarAboInfoModal from "@/Pages/Shifts/Components/CalendarAboInfoModal.vue";
 
 
 export default {
     name: "CalendarFunctionBar",
     mixins: [Permissions, IconLib],
     components: {
+        CalendarAboInfoModal,
+        GeneralCalendarAboSettingModal,
         PlusButton,
         AddButtonSmall,
         PdfConfigModal,
@@ -237,10 +256,18 @@ export default {
             externUpdate: false,
             showPDFConfigModal: false,
             isPageScrolled: false,
+            showCalendarAboSettingModal: false,
+            showCalendarAboInfoModal: false,
         }
     },
     methods: {
         usePage,
+        closeCalendarAboSettingModal(bool){
+            this.showCalendarAboSettingModal = false;
+            if(bool){
+                this.showCalendarAboInfoModal = true;
+            }
+        },
         changeAtAGlance() {
             this.$emit('changeAtAGlance')
         },
@@ -335,7 +362,7 @@ export default {
         },
 
         updateFilterValue(key, value){
-            Inertia.patch(route('user.calendar.filter.single.value.update', {user: this.$page.props.user.id}), {
+            router.patch(route('user.calendar.filter.single.value.update', {user: this.$page.props.user.id}), {
                 key: key,
                 value: value
             }, {

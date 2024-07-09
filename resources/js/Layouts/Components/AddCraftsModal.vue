@@ -22,12 +22,13 @@
                                 </div>
                                 <p class="subpixel-antialiased">{{ $t('Define the specifications of your trade.')}}</p>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-5">
 
+                                <div class="grid grid-cols-1 sm:grid-cols-7 gap-2 mt-5">
+                                    <ColorPickerComponent :color="craft.color" class="col-span-1" @updateColor="addColor" />
                                     <input type="text"
                                            :placeholder="$t('Name of the craft') + '*'"
                                            v-model="craft.name"
-                                           class="h-10 inputMain placeholder:xsLight placeholder:subpixel-antialiased focus:outline-none focus:ring-0 focus:border-secondary focus:border-1 w-full border-gray-300"
+                                           class="h-10 inputMain placeholder:xsLight placeholder:subpixel-antialiased focus:outline-none focus:ring-0 focus:border-secondary focus:border-1 w-full border-gray-300 col-span-3"
                                            required
                                     />
                                     <input type="text"
@@ -35,7 +36,17 @@
                                            v-model="craft.abbreviation"
                                            maxlength="3"
                                            required
-                                           class="h-10 inputMain placeholder:xsLight placeholder:subpixel-antialiased focus:outline-none focus:ring-0 focus:border-secondary focus:border-1 w-full border-gray-300"/>
+                                           class="h-10 inputMain placeholder:xsLight placeholder:subpixel-antialiased focus:outline-none focus:ring-0 focus:border-secondary focus:border-1 w-full border-gray-300 col-span-3"/>
+                                </div>
+
+                                <div class="my-3">
+                                    <span class="xsLight text-xs mb-1">{{$t('Days until notification if shift not fully staffed')}}</span>
+                                    <input type="number"
+                                           v-model="craft.notify_days"
+                                           maxlength="3"
+                                           required
+                                           min="0" max="100"
+                                           class="h-10 inputMain placeholder:xsLight placeholder:subpixel-antialiased focus:outline-none focus:ring-0 focus:border-secondary focus:border-1 w-full border-gray-300 col-span-3"/>
                                 </div>
 
                                 <div class="mt-3">
@@ -43,7 +54,7 @@
                                         <SwitchLabel as="span" class="mr-3 text-sm">
                                             <span class="font-medium text-gray-900" :class="enabled ? '!text-gray-400' : ''">{{ $t('Allocable to a limited extent')}}</span>
                                         </SwitchLabel>
-                                        <Switch v-model="enabled" :class="[enabled ? 'bg-indigo-600' : 'bg-gray-200', 'relative inline-flex h-3 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2']">
+                                        <Switch v-model="enabled" :class="[enabled ? 'bg-artwork-buttons-create' : 'bg-gray-200', 'relative inline-flex h-3 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2']">
                                             <span aria-hidden="true" :class="[enabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-2 w-2 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']" />
                                         </Switch>
                                         <SwitchLabel as="span" class="ml-3 text-sm">
@@ -87,7 +98,7 @@
                                                 </div>
                                                 <button type="button" @click="addOrRemoveFormUserList(user)">
                                                     <span class="sr-only">{{ $t('Remove user from team')}}</span>
-                                                    <IconCircleX stroke-width="1.5" class="ml-3 text-buttonBlue h-5 w-5 hover:text-error "/>
+                                                    <IconCircleX stroke-width="1.5" class="ml-3 text-artwork-buttons-create h-5 w-5 hover:text-error "/>
                                                 </button>
                                             </div>
                                         </div>
@@ -122,15 +133,17 @@ import {
 import {CheckIcon, XCircleIcon, XIcon} from "@heroicons/vue/solid";
 import {ChevronDownIcon} from "@heroicons/vue/outline";
 import Input from "@/Jetstream/Input.vue";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 import TagComponent from "@/Layouts/Components/TagComponent.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import ColorPickerComponent from "@/Components/Globale/ColorPickerComponent.vue";
 
 export default defineComponent({
     name: "AddCraftsModal",
     mixins: [IconLib],
     components: {
+        ColorPickerComponent,
         FormButton,
         XCircleIcon,
         TagComponent,
@@ -146,7 +159,9 @@ export default defineComponent({
                 name: this.craftToEdit ? this.craftToEdit.name : '',
                 abbreviation: this.craftToEdit ? this.craftToEdit.abbreviation : '',
                 users: [],
-                assignable_by_all: true
+                assignable_by_all: true,
+                color: this.craftToEdit ? this.craftToEdit.color : '#ffffff',
+                notify_days: this.craftToEdit ? this.craftToEdit.notify_days : 0
             }),
             enabled: this.craftToEdit ? this.craftToEdit.assignable_by_all : true,
             users: this.craftToEdit ? this.craftToEdit.users : []
@@ -170,6 +185,10 @@ export default defineComponent({
             }
         },
         saveCraft(){
+            if (this.craft.notify_days < 0) {
+                this.craft.notify_days = 0;
+            }
+
             if(!this.enabled){
                 this.craft.assignable_by_all = false
                 this.users.forEach((user) => {
@@ -199,9 +218,12 @@ export default defineComponent({
                 })
             }
         },
+        addColor(color){
+            this.craft.color = color
+        },
         updateCraft(){
 
-        }
+        },
     }
 })
 </script>

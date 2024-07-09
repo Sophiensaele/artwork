@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sector;
+use Artwork\Modules\Sector\Models\Sector;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -18,6 +18,7 @@ class SectorController extends Controller
     {
         Sector::create([
             'name' => $request->name,
+            'color' => $request->color
         ]);
 
         return Redirect::back();
@@ -25,7 +26,7 @@ class SectorController extends Controller
 
     public function update(Request $request, Sector $sector): void
     {
-        $sector->update($request->only('name'));
+        $sector->update($request->only(['name', 'color']));
     }
 
     public function destroy(Sector $sector): RedirectResponse

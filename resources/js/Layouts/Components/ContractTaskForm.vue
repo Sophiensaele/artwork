@@ -63,7 +63,7 @@
                                             <button type="button" @click="deleteUserFromTaskUserArray(index)">
                                                 <span class="sr-only">{{ $t('Remove user from task')}}</span>
                                                 <IconX stroke-width="1.5"
-                                                    class="ml-2 h-4 w-4 p-0.5 hover:text-error rounded-full bg-buttonBlue text-white border-0 "/>
+                                                    class="ml-2 h-4 w-4 p-0.5 hover:text-error rounded-full bg-artwork-buttons-create text-white border-0 "/>
                                             </button>
                                         </div>
 
@@ -81,8 +81,8 @@
 
 <script>
 import {XIcon} from "@heroicons/vue/outline";
-import Permissions from "@/mixins/Permissions.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import Permissions from "@/Mixins/Permissions.vue";
+import IconLib from "@/Mixins/IconLib.vue";
 
 export default {
     name: "ContractTaskForm",

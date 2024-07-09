@@ -1,9 +1,5 @@
 <template>
-    <jet-dialog-modal :show="true" @close="closeModal()">
-        <template #content>
-            <img alt="Details" src="/Svgs/Overlays/illu_money_source_create.svg" class="-ml-6 -mt-8 mb-4"/>
-            <IconX stroke-width="1.5" @click="closeModal()" class="text-secondary h-5 w-5 right-0 top-0 mt-8 mr-5 absolute cursor-pointer"
-                   aria-hidden="true"/>
+    <BaseModal @closed="closeModal" v-if="true" modal-image="/Svgs/Overlays/illu_money_source_create.svg">
             <div class="mx-4">
                 <!--   Heading   -->
                 <div>
@@ -58,7 +54,7 @@
                                 </div>
                                 <button type="button" @click="deleteProjectFromArray(project)">
                                     <span class="sr-only">{{$t('Remove user from team')}}</span>
-                                    <IconCircleX stroke-width="1.5" class="ml-3 text-buttonBlue h-5 w-5 hover:text-error "/>
+                                    <IconCircleX stroke-width="1.5" class="ml-3 text-artwork-buttons-create h-5 w-5 hover:text-error "/>
                                 </button>
                             </div>
                             </span>
@@ -70,24 +66,24 @@
                     </div>
                 </div>
             </div>
-        </template>
-    </jet-dialog-modal>
-
+    </BaseModal>
 </template>
 
 <script>
-import JetDialogModal from "@/Jetstream/DialogModal";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import {CheckIcon, ChevronDownIcon, PlusCircleIcon, XIcon} from '@heroicons/vue/outline';
 import {XCircleIcon} from "@heroicons/vue/solid";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import BaseModal from "@/Components/Modals/BaseModal.vue";
 
 
 export default {
     name: 'LinkProjectsToMoneySourcesComponent',
     mixins: [Permissions, IconLib],
     components: {
+        BaseModal,
         FormButton,
         JetDialogModal,
         XIcon,

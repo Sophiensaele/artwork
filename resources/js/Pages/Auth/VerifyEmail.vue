@@ -33,8 +33,8 @@
     import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue'
     import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue'
     import JetButton from '@/Jetstream/Button.vue'
-    import { Head, Link } from '@inertiajs/inertia-vue3';
-    import Permissions from "@/mixins/Permissions.vue";
+    import { Head, Link } from '@inertiajs/vue3';
+    import Permissions from "@/Mixins/Permissions.vue";
 
     export default defineComponent({
         mixins: [Permissions],

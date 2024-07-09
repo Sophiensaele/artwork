@@ -1,15 +1,17 @@
 <template>
-    <div class="mb-3">
+    <div class="mb-3 flex flex-col gap-2">
         <!-- Event Header -->
         <div class="w-full h-12 flex items-center justify-between px-4 text-white text-sm rounded-lg"
              :style="{backgroundColor: event.event_type.hex_code}">
             <div class="flex items-center">
                 <span v-if="!event.event.allDay">
-                    {{ event.event?.start_time }} - {{ event.event?.end_time }} | {{ event.event_type.abbreviation }} | {{ event.room?.name }}
+                    {{ event.event?.formatted_dates.start }} - {{ event.event?.formatted_dates.end }} | {{ event.event_type.abbreviation }} | {{ event.room?.name }}
                 </span>
+
                 <span v-else>
                     {{ event.event?.event_date_without_time.start }} - {{ event.event?.event_date_without_time.end }} {{ $t('All day') }} | {{ event.event_type.abbreviation }} | {{ event.room?.name }}
                 </span>
+
                 <span v-if="event.event.is_series" class="ml-3">
                     <IconRepeat class="h-4 w-4" />
                 </span>
@@ -19,49 +21,29 @@
                 </div>
             </div>
             <div class="mt-1">
-                <Menu as="div" class="relative">
-                    <div class="flex p-0.5 rounded-full">
-                        <MenuButton
-                            class="flex p-0.5 rounded-full">
-                            <IconDotsVertical stroke-width="1.5"
-                                class=" flex-shrink-0 h-4 w-4 my-auto"
-                                aria-hidden="true"/>
-                        </MenuButton>
-                    </div>
-                    <transition enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95">
-                        <MenuItems
-                            class="origin-top-right z-100 absolute right-0 mr-4 mt-2 w-80 shadow-lg bg-zinc-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none">
-                            <div class="py-1">
-                                <MenuItem v-slot="{ active }">
-                                    <a href="#" @click="openDeleteConfirmModal"
-                                       :class="[active ? 'bg-primaryHover text-white' : 'text-secondary', 'group flex items-center px-4 py-2 text-sm subpixel-antialiased']">
-                                        <IconTrash stroke-width="1.5" class="w-5 h-5 mr-3" />
-                                        {{ $t('Delete shift planning') }}
-                                    </a>
-                                </MenuItem>
-                                <MenuItem v-slot="{ active }">
-                                    <a href="#" @click="saveShiftAsPreset"
-                                       :class="[active ? 'bg-primaryHover text-white' : 'text-secondary', 'group flex items-center px-4 py-2 text-sm subpixel-antialiased']">
-                                        <IconFilePlus stroke-width="1.5" class="w-5 h-5 mr-3" />
-                                        {{ $t('Save shift planning as a template') }}
-                                    </a>
-                                </MenuItem>
-                                <MenuItem v-slot="{ active }">
-                                    <a href="#" @click="showImportShiftTemplateModal = true"
-                                       :class="[active ? 'bg-primaryHover text-white' : 'text-secondary', 'group flex items-center px-4 py-2 text-sm subpixel-antialiased']">
-                                        <IconFileImport stroke-width="1.5" class="w-5 h-5 mr-3" />
-                                        {{ $t('Import shift planning from template') }}
-                                    </a>
-                                </MenuItem>
-                            </div>
-                        </MenuItems>
-                    </transition>
-                </Menu>
+                <BaseMenu dots-size="h-4 w-4">
+                    <MenuItem v-slot="{ active }">
+                        <a href="#" @click="openDeleteConfirmModal"
+                           :class="[active ? 'bg-artwork-navigation-color/10 text-white' : 'text-secondary', 'group flex items-center px-4 py-2 text-sm subpixel-antialiased']">
+                            <IconTrash stroke-width="1.5" class="w-5 h-5 mr-3" />
+                            {{ $t('Delete shift planning') }}
+                        </a>
+                    </MenuItem>
+                    <MenuItem v-slot="{ active }">
+                        <a href="#" @click="saveShiftAsPreset"
+                           :class="[active ? 'bg-artwork-navigation-color/10 text-white' : 'text-secondary', 'group flex items-center px-4 py-2 text-sm subpixel-antialiased']">
+                            <IconFilePlus stroke-width="1.5" class="w-5 h-5 mr-3" />
+                            {{ $t('Save shift planning as a template') }}
+                        </a>
+                    </MenuItem>
+                    <MenuItem v-slot="{ active }">
+                        <a href="#" @click="showImportShiftTemplateModal = true"
+                           :class="[active ? 'bg-artwork-navigation-color/10 text-white' : 'text-secondary', 'group flex items-center px-4 py-2 text-sm subpixel-antialiased']">
+                            <IconFileImport stroke-width="1.5" class="w-5 h-5 mr-3" />
+                            {{ $t('Import shift planning from template') }}
+                        </a>
+                    </MenuItem>
+                </BaseMenu>
             </div>
         </div>
         <ConfirmDeleteModal
@@ -80,18 +62,22 @@
         />
         <ImportShiftTemplate
             v-if="showImportShiftTemplateModal"
-            @closed="showImportShiftTemplateModal = false"
+            @closed="this.closeImportShiftTemplateModal()"
             :event_type="event.event_type"
             :eventId="event.event.id"
         />
-        <div class="flex justify-start mt-3 overflow-x-scroll gap-3 h-full" v-if="showShift">
-            <TimeLineShiftsComponent :time-line="event.timeline"
-                                     :shifts="event.shifts"
+        <!-- Event Timeline -->
+        <div class="" v-if="showShift">
+            <TimeLineShiftsComponent ref="timelineShiftsComponent"
+                                     :time-line="event?.timeline"
+                                     :shifts="event?.shifts"
                                      :crafts="crafts"
                                      :currentUserCrafts="currentUserCrafts"
-                                     :event="event.event"
+                                     :event="event?.event"
                                      :shift-qualifications="shiftQualifications"
-                                     @dropFeedback="dropFeedback"/>
+                                     @dropFeedback="dropFeedback"
+                                     :shift-time-presets="shiftTimePresets"
+            />
         </div>
     </div>
 </template>
@@ -108,7 +94,8 @@ import AddShiftPresetModal from "@/Pages/Projects/Components/AddShiftPresetModal
 import {ChevronDownIcon, ChevronUpIcon} from "@heroicons/vue/outline";
 import ImportShiftTemplate from "@/Pages/Projects/Components/ImportShiftTemplate.vue";
 import SvgCollection from "@/Layouts/Components/SvgCollection.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import BaseMenu from "@/Components/Menu/BaseMenu.vue";
 
 export default defineComponent({
     name: "SingleRelevantEvent",
@@ -117,11 +104,13 @@ export default defineComponent({
         'crafts',
         'eventTypes',
         'currentUserCrafts',
-        'shiftQualifications'
+        'shiftQualifications',
+        'shiftTimePresets'
     ],
     emits: ['dropFeedback'],
     mixins: [IconLib],
     components: {
+        BaseMenu,
         SvgCollection,
         ImportShiftTemplate,
         AddShiftPresetModal,
@@ -143,11 +132,15 @@ export default defineComponent({
         return {
             showConfirmDeleteModal: false,
             showAddShiftPresetModal: false,
-            showShift: parseInt(this.$page.props.urlParameters?.eventId) === parseInt(this.event.event.id),
+            showShift: this.$page.props.urlParameters?.eventId ? parseInt(this.$page.props.urlParameters?.eventId) === parseInt(this.event.event.id) : true,
             showImportShiftTemplateModal: false,
         }
     },
     methods: {
+        closeImportShiftTemplateModal() {
+            this.showImportShiftTemplateModal = false;
+            this.$refs.timelineShiftsComponent.reinitializeEventContainerPlacements();
+        },
         dropFeedback(event) {
             this.$emit('dropFeedback', event)
         },

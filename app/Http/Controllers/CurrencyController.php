@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CollectingSociety;
-use App\Models\Currency;
+use Artwork\Modules\Currency\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
@@ -18,7 +17,8 @@ class CurrencyController extends Controller
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         Currency::create([
-            'name' => $request->get('name')
+            'name' => $request->get('name'),
+            'color' => $request->color
         ]);
         return Redirect::back();
     }
@@ -26,7 +26,7 @@ class CurrencyController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Currency $currency
+     * @param \Artwork\Modules\Currency\Models\Currency $currency
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Currency $currency): \Illuminate\Http\RedirectResponse
@@ -51,5 +51,12 @@ class CurrencyController extends Controller
         $currency->restore();
 
         return Redirect::route('projects.settings.trashed');
+    }
+
+    public function update(Request $request, Currency $currency): \Illuminate\Http\RedirectResponse
+    {
+        $currency->update($request->only(['name', 'color']));
+
+        return Redirect::back();
     }
 }

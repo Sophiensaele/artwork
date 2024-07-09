@@ -26,7 +26,7 @@
                                 <transition leave-active-class="transition ease-in duration-100"
                                             leave-from-class="opacity-100" leave-to-class="opacity-0">
                                     <ListboxOptions
-                                        class="absolute w-40 z-10 mt-1 w-full bg-primary shadow-lg rounded-md text-base ring-1
+                                        class="absolute w-40 z-10 mt-1 w-full bg-artwork-navigation-background shadow-lg rounded-md text-base ring-1
                                         ring-black ring-opacity-5 overflow-y-auto focus:outline-none sm:text-sm">
                                         <ListboxOption as="template" class="max-h-8"
                                                        v-for="page in trashSites"
@@ -34,12 +34,12 @@
                                                        :key="page.name"
                                                        :value="page"
                                                        v-slot="{ active, selected }">
-                                            <li :class="[active ? 'bg-primaryHover text-white' : 'text-secondary', 'group cursor-pointer flex items-center justify-between p-3 text-sm subpixel-antialiased']">
+                                            <li :class="[active ? 'bg-artwork-navigation-color/10 text-white' : 'text-secondary', 'group cursor-pointer flex items-center justify-between p-3 text-sm subpixel-antialiased']">
                                                 <span
                                                     :class="[selected ? 'font-bold text-white' : 'font-normal', 'block truncate']">
                                                     {{ page.name }}
                                                 </span>
-                                                <span :class="[active ? 'bg-primaryHover text-white' :
+                                                <span :class="[active ? 'bg-artwork-navigation-color/10 text-white' :
                                                     'text-secondary',
                                                     'group flex items-center text-sm subpixel-antialiased']">
                                                     <CheckIcon v-if="selected"
@@ -64,8 +64,8 @@
 <script>
 import {Listbox, ListboxButton, ListboxOptions, ListboxOption} from "@headlessui/vue";
 import {SearchIcon, ChevronDownIcon, CheckIcon} from "@heroicons/vue/solid";
-import {Inertia} from "@inertiajs/inertia";
-import Permissions from "@/mixins/Permissions.vue";
+import {router} from "@inertiajs/vue3";
+import Permissions from "@/Mixins/Permissions.vue";
 import {XIcon} from "@heroicons/vue/outline";
 import Input from "@/Layouts/Components/InputComponent.vue";
 
@@ -80,7 +80,7 @@ export default {
     watch: {
         selectedTrash: {
           handler() {
-              Inertia.get(this.selectedTrash.href)
+              router.get(this.selectedTrash.href)
           },
           deep: true
         }

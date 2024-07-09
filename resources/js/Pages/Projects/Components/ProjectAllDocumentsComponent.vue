@@ -15,8 +15,8 @@
             />
             <div @click="selectNewFiles" @dragover.prevent
                  @drop.stop.prevent="uploadDraggedDocuments($event)"
-                 class="mb-4 w-full flex justify-center items-center border-buttonBlue border-dotted border-2 h-40 bg-colorOfAction p-2 cursor-pointer">
-                <p class="text-buttonBlue font-bold text-center"
+                 class="mb-4 w-full flex justify-center items-center border-artwork-buttons-create border-dotted border-2 h-40 bg-colorOfAction p-2 cursor-pointer">
+                <p class="text-artwork-buttons-create font-bold text-center"
                    v-html="$t('Drag document here to upload or click in the field')">
                 </p>
             </div>
@@ -63,10 +63,10 @@
 <script>
 import {defineComponent} from "vue";
 import JetInputError from "@/Jetstream/InputError.vue";
-import IconLib from "@/mixins/IconLib.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import ConfirmDeleteModal from "@/Layouts/Components/ConfirmDeleteModal.vue";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 
 export default defineComponent({
     mixins: [

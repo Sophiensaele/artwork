@@ -71,8 +71,8 @@ import CalendarFunctionBar from "@/Layouts/Components/CalendarFunctionBar.vue";
 import EventsWithoutRoomComponent from "@/Layouts/Components/EventsWithoutRoomComponent.vue";
 import {ExclamationIcon} from "@heroicons/vue/outline";
 import EventComponent from "@/Layouts/Components/EventComponent.vue";
-import {Inertia} from "@inertiajs/inertia";
-import Permissions from "@/mixins/Permissions.vue";
+import {router} from "@inertiajs/vue3";
+import Permissions from "@/Mixins/Permissions.vue";
 
 
 export default {
@@ -89,7 +89,6 @@ export default {
     data() {
         return {
             showEventsWithoutRoomComponent: false,
-            eventsWithoutRoom: [],
             selectedEvent: null,
             createEventComponentIsVisible: false,
             wantedRoom: null,
@@ -131,7 +130,7 @@ export default {
                 let createdBy = event.created_by;
                 let projectLeaders = event.projectLeaders;
 
-                if (createdBy.id === 1 ||projectLeaders?.some((leader) => leader.id === 1)) {
+                if (createdBy.id === 1 || projectLeaders?.some((leader) => leader.id === 1)) {
                     return true;
                 }
                 return false;
@@ -178,7 +177,7 @@ export default {
             return `${year}-${month}-${day}`;
         },
         updateTimes() {
-            Inertia.patch(route('update.user.calendar.filter.dates', this.$page.props.user.id), {
+            router.patch(route('update.user.calendar.filter.dates', this.$page.props.user.id), {
                 start_date:  this.dateValue[0],
                 end_date: this.dateValue[1],
             },{
@@ -227,7 +226,7 @@ export default {
         },
         onEventComponentClose() {
             this.createEventComponentIsVisible = false;
-            Inertia.reload();
+            router.reload();
         },
 
 
@@ -275,22 +274,4 @@ export default {
     overflow: overlay;
 }
 
-::-webkit-scrollbar {
-    width: 16px;
-}
-
-::-webkit-scrollbar-track {
-    background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #A7A6B170;
-    border-radius: 16px;
-    border: 6px solid transparent;
-    background-clip: content-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background-color: #a8bbbf;
-}
 </style>

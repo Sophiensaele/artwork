@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CompanyType;
+use Artwork\Modules\CompanyType\Models\CompanyType;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Redirect;
-
-use function Pest\Laravel\delete;
 
 class CompanyTypeController extends Controller
 {
@@ -20,7 +17,8 @@ class CompanyTypeController extends Controller
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         CompanyType::create([
-            'name' => $request->name
+            'name' => $request->name,
+            'color' => $request->color
         ]);
         return Redirect::back();
     }
@@ -28,7 +26,7 @@ class CompanyTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\CompanyType  $companyType
+     * @param  \Artwork\Modules\CompanyType\Models\CompanyType  $companyType
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(CompanyType $companyType): \Illuminate\Http\RedirectResponse
@@ -53,5 +51,12 @@ class CompanyTypeController extends Controller
         $companyType->restore();
 
         return Redirect::route('projects.settings.trashed');
+    }
+
+    public function update(Request $request, CompanyType $companyType): \Illuminate\Http\RedirectResponse
+    {
+        $companyType->update($request->only(['name', 'color']));
+
+        return Redirect::back();
     }
 }

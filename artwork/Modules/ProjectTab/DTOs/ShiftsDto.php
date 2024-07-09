@@ -21,38 +21,108 @@ class ShiftsDto extends BaseDto
 
     public ?Collection $shiftQualifications = null;
 
-    public function setUsersForShifts(?array $usersForShifts): void
+    public ?Collection $shiftTimePresets = null;
+
+    public function setShiftTimePresets(?Collection $shiftTimePresets): self
+    {
+        $this->shiftTimePresets = $shiftTimePresets;
+
+        return $this;
+    }
+
+    public function setUsersForShifts(?array $usersForShifts): self
     {
         $this->usersForShifts = $usersForShifts;
+
+        return $this;
     }
 
-    public function setFreelancersForShifts(?array $freelancersForShifts): void
+    public function setFreelancersForShifts(?array $freelancersForShifts): self
     {
         $this->freelancersForShifts = $freelancersForShifts;
+
+        return $this;
     }
 
-    public function setServiceProvidersForShifts(?array $serviceProvidersForShifts): void
+    public function setServiceProvidersForShifts(?array $serviceProvidersForShifts): self
     {
         $this->serviceProvidersForShifts = $serviceProvidersForShifts;
+
+        return $this;
     }
 
-    public function setEventsWithRelevant(?array $eventsWithRelevant): void
+    public function setEventsWithRelevant(?array $eventsWithRelevant): self
     {
         $this->eventsWithRelevant = $eventsWithRelevant;
+
+        return $this;
     }
 
-    public function setCrafts(?Collection $crafts): void
+    public function setCrafts(?Collection $crafts): self
     {
         $this->crafts = $crafts;
+
+        return $this;
     }
 
-    public function setCurrentUserCrafts(?Collection $currentUserCrafts): void
+    public function setCurrentUserCrafts(?Collection $currentUserCrafts): self
     {
         $this->currentUserCrafts = $currentUserCrafts;
+
+        return $this;
     }
 
-    public function setShiftQualifications(?Collection $shiftQualifications): void
+    public function setShiftQualifications(?Collection $shiftQualifications): self
     {
         $this->shiftQualifications = $shiftQualifications;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getUsersForShifts(): ?array
+    {
+        return $this->usersForShifts;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getFreelancersForShifts(): ?array
+    {
+        return $this->freelancersForShifts;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getServiceProvidersForShifts(): ?array
+    {
+        return $this->serviceProvidersForShifts;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getEventsWithRelevant(): ?array
+    {
+        return $this->eventsWithRelevant;
+    }
+
+    public function getCrafts(): ?Collection
+    {
+        return $this->crafts;
+    }
+
+    public function getCurrentUserCrafts(): ?Collection
+    {
+        return $this->currentUserCrafts;
+    }
+
+    public function getShiftQualifications(): ?Collection
+    {
+        return $this->shiftQualifications;
     }
 }

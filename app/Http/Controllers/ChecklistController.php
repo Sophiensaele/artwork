@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ChecklistShowResource;
-use App\Models\ChecklistTemplate;
-use App\Models\Task;
 use Artwork\Modules\Change\Services\ChangeService;
 use Artwork\Modules\Checklist\Http\Requests\ChecklistUpdateRequest;
+use Artwork\Modules\Checklist\Http\Resources\ChecklistShowResource;
 use Artwork\Modules\Checklist\Models\Checklist;
 use Artwork\Modules\Checklist\Services\ChecklistService;
+use Artwork\Modules\ChecklistTemplate\Models\ChecklistTemplate;
 use Artwork\Modules\Project\Models\Project;
-use Artwork\Modules\Project\Models\ProjectHistory;
-use Artwork\Modules\Tasks\Services\TaskService;
+use Artwork\Modules\Task\Models\Task;
+use Artwork\Modules\Task\Services\TaskService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Response;
 use Inertia\ResponseFactory;
@@ -56,12 +54,6 @@ class ChecklistController extends Controller
                 ->setTranslationKey('Checklist added')
                 ->setTranslationKeyPlaceholderValues([$request->name])
         );
-
-        ProjectHistory::create([
-            "user_id" => Auth::id(),
-            "project_id" => $request->project_id,
-            "description" => "Checkliste $request->name angelegt"
-        ]);
 
         return Redirect::back();
     }
@@ -141,7 +133,7 @@ class ChecklistController extends Controller
             return Redirect::back();
         }
 
-        $this->checklistService->assignUsersById($checklist, $request->assigned_user_ids, $taskService);
+        $this->checklistService->assignUsersById($checklist, $taskService, $request->assigned_user_ids ?? []);
 
         $this->changeService->saveFromBuilder(
             $this->changeService

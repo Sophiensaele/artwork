@@ -2,49 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\PermissionNameEnum;
-use App\Enums\RoleNameEnum;
-use App\Events\UserUpdated;
-use App\Http\Requests\SearchRequest;
-use App\Http\Resources\EventTypeResource;
-use App\Http\Resources\UserIndexResource;
-use App\Http\Resources\UserShowResource;
-use App\Http\Resources\UserWorkProfileResource;
-use App\Models\Craft;
-use App\Models\EventType;
-use App\Models\Freelancer;
-use App\Models\ServiceProvider;
-use App\Models\User;
+use Artwork\Core\Http\Requests\SearchRequest;
 use Artwork\Modules\Calendar\Services\CalendarService;
+use Artwork\Modules\Craft\Models\Craft;
 use Artwork\Modules\Department\Models\Department;
+use Artwork\Modules\Event\Services\EventService;
+use Artwork\Modules\EventType\Services\EventTypeService;
+use Artwork\Modules\Freelancer\Models\Freelancer;
+use Artwork\Modules\Invitation\Models\Invitation;
+use Artwork\Modules\Permission\Enums\PermissionEnum;
+use Artwork\Modules\Permission\Models\Permission;
 use Artwork\Modules\PermissionPresets\Services\PermissionPresetService;
-use Artwork\Modules\Project\Models\Project;
-use Artwork\Modules\Room\Models\Room;
+use Artwork\Modules\Project\Services\ProjectService;
+use Artwork\Modules\Role\Enums\RoleEnum;
+use Artwork\Modules\Room\Services\RoomService;
+use Artwork\Modules\ServiceProvider\Models\ServiceProvider;
 use Artwork\Modules\ShiftQualification\Http\Requests\UpdateUserShiftQualificationRequest;
 use Artwork\Modules\ShiftQualification\Repositories\ShiftQualificationRepository;
 use Artwork\Modules\ShiftQualification\Services\ShiftQualificationService;
 use Artwork\Modules\ShiftQualification\Services\UserShiftQualificationService;
+use Artwork\Modules\User\Events\UserUpdated;
+use Artwork\Modules\User\Http\Resources\UserIndexResource;
+use Artwork\Modules\User\Http\Resources\UserShowResource;
+use Artwork\Modules\User\Http\Resources\UserWorkProfileResource;
+use Artwork\Modules\User\Models\User;
+use Artwork\Modules\User\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
+use Inertia\Inertia;
 use Inertia\Response;
 use Inertia\ResponseFactory;
 use Laravel\Fortify\Contracts\FailedPasswordResetLinkRequestResponse;
 use Laravel\Fortify\Fortify;
-use Artwork\Modules\Permission\Models\Permission;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     public function __construct(
-        private readonly CalendarService $calendarService
+        private readonly UserService $userService,
     ) {
         $this->authorizeResource(User::class, 'user');
     }
@@ -56,6 +63,21 @@ class UserController extends Controller
     public function search(SearchRequest $request): array
     {
         return UserIndexResource::collection(User::nameOrLastNameLike($request->get('query'))->get())->resolve();
+    }
+
+
+    public function scoutSearch(Request $request): JsonResponse
+    {
+        $users = [];
+        if (
+            request()->has('user_search') &&
+            request()->get('user_search') !== null &&
+            request()->get('user_search') !== ''
+        ) {
+            $users = $this->userService->searchUsers($request->string('user_search'));
+        }
+
+        return \response()->json($users);
     }
 
     /**
@@ -114,7 +136,8 @@ class UserController extends Controller
             'roles' => Role::all(),
             'freelancers' => Freelancer::all(),
             'serviceProviders' => ServiceProvider::all(),
-            'permission_presets' => $permissionPresetService->getPermissionPresets()
+            'permission_presets' => $permissionPresetService->getPermissionPresets(),
+            'invitedUsers' => Invitation::all()
         ]);
     }
 
@@ -128,68 +151,50 @@ class UserController extends Controller
         ]);
     }
 
-    public function editUserShiftplan(
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function editUserShiftPlan(
+        Request $request,
         User $user,
-        CalendarController $shiftPlan,
-        ShiftQualificationService $shiftQualificationService
+        UserService $userService,
+        ShiftQualificationService $shiftQualificationService,
+        CalendarService $calendarService,
+        EventService $eventService,
+        RoomService $roomService,
+        EventTypeService $eventTypeService,
+        ProjectService $projectService,
+        SessionManager $sessionManager,
+        Repository $config
     ): Response|ResponseFactory {
-        $showCalendar = $shiftPlan->createCalendarDataForUserShiftPlan($user);
-        //$this->getAvailabilityData($user, request('month'))
-        $availabilityData = $this->calendarService
-            ->getAvailabilityData(user: $user, month: request('month'));
+        $showVacationsAndAvailabilities = $request->get('showVacationsAndAvailabilities');
+        $vacationMonth = $request->get('vacationMonth');
+        $selectedDate = $showVacationsAndAvailabilities ?
+            Carbon::parse($showVacationsAndAvailabilities) :
+            Carbon::today();
+        $selectedPeriodDate = $vacationMonth ?
+            Carbon::parse($vacationMonth) :
+            Carbon::today();
 
-        $selectedDate = Carbon::today();
-        $selectedPeriodDate = Carbon::today();
-        $vacations = [];
-        // get vacations of the selected date (request('showVacationsAndAvailabilities'))
-        if (request('showVacationsAndAvailabilities')) {
-            $selectedDate = Carbon::parse(request('showVacationsAndAvailabilities'));
-        }
+        $selectedPeriodDate->locale($sessionManager->get('locale') ?? $config->get('app.fallback_locale'));
 
-        if (request('vacationMonth')) {
-            $selectedPeriodDate = Carbon::parse(request('vacationMonth'));
-        }
-
-        $vacations = $user->vacations()
-            ->where('date', $selectedDate)
-            ->orderBy('date', 'ASC')->get();
-
-        $availabilities = $user->availabilities()
-            ->where('date', $selectedDate)
-            ->orderBy('date', 'ASC')->get();
-
-        $createShowDate = [
-            $selectedPeriodDate->locale(
-                \session()->get('locale') ??
-                    config('app.fallback_locale')
-            )->isoFormat('MMMM YYYY'),
-            $selectedPeriodDate->copy()->startOfMonth()->toDate()
-        ];
-
-        return inertia('Users/UserShiftPlanPage', [
-            'user_to_edit' => new UserShowResource($user),
-            'currentTab' => 'shiftplan',
-            'calendarData' => $availabilityData['calendarData'],
-            'dateToShow' => $availabilityData['dateToShow'],
-            'vacationSelectCalendar' => $this->calendarService
-                ->createVacationAndAvailabilityPeriodCalendar(request('vacationMonth')),
-            'createShowDate' => $createShowDate,
-            'vacations' => $vacations,
-            'availabilities' => $availabilities,
-            'showVacationsAndAvailabilitiesDate' => $selectedDate->format('Y-m-d'),
-            'dateValue' => $showCalendar['dateValue'],
-            'daysWithEvents' => $showCalendar['daysWithEvents'],
-            'totalPlannedWorkingHours' => $showCalendar['totalPlannedWorkingHours'],
-            'rooms' => Room::all(),
-            'eventTypes' => EventTypeResource::collection(EventType::all())->resolve(),
-            'projects' => Project::all(),
-            'shifts' => $user
-                ->shifts()
-                ->with(['event', 'event.project', 'event.room'])
-                ->orderBy('start', 'ASC')
-                ->get(),
-            'shiftQualifications' => $shiftQualificationService->getAllOrderedByCreationDateAscending()
-        ]);
+        return Inertia::render(
+            'Users/UserShiftPlanPage',
+            $userService->getUserShiftPlanPageDto(
+                $user,
+                $calendarService,
+                $eventService,
+                $roomService,
+                $eventTypeService,
+                $projectService,
+                $shiftQualificationService,
+                $selectedPeriodDate,
+                $selectedDate,
+                $request->get('month'),
+                $vacationMonth
+            )
+        );
     }
 
     public function editUserTerms(User $user): Response|ResponseFactory
@@ -291,14 +296,14 @@ class UserController extends Controller
 
     public function updateUserDetails(Request $request, User $user): RedirectResponse
     {
-        if ($user->id !== Auth::user()->id && !Auth::user()->can(PermissionNameEnum::TEAM_UPDATE->value)) {
+        if ($user->id !== Auth::user()->id && !Auth::user()->can(PermissionEnum::TEAM_UPDATE->value)) {
             abort(\Illuminate\Http\Response::HTTP_FORBIDDEN);
         }
         $user->update(
             $request->only('first_name', 'last_name', 'phone_number', 'position', 'description', 'email', 'language')
         );
 
-        if (Auth::user()->can(PermissionNameEnum::TEAM_UPDATE->value)) {
+        if (Auth::user()->can(PermissionEnum::TEAM_UPDATE->value)) {
             $user->departments()->sync(
                 collect($request->departments)
                     ->map(function ($department) {
@@ -315,7 +320,7 @@ class UserController extends Controller
     public function updateUserPermissionsAndRoles(Request $request, User $user): RedirectResponse
     {
         //only add permissions which are also existing to the array which gets synced with user
-        $availablePermissions = PermissionNameEnum::cases();
+        $availablePermissions = PermissionEnum::cases();
         $permissionsToGrant = [];
         foreach ($request->permissions as $permissionToGrant) {
             foreach ($availablePermissions as $availablePermission) {
@@ -326,7 +331,7 @@ class UserController extends Controller
         }
 
         //only add roles which are also existing to the array which gets synced with user
-        $availableRoles = RoleNameEnum::cases();
+        $availableRoles = RoleEnum::cases();
         $rolesToGrant = [];
         foreach ($request->roles as $roleToGrant) {
             foreach ($availableRoles as $availableRole) {
@@ -499,5 +504,62 @@ class UserController extends Controller
     public function updateZoomFactor(User $user, Request $request): void
     {
         $user->update($request->only('zoom_factor'));
+    }
+
+    public function operationPlan(
+        Request $request,
+        User $user,
+        UserService $userService,
+        ShiftQualificationService $shiftQualificationService,
+        CalendarService $calendarService,
+        EventService $eventService,
+        RoomService $roomService,
+        EventTypeService $eventTypeService,
+        ProjectService $projectService,
+        SessionManager $sessionManager,
+        Repository $config
+    ): Response|ResponseFactory {
+        $showVacationsAndAvailabilities = $request->get('showVacationsAndAvailabilities');
+        $vacationMonth = $request->get('vacationMonth');
+        $selectedDate = $showVacationsAndAvailabilities ?
+            Carbon::parse($showVacationsAndAvailabilities) :
+            Carbon::today();
+        $selectedPeriodDate = $vacationMonth ?
+            Carbon::parse($vacationMonth) :
+            Carbon::today();
+        $user->load(['shiftCalendarAbo']);
+        $selectedPeriodDate->locale($sessionManager->get('locale') ?? $config->get('app.fallback_locale'));
+
+        return Inertia::render(
+            'Shifts/UserOperationPlan',
+            $userService->getUserShiftPlanPageDto(
+                $user,
+                $calendarService,
+                $eventService,
+                $roomService,
+                $eventTypeService,
+                $projectService,
+                $shiftQualificationService,
+                $selectedPeriodDate,
+                $selectedDate,
+                $request->get('month'),
+                $vacationMonth
+            )
+        );
+    }
+
+    public function compactMode(User $user, Request $request): void
+    {
+        $user->update($request->only('compact_mode'));
+    }
+
+    public function updateShowCrafts(User $user, Request $request): void
+    {
+        $user->update($request->only('show_crafts'));
+    }
+
+    public function calendarGoToStepper(User $user, Request $request): void
+    {
+        $user->update($request->only('goto_mode'));
     }
 }

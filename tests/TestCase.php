@@ -2,8 +2,10 @@
 
 namespace Tests;
 
-use App\Enums\RoleNameEnum;
-use App\Models\User;
+use Artwork\Modules\EventType\Cache\EventTypeArrayCache;
+use Artwork\Modules\ProjectTab\Cache\ProjectTabArrayCache;
+use Artwork\Modules\Role\Enums\RoleEnum;
+use Artwork\Modules\User\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -15,14 +17,22 @@ abstract class TestCase extends BaseTestCase
     use DatabaseTransactions;
     use WithFaker;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        EventTypeArrayCache::forgetAll();
+        ProjectTabArrayCache::forgetAll();
+        $this->withoutVite();
+    }
+
     /**
-     * @return \App\Models\User
+     * @return \Artwork\Modules\User\Models\User
      */
     public function adminUser(User $user = null): User
     {
         $user = $user ?? User::factory()->create();
-        Role::firstOrCreate(['name' => RoleNameEnum::ARTWORK_ADMIN->value]);
-        $user->assignRole(RoleNameEnum::ARTWORK_ADMIN->value);
+        Role::firstOrCreate(['name' => RoleEnum::ARTWORK_ADMIN->value]);
+        $user->assignRole(RoleEnum::ARTWORK_ADMIN->value);
 
         return $user;
     }

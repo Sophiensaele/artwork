@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ContractType;
+use Artwork\Modules\ContractType\Models\ContractType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
@@ -27,7 +27,8 @@ class ContractTypeController extends Controller
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         ContractType::create([
-            'name' => $request->name
+            'name' => $request->name,
+            'color' => $request->color
         ]);
         return Redirect::back();
     }
@@ -35,7 +36,7 @@ class ContractTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\ContractType  $contractType
+     * @param  \Artwork\Modules\ContractType\Models\ContractType  $contractType
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(ContractType $contractType): \Illuminate\Http\RedirectResponse
@@ -60,5 +61,12 @@ class ContractTypeController extends Controller
         $contractType->restore();
 
         return Redirect::route('projects.settings.trashed');
+    }
+
+    public function update(Request $request, ContractType $contractType): \Illuminate\Http\RedirectResponse
+    {
+        $contractType->update($request->only(['name', 'color']));
+
+        return Redirect::back();
     }
 }

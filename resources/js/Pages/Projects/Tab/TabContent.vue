@@ -11,7 +11,7 @@ import ShiftTab from "@/Pages/Projects/Tab/Components/ShiftTab.vue";
 import BudgetTab from "@/Pages/Projects/Tab/Components/BudgetTab.vue";
 import ProjectBudgetDeadlineComponent from "@/Pages/Projects/Components/ProjectBudgetDeadlineComponent.vue";
 import BaseSidenav from "@/Layouts/Components/BaseSidenav.vue";
-import {Link} from "@inertiajs/inertia-vue3";
+import {Link} from "@inertiajs/vue3";
 import SeparatorComponent from "@/Pages/Projects/Tab/Components/SeparatorComponent.vue";
 import ProjectGroupComponent from "@/Pages/Projects/Components/ProjectGroupComponent.vue";
 import ProjectTeamComponent from "@/Pages/Projects/Components/ProjectTeamComponent.vue";
@@ -27,7 +27,7 @@ import ProjectDocumentsComponent from "@/Pages/Projects/Components/ProjectDocume
 import ProjectAllDocumentsComponent from "@/Pages/Projects/Components/ProjectAllDocumentsComponent.vue";
 import ChecklistAllComponent from "@/Pages/Projects/Components/ChecklistAllComponent.vue";
 import CommentAllTab from "@/Pages/Projects/Tab/Components/CommentAllTab.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import BudgetInformations from "@/Pages/Projects/Tab/Components/BudgetInformations.vue";
 export default {
     name: "TabContent",
@@ -99,7 +99,7 @@ export default {
 </script>
 
 <template>
-    <ProjectHeaderComponent :header-object="headerObject" :project="headerObject.project">
+    <ProjectHeaderComponent :header-object="headerObject" :project="headerObject.project" :current-tab="currentTab">
         <div class="my-10 w-full">
             <div v-for="component in currentTab.components"  :class="removeML(component.component?.type)">
                 <Component
@@ -131,8 +131,6 @@ export default {
                 />
             </div>
         </div>
-
-
         <BaseSidenav @toggle="this.show =! this.show" v-if="currentTab.hasSidebarTabs">
             <div class="w-full">
                 <div class="mb-5 ml-3">
@@ -140,7 +138,7 @@ export default {
                         <div class="border-gray-200">
                             <nav class="-mb-px uppercase text-xs tracking-wide pt-4 flex space-x-8" aria-label="Tabs">
                                 <div v-for="(tab, index) in currentTab.sidebar_tabs" :key="tab?.name" @click="currentSideBarTab = index"
-                                      :class="[index === currentSideBarTab ? 'text-artwork-buttons-create border-artwork-buttons-create' : 'border-transparent text-secondary hover:text-artwork-buttons-hover hover:border-artwork-buttons-hover', 'whitespace-nowrap py-2 px-1 border-b-2 font-medium font-semibold cursor-pointer']"
+                                      :class="[index === currentSideBarTab ? 'text-artwork-context-light border-artwork-context-light' : 'border-transparent text-secondary hover:text-artwork-buttons-hover hover:border-artwork-buttons-hover', 'whitespace-nowrap py-2 px-1 border-b-2 font-semibold cursor-pointer']"
                                       :aria-current="index === currentSideBarTab ? 'page' : undefined">
                                     {{ tab.name }}
                                 </div>

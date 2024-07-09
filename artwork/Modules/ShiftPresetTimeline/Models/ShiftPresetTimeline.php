@@ -2,7 +2,7 @@
 
 namespace Artwork\Modules\ShiftPresetTimeline\Models;
 
-use App\Casts\TimeWithoutSeconds;
+use Artwork\Core\Casts\TimeWithoutSeconds;
 use Artwork\Core\Database\Models\Model;
 use Artwork\Modules\ShiftPreset\Models\ShiftPreset;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,6 +31,7 @@ class ShiftPresetTimeline extends Model
     protected $casts = [
         'start' => TimeWithoutSeconds::class,
         'end' => TimeWithoutSeconds::class,
+
     ];
 
     public function shiftPreset(): BelongsTo

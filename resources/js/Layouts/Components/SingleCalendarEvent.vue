@@ -4,19 +4,19 @@
         class="rounded-lg relative group">
         <div v-if="zoomFactor > 0.4"
              class="absolute w-full h-full rounded-lg group-hover:block flex justify-center align-middle items-center"
-             :class="event.clicked ? 'block bg-green-200/50' : 'hidden bg-indigo-500/50'">
+             :class="event.clicked ? 'block bg-green-200/50' : 'hidden bg-artwork-buttons-create/50'">
             <div class="flex justify-center items-center h-full gap-2" v-if="!multiEdit">
                 <a v-if="event.projectId && !project" type="button" :href="getEditHref(event.projectId)"
-                   class="rounded-full bg-indigo-600 p-1 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                   class="rounded-full bg-artwork-buttons-create p-1 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                     <IconLink stroke-width="1.5" class="h-4 w-4"/>
                 </a>
                 <button type="button" @click="openEditEventModal(event)"
-                        class="rounded-full bg-indigo-600 p-1 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        class="rounded-full bg-artwork-buttons-create p-1 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                     <IconEdit class="h-4 w-4" stroke-width="1.5"/>
                 </button>
                 <button v-if="isRoomAdmin || isCreator || this.hasAdminRole()" @click="openAddSubEventModal"
                         v-show="event.eventTypeId === 1" type="button"
-                        class="rounded-full bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        class="rounded-full bg-artwork-buttons-create text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                     <IconCirclePlus stroke-width="1.5" stroke="currentColor" class="w-6 h-6"/>
                 </button>
                 <button v-if="isRoomAdmin || isCreator || this.hasAdminRole()" type="button"
@@ -52,7 +52,7 @@
                         {{ event.eventTypeAbbreviation }}:
                     </div>
                     <div :style="{ width: width - (64 * zoomFactor) + 'px'}" class=" truncate">
-                        {{ event.title }}
+                        {{ event.eventName ?? event.project.name }}
                     </div>
                     <div v-if="$page.props.user.calendar_settings.project_status" class="absolute right-1">
                         <div v-if="event.project?.state?.color"
@@ -337,7 +337,7 @@
 </template>
 
 <script>
-import Button from "@/Jetstream/Button";
+import Button from "@/Jetstream/Button.vue";
 import {PlusCircleIcon} from '@heroicons/vue/outline'
 import UserTooltip from "@/Layouts/Components/UserTooltip.vue";
 import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/vue";
@@ -346,11 +346,11 @@ import ConfirmationComponent from "@/Layouts/Components/ConfirmEventRequestCompo
 import ConfirmDeleteModal from "@/Layouts/Components/ConfirmDeleteModal.vue";
 import EventComponent from "@/Layouts/Components/EventComponent.vue";
 import NewUserToolTip from "@/Layouts/Components/NewUserToolTip.vue";
-import {Link} from "@inertiajs/inertia-vue3";
+import {Link} from "@inertiajs/vue3";
 import DeclineEventModal from "@/Layouts/Components/DeclineEventModal.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import VueMathjax from "vue-mathjax-next";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
 
 export default {
     mixins: [Permissions, IconLib],

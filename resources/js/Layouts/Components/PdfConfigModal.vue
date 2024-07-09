@@ -20,20 +20,20 @@
                                 <div class="mb-4">
                                     <label for="title" class="block text-sm font-medium leading-6 text-gray-900">{{ $t('Heading')}}</label>
                                     <div class="mt-2">
-                                        <input v-model="pdf.title" type="text" :placeholder="pdf.title" name="title" id="title" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                        <input v-model="pdf.title" type="text" :placeholder="pdf.title" name="title" id="title" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-artwork-buttons-create sm:text-sm sm:leading-6" />
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                                     <div>
                                         <label for="start" class="block text-sm font-medium leading-6 text-gray-900">{{ $t('Start-Time')}}</label>
                                         <div class="mt-2">
-                                            <input v-model="pdf.start" type="date" name="start" id="start" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                            <input v-model="pdf.start" type="date" name="start" id="start" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-artwork-buttons-create sm:text-sm sm:leading-6" />
                                         </div>
                                     </div>
                                     <div>
                                         <label for="end" class="block text-sm font-medium leading-6 text-gray-900">{{ $t('End-Time')}}</label>
                                         <div class="mt-2">
-                                            <input v-model="pdf.end" type="date" name="end" id="end" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                            <input v-model="pdf.end" type="date" name="end" id="end" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-artwork-buttons-create sm:text-sm sm:leading-6" />
                                         </div>
                                     </div>
                                 </div>
@@ -107,9 +107,8 @@
 <script>
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot, Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions} from '@headlessui/vue'
 import {XIcon} from "@heroicons/vue/solid";
-import Permissions from "@/mixins/Permissions.vue";
-import {useForm, usePage} from "@inertiajs/inertia-vue3";
-import {Inertia} from "@inertiajs/inertia";
+import Permissions from "@/Mixins/Permissions.vue";
+import {useForm} from "@inertiajs/vue3";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
 export default {
     name: "PdfConfigModal",

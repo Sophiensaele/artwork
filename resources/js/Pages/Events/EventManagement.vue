@@ -1,5 +1,5 @@
 <template>
-    <app-layout>
+    <app-layout :title="$t('Calendar')">
         <div>
             <div v-if="calendarType && calendarType === 'daily'">
                 <div class="mr-4">
@@ -63,13 +63,12 @@
 
 import {defineComponent} from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import '@vuepic/vue-datepicker/dist/main.css'
-import CalendarComponent from "@/Layouts/Components/CalendarComponent";
+import CalendarComponent from "@/Layouts/Components/CalendarComponent.vue";
 import IndividualCalendarComponent from "@/Layouts/Components/IndividualCalendarComponent.vue";
 import IndividualCalendarAtGlanceComponent from "@/Layouts/Components/IndividualCalendarAtGlanceComponent.vue";
-import {usePage} from "@inertiajs/inertia-vue3";
-import {Inertia} from "@inertiajs/inertia";
-import Permissions from "@/mixins/Permissions.vue";
+import {usePage, router} from "@inertiajs/vue3";
+import Permissions from "@/Mixins/Permissions.vue";
+
 
 export default defineComponent({
     mixins: [Permissions],
@@ -101,11 +100,10 @@ export default defineComponent({
         usePage,
         changeAtAGlance() {
             this.atAGlance = !this.atAGlance;
-            Inertia.reload({
+            router.reload({
                 data: {
                     atAGlance: this.atAGlance,
-                },
-                only: ['calendar', 'eventsAtAGlance']
+                }
             })
         }
     },

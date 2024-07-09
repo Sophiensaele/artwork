@@ -1,10 +1,11 @@
 <template>
     <div id="myCalendar" class="bg-white min-w-[98%] w-[98%]" :class="isFullscreen ? 'overflow-y-auto' : ''">
         <div class="w-full flex flex-wrap bg-secondaryHover ml-14">
-            <div class="flex justify-center w-full bg-white">
+            <div class="flex justify-center w-full bg-white" :class="filteredEvents?.length ? 'mt-10' : ''">
                 <div class="mt-4 flex errorText items-center cursor-pointer mb-2"
                      @click="openEventsWithoutRoomComponent()"
-                     v-if="filteredEvents?.length > 0">
+                     v-if="filteredEvents?.length > 0"
+                     >
                     <IconAlertTriangle class="h-6  mr-2"/>
                     {{ filteredEvents?.length === 1 ? $t('{0} Event without room!', [filteredEvents?.length]) : $t('{0} Events without room!', [filteredEvents?.length]) }}
                 </div>
@@ -111,7 +112,7 @@
             <FormButton :text="$t('Move events')"
                        @click="openMultiEditModal"/>
             <FormButton @click="openDeleteSelectedEventsModal = true"
-                       class="!border-2 !border-buttonBlue bg-transparent !text-buttonBlue hover:!text-white hover:!bg-buttonHover !hover:border-transparent resize-none"
+                       class="!border-2 !border-artwork-buttons-create bg-transparent !text-artwork-buttons-create hover:!text-white hover:!bg-artwork-buttons-hover !hover:border-transparent resize-none"
                        :text="$t('Delete events')"/>
         </div>
 
@@ -135,14 +136,14 @@ import CalendarFunctionBar from "@/Layouts/Components/CalendarFunctionBar.vue";
 import EventsWithoutRoomComponent from "@/Layouts/Components/EventsWithoutRoomComponent.vue";
 import {ExclamationIcon} from "@heroicons/vue/outline";
 import EventComponent from "@/Layouts/Components/EventComponent.vue";
-import {Inertia} from "@inertiajs/inertia";
+import {router} from "@inertiajs/vue3";
 import MultiEditModal from "@/Layouts/Components/MultiEditModal.vue";
 import CalendarEventTooltip from "@/Layouts/Components/CalendarEventTooltip.vue";
 import ConfirmDeleteModal from "@/Layouts/Components/ConfirmDeleteModal.vue";
-import {Link} from "@inertiajs/inertia-vue3";
-import Permissions from "@/mixins/Permissions.vue";
+import {Link} from "@inertiajs/vue3";
+import Permissions from "@/Mixins/Permissions.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
 
 
 export default {
@@ -176,6 +177,7 @@ export default {
             openDeleteSelectedEventsModal: false,
             checkedEvents: [],
             isPageScrolled: false,
+            dateValueCopy: this.dateValue ? this.dateValue : [],
         }
     },
     props: [
@@ -288,11 +290,11 @@ export default {
         },
         onEventComponentClose() {
             this.createEventComponentIsVisible = false;
-            Inertia.reload();
+            router.reload();
         },
         deleteSelectedEvents() {
             this.getCheckedEvents();
-            Inertia.post(route('multi-edit.delete'), {
+            router.post(route('multi-edit.delete'), {
                 events: this.editEvents
             }, {
                 onSuccess: () => {
@@ -358,7 +360,7 @@ export default {
 
         },
         updateZoomFactorInUser(){
-            this.$inertia.patch(route('user.update.zoom_factor', {user : this.$page.props.user.id}), {
+            router.patch(route('user.update.zoom_factor', {user : this.$page.props.user.id}), {
                 zoom_factor: this.zoomFactor
             }, {
                 preserveScroll: true
@@ -369,28 +371,28 @@ export default {
         },
         onEventsWithoutRoomComponentClose() {
             this.showEventsWithoutRoomComponent = false;
-            Inertia.reload();
+            router.reload();
         },
         calculateDateDifference() {
-            const date1 = new Date(this.dateValue[0]);
-            const date2 = new Date(this.dateValue[1]);
+            const date1 = new Date(this.dateValueCopy[0]);
+            const date2 = new Date(this.dateValueCopy[1]);
             const timeDifference = date2.getTime() - date1.getTime();
             return timeDifference / (1000 * 3600 * 24);
         },
         previousTimeRange() {
             const dayDifference = this.calculateDateDifference();
-            this.dateValue[1] = this.getPreviousDay(this.dateValue[0]);
-            const newDate = new Date(this.dateValue[1]);
+            this.dateValueCopy[1] = this.getPreviousDay(this.dateValueCopy[0]);
+            const newDate = new Date(this.dateValueCopy[1]);
             newDate.setDate(newDate.getDate() - dayDifference);
-            this.dateValue[0] = newDate.toISOString().slice(0, 10);
+            this.dateValueCopy[0] = newDate.toISOString().slice(0, 10);
             this.updateTimes();
         },
         nextTimeRange() {
             const dayDifference = this.calculateDateDifference();
-            this.dateValue[0] = this.getNextDay(this.dateValue[1]);
-            const newDate = new Date(this.dateValue[1]);
+            this.dateValueCopy[0] = this.getNextDay(this.dateValueCopy[1]);
+            const newDate = new Date(this.dateValueCopy[1]);
             newDate.setDate(newDate.getDate() + dayDifference + 1);
-            this.dateValue[1] = newDate.toISOString().slice(0, 10);
+            this.dateValueCopy[1] = newDate.toISOString().slice(0, 10);
             this.updateTimes();
         },
         getNextDay(dateString) {
@@ -410,9 +412,9 @@ export default {
             return `${year}-${month}-${day}`;
         },
         updateTimes() {
-            Inertia.patch(route('update.user.calendar.filter.dates', this.$page.props.user.id), {
-                start_date:  this.dateValue[0],
-                end_date: this.dateValue[1],
+            router.patch(route('update.user.calendar.filter.dates', this.$page.props.user.id), {
+                start_date:  this.dateValueCopy[0],
+                end_date: this.dateValueCopy[1],
             },{
                 preserveScroll: true
             })
@@ -428,24 +430,6 @@ export default {
     overflow: overlay;
 }
 
-::-webkit-scrollbar {
-    width: 16px;
-}
-
-::-webkit-scrollbar-track {
-    background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #A7A6B170;
-    border-radius: 16px;
-    border: 6px solid transparent;
-    background-clip: content-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background-color: #a8bbbf;
-}
 .stickyHeader {
     position: sticky;
     align-self: flex-start;

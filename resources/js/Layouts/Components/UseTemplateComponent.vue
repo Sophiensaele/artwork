@@ -1,9 +1,5 @@
 <template>
-    <jet-dialog-modal :show="true" @close="closeModal()">
-        <template #content>
-            <img alt="Vorlage einlesen" src="/Svgs/Overlays/illu_budget_edit.svg" class="-ml-6 -mt-8 mb-4"/>
-            <XIcon @click="closeModal()" class="text-secondary h-5 w-5 right-0 top-0 mt-8 mr-5 absolute cursor-pointer"
-                   aria-hidden="true"/>
+    <BaseModal @closed="closeModal" v-if="true" modal-image="/Svgs/Overlays/illu_budget_edit.svg">
             <div class="mx-4">
                 <div>
                     <h1 class="my-1 flex">
@@ -62,8 +58,7 @@
                     </div>
                 </div>
             </div>
-        </template>
-    </jet-dialog-modal>
+    </BaseModal>
 </template>
 
 <script>
@@ -73,19 +68,21 @@ import {
     ListboxOption,
     ListboxOptions
 } from "@headlessui/vue";
-import JetDialogModal from "@/Jetstream/DialogModal";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import {
     XIcon,
     CheckIcon,
     ChevronDownIcon
 } from '@heroicons/vue/outline';
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
+import BaseModal from "@/Components/Modals/BaseModal.vue";
 
 export default {
     name: 'UseTemplateComponent',
     mixins: [Permissions],
     components: {
+        BaseModal,
         FormButton,
         ListboxOptions,
         ListboxOption,

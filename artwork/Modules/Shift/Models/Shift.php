@@ -3,13 +3,13 @@
 namespace Artwork\Modules\Shift\Models;
 
 use Antonrom\ModelChangesHistory\Traits\HasChangesHistory;
-use App\Casts\TimeWithoutSeconds;
-use App\Models\Freelancer;
-use App\Models\ServiceProvider;
-use App\Models\User;
+use Artwork\Core\Casts\TimeWithoutSeconds;
 use Artwork\Core\Database\Models\Model;
 use Artwork\Modules\Craft\Models\Craft;
 use Artwork\Modules\Event\Models\Event;
+use Artwork\Modules\Freelancer\Models\Freelancer;
+use Artwork\Modules\ServiceProvider\Models\ServiceProvider;
+use Artwork\Modules\User\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,6 +48,10 @@ use Illuminate\Support\Collection;
  * @property-read string $break_formatted
  * @property-read User|null $committedBy
  * @property-read Collection<ShiftsQualifications> $shiftsQualifications
+ * @property-read array $formatted_dates
+ * @property-read array $days_of_shift
+ * @property-read int $max_users
+ * @method static Builder isCommitted()
  */
 class Shift extends Model
 {
@@ -91,7 +95,7 @@ class Shift extends Model
         'break_formatted',
         'infringement',
         'formatted_dates',
-        'days_of_shift'
+        'max_users',
     ];
 
     public function committedBy(): BelongsTo
@@ -149,6 +153,9 @@ class Shift extends Model
             ->withPivot(['id', 'shift_qualification_id', 'shift_count']);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFormattedDatesAttribute(): array
     {
         return [
@@ -159,7 +166,11 @@ class Shift extends Model
         ];
     }
 
-    public function getDaysOfShiftAttribute(){
+    /**
+     * @return array<string, mixed>
+     */
+    public function getDaysOfShiftAttribute(): array
+    {
         if (!$this->start_date || !$this->end_date) {
             return [];
         }
@@ -249,5 +260,15 @@ class Shift extends Model
     public function scopeEventIdInArray(Builder $builder, array $eventIds): Builder
     {
         return $builder->whereIntegerInRaw('event_id', $eventIds);
+    }
+
+    public function scopeOrderedByStart(Builder $builder, string $direction = 'asc'): Builder
+    {
+        return $builder->orderBy('start', $direction);
+    }
+
+    public function getMaxUsersAttribute(): int
+    {
+        return $this->shiftsQualifications->sum('value');
     }
 }

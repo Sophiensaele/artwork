@@ -61,7 +61,7 @@
                                             </div>
                                         </div>
                                         <div class="hidden group-hover:block ml-3">
-                                            <XCircleIcon @click="showAddTimeLineForm = false" class="mt-2 h-5 w-5 text-buttonBlue hover:text-error cursor-pointer"/>
+                                            <XCircleIcon @click="showAddTimeLineForm = false" class="mt-2 h-5 w-5 text-artwork-buttons-create hover:text-error cursor-pointer"/>
                                         </div>
                                     </div>
                                     <div class="h-1">
@@ -94,7 +94,7 @@ import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from 
 import {PlusCircleIcon} from "@heroicons/vue/outline";
 import SingleTimeLine from "@/Pages/Projects/Components/SingleTimeLine.vue";
 import Input from "@/Jetstream/Input.vue";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
 
 export default defineComponent({

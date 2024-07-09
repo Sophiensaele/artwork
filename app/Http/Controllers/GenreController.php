@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Genre;
+use Artwork\Modules\Genre\Models\Genre;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -18,6 +18,7 @@ class GenreController extends Controller
     {
         Genre::create([
             'name' => $request->name,
+            'color' => $request->color
         ]);
         return Redirect::back();
     }
@@ -26,12 +27,12 @@ class GenreController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Genre  $genre
+     * @param  \Artwork\Modules\Genre\Models\Genre  $genre
      * @return RedirectResponse
      */
     public function update(Request $request, Genre $genre): RedirectResponse
     {
-        $genre->update($request->only('name'));
+        $genre->update($request->only(['name', 'color']));
 
         return Redirect::back();
     }

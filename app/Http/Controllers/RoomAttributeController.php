@@ -2,42 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\RoomRoomAttributeMapping;
+use Artwork\Modules\RoomAttribute\Models\RoomAttribute;
+use Artwork\Modules\RoomRoomAttributeMapping\Models\RoomRoomAttributeMapping;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Artwork\Modules\Room\Models\RoomAttribute;
 
 class RoomAttributeController extends Controller
 {
-    public function index(): void
-    {
-    }
-
-    public function create(): void
-    {
-    }
-
     public function store(Request $request): void
     {
         RoomAttribute::create(['name' => $request->get('name')]);
     }
-
-
-    public function show(): void
-    {
-    }
-
-
-    public function edit(): void
-    {
-    }
-
-
-    public function update(): void
-    {
-    }
-
 
     public function destroy(RoomAttribute $roomAttribute): RedirectResponse
     {

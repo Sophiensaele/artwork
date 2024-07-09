@@ -4,7 +4,7 @@
             <img src="/Svgs/IconSvgs/icon_group_black.svg" class="h-4 w-4 mr-2" aria-hidden="true" alt=""/>
         </span>
         {{ $t('Belongs to') }}
-        <Link :href="route('projects.tab', {project: currentGroup?.id ?? headerObject.currentGroup?.id, projectTab: this.first_project_tab_id})" class="text-buttonBlue ml-1">
+        <Link :href="route('projects.tab', {project: currentGroup?.id ?? headerObject.currentGroup?.id, projectTab: this.first_project_tab_id})" class="text-artwork-buttons-create ml-1">
             {{ currentGroup?.name ?? headerObject.currentGroup?.name }}
         </Link>
     </div>
@@ -12,7 +12,7 @@
 
 <script>
 import {defineComponent} from "vue";
-import {Link} from "@inertiajs/inertia-vue3";
+import {Link} from "@inertiajs/vue3";
 
 export default defineComponent({
     props: [

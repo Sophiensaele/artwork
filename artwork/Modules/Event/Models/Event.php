@@ -3,22 +3,22 @@
 namespace Artwork\Modules\Event\Models;
 
 use Antonrom\ModelChangesHistory\Traits\HasChangesHistory;
-use App\Builders\EventBuilder;
-use App\Models\EventType;
-use App\Models\SeriesEvents;
-use App\Models\User;
+use Artwork\Core\Database\Models\Model;
+use Artwork\Modules\Event\Services\EventService;
 use Artwork\Modules\EventComment\Models\EventComment;
+use Artwork\Modules\EventType\Models\EventType;
 use Artwork\Modules\Project\Models\Project;
 use Artwork\Modules\Room\Models\Room;
+use Artwork\Modules\SeriesEvents\Models\SeriesEvents;
 use Artwork\Modules\Shift\Models\Shift;
-use Artwork\Modules\SubEvents\Models\SubEvent;
+use Artwork\Modules\SubEvent\Models\SubEvent;
 use Artwork\Modules\Timeline\Models\Timeline;
+use Artwork\Modules\User\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Artwork\Core\Database\Models\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -44,6 +44,8 @@ use Illuminate\Support\Collection;
  * @property int $project_id
  * @property bool $is_series
  * @property int $series_id
+ * @property Carbon $earliest_start_datetime
+ * @property Carbon $latest_end_datetime
  * @property string $created_at
  * @property string $updated_at
  * @property string $deleted_at
@@ -92,7 +94,9 @@ class Event extends Model
         'accepted',
         'option_string',
         'declined_room_id',
-        'allDay'
+        'allDay',
+        'latest_end_datetime',
+        'earliest_start_datetime'
     ];
 
     protected $guarded = [
@@ -107,7 +111,9 @@ class Event extends Model
         'end_time' => 'datetime:d. M Y H:i',
         'is_series' => 'boolean',
         'accepted' => 'boolean',
-        'allDay' => 'boolean'
+        'allDay' => 'boolean',
+        'earliest_start_datetime' => 'datetime',
+        'latest_end_datetime' => 'datetime',
     ];
 
     protected $appends = [
@@ -115,8 +121,21 @@ class Event extends Model
         'start_time_without_day',
         'end_time_without_day',
         'event_date_without_time',
-        'days_of_shifts'
+        'formatted_dates',
+        'dates_for_series_event'
     ];
+
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::saving(function (Event $event): void {
+            /** @var EventService $eventService */
+            $eventService = app()->get(EventService::class);
+            $event->earliest_start_datetime = $eventService->getEarliestStartTime($event);
+            $event->latest_end_datetime = $eventService->getLatestEndTime($event);
+        });
+    }
 
     public function comments(): HasMany
     {
@@ -195,11 +214,37 @@ class Event extends Model
         return Carbon::parse($this->end_time)->format('H:i');
     }
 
+
+    /**
+     * @return array<string, string>
+     */
+    public function getFormattedDatesAttribute(): array
+    {
+        return [
+            'start' => Carbon::parse($this->start_time)->translatedFormat('d.m.Y H:i'),
+            'end' => Carbon::parse($this->end_time)->translatedFormat('d.m.Y H:i')
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
     public function getEventDateWithoutTimeAttribute(): array
     {
         return [
             'start' => Carbon::parse($this->start_time)->format('d.m.Y'),
             'end' => Carbon::parse($this->end_time)->format('d.m.Y')
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getTimesWithoutDatesAttribute(): array
+    {
+        return [
+            'start' => Carbon::parse($this->start_time)->format('H:i'),
+            'end' => Carbon::parse($this->end_time)->format('H:i')
         ];
     }
 
@@ -223,14 +268,18 @@ class Event extends Model
         return $days;
     }
 
-    /**
-     * @return array<string>
-     */
-    public function getDaysOfShiftsAttribute(): array
+    public function getDaysOfShifts(Shift|Collection $shifts = null): array
     {
+        if ($shifts instanceof Shift) {
+            $shifts = collect([$shifts]);
+        }
         $days = [];
 
-        foreach ($this->shifts as $shift) {
+        if (!$shifts) {
+            $shifts = $this->shifts;
+        }
+
+        foreach ($shifts as $shift) {
             if ($shift->start_date === null || $shift->end_date === null) {
                 continue;
             }
@@ -241,11 +290,6 @@ class Event extends Model
         }
 
         return $days;
-    }
-
-    public function newEloquentBuilder($query): EventBuilder
-    {
-        return new EventBuilder($query);
     }
 
     public function getMinutesFromDayStart(Carbon $date): int
@@ -327,15 +371,15 @@ class Event extends Model
             }
         )->orWhere(
             function ($query) use ($start, $end): void {
-            // Events, die vor dem gegebenen Startdatum beginnen und innerhalb des gegebenen Zeitraums enden
+                // Events, die vor dem gegebenen Startdatum beginnen und innerhalb des gegebenen Zeitraums enden
                 $query->where('start_time', '<', $start)
-                ->whereBetween('end_time', [$start, $end]);
+                    ->whereBetween('end_time', [$start, $end]);
             }
         )->orWhere(
             function ($query) use ($start, $end): void {
                 // Events, die innerhalb des gegebenen Zeitraums starten und nach dem gegebenen Enddatum enden
                 $query->whereBetween('start_time', [$start, $end])
-                ->where('end_time', '>', $end);
+                    ->where('end_time', '>', $end);
             }
         );
     }
@@ -343,5 +387,34 @@ class Event extends Model
     public function scopeIsNotId(Builder $builder, int $eventId): Builder
     {
         return $builder->where('id', '!=', $eventId);
+    }
+
+    public function scopeOccursAt(Builder $builder, Carbon $carbon): Builder
+    {
+        return $builder
+            ->whereDate('start_time', '<=', $carbon)
+            ->whereDate('end_time', '>=', $carbon);
+    }
+
+    public function scopeOrderByStartTime(Builder $builder, string $direction = 'ASC'): Builder
+    {
+        return $builder->orderBy('start_time', $direction);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getDatesForSeriesEventAttribute(): array
+    {
+        if (!$this->is_series) {
+            return [];
+        }
+
+        return [
+            'start' => Carbon::parse($this->start_time)->format('Y-m-d'),
+            'end' => Carbon::parse($this->series->end_date)->format('Y-m-d'),
+            'formatted_start' => Carbon::parse($this->start_time)->translatedFormat('d. M Y'),
+            'formatted_end' => Carbon::parse($this->series->end_date)->translatedFormat('d. M Y')
+        ];
     }
 }

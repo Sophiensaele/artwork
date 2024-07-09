@@ -1,11 +1,6 @@
 <template>
-    <jet-dialog-modal :show="this.show" @close="this.close">
-        <template #content>
-            <img src="/Svgs/Overlays/illu_user_invite.svg" class="-ml-6 -mt-8 mb-4" alt="artwork"/>
+    <BaseModal @closed="close(false)" v-if="show" modal-image="/Svgs/Overlays/illu_user_invite.svg">
             <div class="mx-4">
-                <XIcon @click="this.close"
-                       class="h-5 w-5 flex text-secondary cursor-pointer absolute right-0 mr-10"
-                       aria-hidden="true"/>
                 <div class="mt-8 headline1">
                     {{this.mode === 'create' ? $t('Create qualification') : $t('Edit qualification')}}
                 </div>
@@ -93,12 +88,11 @@
                         />
                 </div>
             </div>
-        </template>
-    </jet-dialog-modal>
+    </BaseModal>
 </template>
 
 <script>
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 import {defineComponent} from "vue";
 import {ChevronDownIcon, XIcon} from "@heroicons/vue/outline";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
@@ -106,6 +100,7 @@ import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/vue";
 import ShiftQualificationIconCollection from "@/Layouts/Components/ShiftQualificationIconCollection.vue";
 import Label from "@/Jetstream/Label.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
+import BaseModal from "@/Components/Modals/BaseModal.vue";
 const shiftQualificationIcons = [
     {iconName: 'user-icon'},
     {iconName: 'academic-cap-icon'},
@@ -122,6 +117,7 @@ const shiftQualificationIcons = [
 export default defineComponent({
     name: 'ShiftQualificationModal',
     components: {
+        BaseModal,
         FormButton,
         Label,
         ShiftQualificationIconCollection,

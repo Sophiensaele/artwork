@@ -49,7 +49,7 @@
 
 <script>
 import {defineComponent} from 'vue'
-import {Link} from "@inertiajs/inertia-vue3";
+import {Link} from "@inertiajs/vue3";
 import DragElement from "@/Pages/Projects/Components/DragElement.vue";
 import ShowUserShiftsModal from "@/Pages/Shifts/Components/ShowUserShiftsModal.vue";
 
@@ -83,24 +83,6 @@ export default defineComponent({
 
 .shiftUsers {
     overflow: overlay;
-}
-::-webkit-scrollbar {
-    width: 16px;
-}
-
-::-webkit-scrollbar-track {
-    background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #A7A6B170;
-    border-radius: 16px;
-    border: 6px solid transparent;
-    background-clip: content-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background-color: #a8bbbf;
 }
 
 </style>

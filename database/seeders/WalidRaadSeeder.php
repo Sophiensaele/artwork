@@ -2,20 +2,20 @@
 
 namespace Database\Seeders;
 
-use App\Enums\BudgetTypesEnum;
-use App\Enums\TabComponentEnums;
-use App\Models\EventType;
-use App\Models\MoneySource;
-use App\Models\SeriesEvents;
 use Artwork\Modules\Area\Models\Area;
+use Artwork\Modules\Budget\Enums\BudgetTypeEnum;
 use Artwork\Modules\Budget\Models\BudgetSumDetails;
 use Artwork\Modules\Budget\Models\SubPositionRow;
 use Artwork\Modules\BudgetColumnSetting\Services\BudgetColumnSettingService;
 use Artwork\Modules\Event\Models\Event;
+use Artwork\Modules\EventType\Models\EventType;
+use Artwork\Modules\MoneySource\Models\MoneySource;
 use Artwork\Modules\Project\Models\Project;
 use Artwork\Modules\Project\Models\ProjectStates;
+use Artwork\Modules\ProjectTab\Enums\ProjectTabComponentEnum;
 use Artwork\Modules\ProjectTab\Models\Component;
 use Artwork\Modules\ProjectTab\Models\ProjectTab;
+use Artwork\Modules\SeriesEvents\Models\SeriesEvents;
 use Artwork\Modules\Shift\Models\Shift;
 use Artwork\Modules\ShiftQualification\Models\ShiftQualification;
 use Carbon\Carbon;
@@ -44,6 +44,46 @@ class WalidRaadSeeder extends Seeder
             'name' => 'Tolle Quelle',
             'amount' => 100000,
         ]);
+
+
+        $firstArea = Area::find(1);
+
+        $firstArea->rooms()->create([
+            'name' => 'Theater',
+            'user_id' => 1,
+            'order' => 3
+        ]);
+
+        $firstArea->rooms()->create([
+            'name' => 'Raum 5C',
+            'user_id' => 1,
+            'order' => 4
+        ]);
+
+        $secondArea = Area::find(2);
+
+        $secondArea->rooms()->create([
+            'name' => 'Raum 7D',
+            'user_id' => 1,
+            'order' => 2
+        ]);
+
+        $lastArea = Area::create([
+            'name' => 'Haus 1'
+        ]);
+
+        $lastArea->rooms()->create([
+            'name' => 'Raum 3B',
+            'user_id' => 1,
+            'order' => 1
+        ]);
+
+        $lastArea->rooms()->create([
+            'name' => '6a',
+            'user_id' => 1,
+            'order' => 2
+        ]);
+
 
         /**
          * Attach users to Money Source
@@ -87,7 +127,7 @@ class WalidRaadSeeder extends Seeder
 
         $firstChecklistTabWithChecklistComponentId = ProjectTab::query()
             ->where('name', 'Checklists')
-            ->whereRelation('components.component', 'type', TabComponentEnums::CHECKLIST->value)
+            ->whereRelation('components.component', 'type', ProjectTabComponentEnum::CHECKLIST->value)
             ->first()
             ->id;
         /**
@@ -232,7 +272,7 @@ class WalidRaadSeeder extends Seeder
 
         $firstCommentsTabWithCommentsComponentId = ProjectTab::query()
             ->where('name', 'Comments')
-            ->whereRelation('components.component', 'type', TabComponentEnums::COMMENT_TAB->value)
+            ->whereRelation('components.component', 'type', ProjectTabComponentEnum::COMMENT_TAB->value)
             ->first()
             ->id;
 
@@ -279,6 +319,10 @@ class WalidRaadSeeder extends Seeder
 
         $project->shiftRelevantEventTypes()->attach([2, 8]);
 
+        SeriesEvents::create([
+            'frequency_id' => 1,
+            'end_date' => Carbon::now()->subDays(7)->startOfDay(),
+        ]);
 
         $eventMain = $project->events()->create([
             'eventName' => 'Workshop',
@@ -294,7 +338,9 @@ class WalidRaadSeeder extends Seeder
             'series_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => true
+            'allDay' => true,
+            'earliest_start_datetime' => Carbon::now()->subDays(10)->startOfDay(),
+            'latest_end_datetime' => Carbon::now()->subDays(10)->endOfDay()
         ]);
 
         $serieEvent1 = $project->events()->create([
@@ -311,7 +357,9 @@ class WalidRaadSeeder extends Seeder
             'series_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => true
+            'allDay' => true,
+            'earliest_start_datetime' => Carbon::now()->subDays(9)->startOfDay(),
+            'latest_end_datetime' => Carbon::now()->subDays(9)->endOfDay()
         ]);
 
         $serieEvent2 = $project->events()->create([
@@ -328,13 +376,12 @@ class WalidRaadSeeder extends Seeder
             'series_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => true
+            'allDay' => true,
+            'earliest_start_datetime' => Carbon::now()->subDays(8)->startOfDay(),
+            'latest_end_datetime' => Carbon::now()->subDays(8)->endOfDay()
         ]);
 
-        SeriesEvents::create([
-            'frequency_id' => 1,
-            'end_date' => Carbon::now()->subDays(7)->startOfDay(),
-        ]);
+
 
         $project->events()->create([
             'eventName' => 'Meeting',
@@ -348,7 +395,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => false
+            'allDay' => false,
+            'earliest_start_datetime' => Carbon::now()->subDays(10)->format('Y-m-d H:i:s'),
+            'latest_end_datetime' => Carbon::now()->subDays(10)->addHour()->format('Y-m-d H:i:s')
         ]);
 
         $project->events()->create([
@@ -363,7 +412,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => false
+            'allDay' => false,
+            'earliest_start_datetime' => Carbon::now()->subDays(7)->format('Y-m-d H:i:s'),
+            'latest_end_datetime' => Carbon::now()->subDays(7)->addHour()->format('Y-m-d H:i:s')
         ]);
 
         $project->events()->create([
@@ -378,7 +429,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => false
+            'allDay' => false,
+            'earliest_start_datetime' => Carbon::now()->subDays(0)->format('Y-m-d H:i:s'),
+            'latest_end_datetime' => Carbon::now()->subDays(10)->addHour()->format('Y-m-d H:i:s')
         ]);
 
         $project->events()->create([
@@ -393,7 +446,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => true
+            'allDay' => true,
+            'earliest_start_datetime' =>  Carbon::now()->subDays(4)->startOfDay(),
+            'latest_end_datetime' => Carbon::now()->subDays(4)->endOfDay()
         ]);
 
         $project->events()->create([
@@ -408,7 +463,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => true
+            'allDay' => true,
+            'earliest_start_datetime' =>  Carbon::now()->subDays(4)->startOfDay(),
+            'latest_end_datetime' => Carbon::now()->subDays(4)->endOfDay()
         ]);
 
         $project->events()->create([
@@ -423,7 +480,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => true
+            'allDay' => true,
+            'earliest_start_datetime' =>  Carbon::now()->subDays(10)->startOfDay(),
+            'latest_end_datetime' => Carbon::now()->subDays(10)->endOfDay()
         ]);
 
         $project->events()->create([
@@ -438,7 +497,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => true
+            'allDay' => true,
+            'earliest_start_datetime' =>  Carbon::now()->subDays(7)->startOfDay(),
+            'latest_end_datetime' => Carbon::now()->subDays(7)->endOfDay()
         ]);
 
         /** @var Event $eventWithManyShifts */
@@ -454,7 +515,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => true
+            'allDay' => true,
+            'earliest_start_datetime' =>  Carbon::now()->subDays(6),
+            'latest_end_datetime' => Carbon::now()->subDays(6)->addHours(5)
         ]);
 
         $project->events()->create([
@@ -469,7 +532,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => false
+            'allDay' => false,
+            'earliest_start_datetime' =>  Carbon::now()->endOfDay()->subHours(3),
+            'latest_end_datetime' => Carbon::now()->endOfDay()->subMinutes(59)
         ]);
 
         $project->events()->create([
@@ -484,7 +549,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => false
+            'allDay' => false,
+            'earliest_start_datetime' =>  Carbon::now()->subDays(10)->format('Y-m-d H:i:s'),
+            'latest_end_datetime' => Carbon::now()->subDays(10)->addHour()->format('Y-m-d H:i:s')
         ]);
 
         /** @var Event $eventWithShift */
@@ -500,7 +567,9 @@ class WalidRaadSeeder extends Seeder
             'user_id' => 1,
             'accepted' => false,
             'option_string' => null,
-            'allDay' => false
+            'allDay' => false,
+            'earliest_start_datetime' =>  Carbon::now()->subDays(10)->format('Y-m-d H:i:s'),
+            'latest_end_datetime' => Carbon::now()->subDays(10)->addHour()->format('Y-m-d H:i:s')
         ]);
 
         /** @var Shift $shift */
@@ -659,44 +728,6 @@ class WalidRaadSeeder extends Seeder
             'event_end_day' => $eventWithManyShifts->end_time->format('Y-m-d'),
         ]);
 
-        $firstArea = Area::find(1);
-
-        $firstArea->rooms()->create([
-            'name' => 'Theater',
-            'user_id' => 1,
-            'order' => 3
-        ]);
-
-        $firstArea->rooms()->create([
-            'name' => 'Raum 5C',
-            'user_id' => 1,
-            'order' => 4
-        ]);
-
-        $secondArea = Area::find(2);
-
-        $secondArea->rooms()->create([
-            'name' => 'Raum 7D',
-            'user_id' => 1,
-            'order' => 2
-        ]);
-
-        $lastArea = Area::create([
-            'name' => 'Haus 1'
-        ]);
-
-        $lastArea->rooms()->create([
-            'name' => 'Raum 3B',
-            'user_id' => 1,
-            'order' => 1
-        ]);
-
-        $lastArea->rooms()->create([
-            'name' => '6a',
-            'user_id' => 1,
-            'order' => 2
-        ]);
-
 
         /**
          * create project budget table
@@ -759,10 +790,10 @@ class WalidRaadSeeder extends Seeder
 
         // COST TABLE
         $costMainPosition = $table->mainPositions()->create([
-            'type' => BudgetTypesEnum::BUDGET_TYPE_COST,
+            'type' => BudgetTypeEnum::BUDGET_TYPE_COST,
             'name' => 'Gesamtkosten Produktion',
             'position' => $table->mainPositions()
-                    ->where('type', BudgetTypesEnum::BUDGET_TYPE_COST)->max('position') + 1
+                    ->where('type', BudgetTypeEnum::BUDGET_TYPE_COST)->max('position') + 1
         ]);
 
         $costMainPosition->mainPositionSumDetails()->create([
@@ -1147,11 +1178,11 @@ class WalidRaadSeeder extends Seeder
         ]);
 
         $costMainPosition2 = $table->mainPositions()->create([
-            'type' => BudgetTypesEnum::BUDGET_TYPE_COST,
+            'type' => BudgetTypeEnum::BUDGET_TYPE_COST,
             'name' => 'Gesamtkosten Technik',
             'position' => $table->mainPositions()
-                    ->where('type', BudgetTypesEnum::BUDGET_TYPE_COST)->max('position') + 1,
-            'is_verified' => BudgetTypesEnum::BUDGET_VERIFIED_TYPE_REQUESTED
+                    ->where('type', BudgetTypeEnum::BUDGET_TYPE_COST)->max('position') + 1,
+            'is_verified' => BudgetTypeEnum::BUDGET_VERIFIED_TYPE_REQUESTED
         ]);
 
         $costMainPosition2->mainPositionSumDetails()->create([
@@ -1386,10 +1417,10 @@ class WalidRaadSeeder extends Seeder
 
         // EARNING TABLE
         $earningMainPosition = $table->mainPositions()->create([
-            'type' => BudgetTypesEnum::BUDGET_TYPE_EARNING,
+            'type' => BudgetTypeEnum::BUDGET_TYPE_EARNING,
             'name' => 'Einnahmen mit Budgetposten',
             'position' => $table->mainPositions()
-                    ->where('type', BudgetTypesEnum::BUDGET_TYPE_EARNING)->max('position') + 1
+                    ->where('type', BudgetTypeEnum::BUDGET_TYPE_EARNING)->max('position') + 1
         ]);
 
         $earningMainPosition->mainPositionSumDetails()->create([

@@ -3,16 +3,16 @@
         <div class="col-span-8">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="col-span-1">
-                    <input type="text" v-model="contactData.first_name" @focusout="updateContact" name="first_name" id="first_name" class="block w-full border-0 py-2.5 text-gray-900 shadow-sm ring-2 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-8" :placeholder="$t('First name')" />
+                    <input type="text" v-model="contactData.first_name" @focusout="updateContact" name="first_name" id="first_name" class="block w-full border-0 py-2.5 text-gray-900 shadow-sm ring-2 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-artwork-buttons-create sm:text-sm sm:leading-8" :placeholder="$t('First name')" />
                 </div>
                 <div class="col-span-1">
-                    <input type="text" v-model="contactData.last_name" @focusout="updateContact" name="last_name" id="last_name" class="block w-full border-0 py-2.5 text-gray-900 shadow-sm ring-2 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-8" :placeholder="$t('Last name')" />
+                    <input type="text" v-model="contactData.last_name" @focusout="updateContact" name="last_name" id="last_name" class="block w-full border-0 py-2.5 text-gray-900 shadow-sm ring-2 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-artwork-buttons-create sm:text-sm sm:leading-8" :placeholder="$t('Last name')" />
                 </div>
                 <div class="col-span-1">
-                    <input type="email" v-model="contactData.email" @focusout="updateContact" name="email" id="email" class="block w-full border-0 py-2.5 text-gray-900 shadow-sm ring-2 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-8" :placeholder="$t('Email')" />
+                    <input type="email" v-model="contactData.email" @focusout="updateContact" name="email" id="email" class="block w-full border-0 py-2.5 text-gray-900 shadow-sm ring-2 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-artwork-buttons-create sm:text-sm sm:leading-8" :placeholder="$t('Email')" />
                 </div>
                 <div class="col-span-1">
-                    <input type="text" v-model="contactData.phone_number" @focusout="updateContact" name="phone_number" id="phone_number" class="block w-full border-0 py-2.5 text-gray-900 shadow-sm ring-2 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-8" :placeholder="$t('Phone number')" />
+                    <input type="text" v-model="contactData.phone_number" @focusout="updateContact" name="phone_number" id="phone_number" class="block w-full border-0 py-2.5 text-gray-900 shadow-sm ring-2 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-artwork-buttons-create sm:text-sm sm:leading-8" :placeholder="$t('Phone number')" />
                 </div>
             </div>
         </div>
@@ -32,8 +32,8 @@
 <script>
 import {defineComponent} from 'vue'
 import {CheckIcon, XIcon} from "@heroicons/vue/solid";
-import {Inertia} from "@inertiajs/inertia";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {router} from "@inertiajs/vue3";
+import {useForm} from "@inertiajs/vue3";
 import SuccessModal from "@/Layouts/Components/General/SuccessModal.vue";
 
 export default defineComponent({
@@ -56,7 +56,7 @@ export default defineComponent({
     },
     methods: {
         deleteContact(){
-            Inertia.delete(route('service-provider.contact.delete', this.contact.id), {
+            router.delete(route('service-provider.contact.delete', this.contact.id), {
                 preserveState: true, preserveScroll: true, onSuccess: () => this.openSuccessModal()
             });
         },

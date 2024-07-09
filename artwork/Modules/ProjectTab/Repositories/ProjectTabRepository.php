@@ -2,11 +2,11 @@
 
 namespace Artwork\Modules\ProjectTab\Repositories;
 
-use App\Enums\TabComponentEnums;
 use Artwork\Core\Database\Repository\BaseRepository;
+use Artwork\Modules\ProjectTab\Enums\ProjectTabComponentEnum;
 use Artwork\Modules\ProjectTab\Models\ProjectTab;
 
-class ProjectTabRepository extends BaseRepository
+readonly class ProjectTabRepository extends BaseRepository
 {
     public function findFirstProjectTab(): ProjectTab|null
     {
@@ -16,7 +16,7 @@ class ProjectTabRepository extends BaseRepository
         return $projectTab;
     }
 
-    public function findFirstProjectTabByComponentsComponentType(TabComponentEnums $type): ProjectTab|null
+    public function findFirstProjectTabByComponentsComponentType(ProjectTabComponentEnum $type): ProjectTab|null
     {
         /** @var ProjectTab $projectTab */
         $projectTab = ProjectTab::query()
@@ -24,5 +24,17 @@ class ProjectTabRepository extends BaseRepository
             ->first();
 
         return $projectTab;
+    }
+
+    public function findByName(string $name): ?ProjectTab
+    {
+        return ProjectTab::query()
+            ->where('name', $name)
+            ->first();
+    }
+
+    public function findById(int $id): ?ProjectTab
+    {
+        return ProjectTab::find($id);
     }
 }

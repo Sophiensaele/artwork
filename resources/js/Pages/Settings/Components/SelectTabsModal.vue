@@ -1,6 +1,6 @@
 <script>
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
 import {
     Dialog,
     DialogPanel,
@@ -12,7 +12,7 @@ import {
     TransitionRoot
 } from "@headlessui/vue";
 import {XIcon} from "@heroicons/vue/solid";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 import {
     Listbox,
     ListboxButton,

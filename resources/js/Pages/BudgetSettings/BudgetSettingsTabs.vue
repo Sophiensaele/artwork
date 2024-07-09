@@ -6,7 +6,7 @@
                   :key="tab.name"
                   :class="[
                       tab.current ?
-                          'border-buttonBlue text-buttonBlue' :
+                          'border-artwork-buttons-create text-artwork-buttons-create' :
                           'border-transparent text-secondary hover:text-gray-600 hover:border-gray-300',
                       'whitespace-nowrap py-4 px-1 border-b-2 font-semibold'
                   ]"
@@ -19,8 +19,8 @@
 
 <script>
 import {defineComponent} from 'vue';
-import {Link} from "@inertiajs/inertia-vue3";
-import Permissions from "@/mixins/Permissions.vue";
+import {Link} from "@inertiajs/vue3";
+import Permissions from "@/Mixins/Permissions.vue";
 
 export default defineComponent({
     name: 'BudgetSettingsTabs',

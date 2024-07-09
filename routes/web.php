@@ -72,10 +72,11 @@ use App\Http\Controllers\UserCommentedBudgetItemsSettingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserShiftCalendarFilterController;
 use App\Http\Controllers\VacationController;
-use App\Http\Middleware\CanEditMoneySource;
-use App\Http\Middleware\CanEditProject;
-use App\Http\Middleware\CanViewProject;
-use App\Http\Middleware\CanViewRoom;
+use Artwork\Modules\Inventory\Http\Controller\InventoryController;
+use Artwork\Modules\MoneySource\Http\Middleware\CanEditMoneySource;
+use Artwork\Modules\Project\Http\Middleware\CanEditProject;
+use Artwork\Modules\Project\Http\Middleware\CanViewProject;
+use Artwork\Modules\Room\Http\Middleware\CanViewRoom;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -185,7 +186,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function (): void {
     Route::get('/users/money_source_search', [UserController::class, 'moneySourceSearch'])
         ->name('users.money_source_search');
     Route::get('/users/{user}/info', [UserController::class, 'editUserInfo'])->name('user.edit.info');
-    Route::get('/users/{user}/shiftplan', [UserController::class, 'editUserShiftplan'])->name('user.edit.shiftplan');
+    Route::get('/users/{user}/shiftplan', [UserController::class, 'editUserShiftPlan'])->name('user.edit.shiftplan');
     Route::get('/users/{user}/terms', [UserController::class, 'editUserTerms'])->name('user.edit.terms');
     Route::get('/users/{user}/permissions', [UserController::class, 'editUserPermissions'])
         ->name('user.edit.permissions');
@@ -350,17 +351,19 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function (): void {
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
     Route::patch('/categories/{category}/restore', [CategoryController::class, 'restore']);
     Route::delete('/categories/{id}/force', [CategoryController::class, 'forceDelete'])->name('categories.force');
+    Route::patch('/project/create/settings', [ProjectController::class, 'updateSettings'])
+        ->name('project_settings.update');
 
     //Genres
     Route::post('/genres', [GenreController::class, 'store'])->name('genres.store');
-    Route::patch('/genres/{genre}', [GenreController::class, 'update']);
+    Route::patch('/genres/{genre}', [GenreController::class, 'update'])->name('genres.update');
     Route::delete('/genres/{genre}', [GenreController::class, 'destroy']);
     Route::patch('/genres/{genre}/restore', [GenreController::class, 'restore']);
     Route::delete('/genres/{id}/force', [GenreController::class, 'forceDelete'])->name('genres.force');
 
     //Sectors
     Route::post('/sectors', [SectorController::class, 'store'])->name('sectors.store');
-    Route::patch('/sectors/{sector}', [SectorController::class, 'update']);
+    Route::patch('/sectors/{sector}', [SectorController::class, 'update'])->name('sectors.update');
     Route::delete('/sectors/{sector}', [SectorController::class, 'destroy']);
     Route::patch('/sectors/{sector}/restore', [SectorController::class, 'restore']);
     Route::delete('/sectors/{id}/force', [SectorController::class, 'forceDelete'])->name('sectors.force');
@@ -598,6 +601,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function (): void {
         Route::patch('/timelines/update', [ProjectController::class, 'updateTimeLines'])->name('update.timelines');
         Route::patch('/shifts/commit', [ShiftController::class, 'updateCommitments'])->name('update.shift.commitment');
         Route::patch('/{shift}/update', [ShiftController::class, 'updateShift'])->name('event.shift.update');
+        Route::patch('/{shift}/update/description', [ShiftController::class, 'updateDescription'])
+            ->name('event.shift.update.updateDescription');
         Route::patch('/sums/money-source/{sumMoneySource}', [SumDetailsController::class, 'update'])
             ->name('project.sum.money.source.update');
 
@@ -911,6 +916,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function (): void {
         ->name('contract_types.restore');
     Route::delete('/contract_types/{id}/force', [ContractTypeController::class, 'forceDelete'])
         ->name('contract_types.force');
+    Route::patch('/contract_types/{contract_type}/update', [ContractTypeController::class, 'update'])
+        ->name('contract_types.update');
 
     // CompanyTypes
     Route::get('/company_types', [CompanyTypeController::class, 'index'])->name('company_types.index');
@@ -921,6 +928,8 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function (): void {
         ->name('company_types.restore');
     Route::delete('/company_types/{id}/force', [CompanyTypeController::class, 'forceDelete'])
         ->name('company_types.force');
+    Route::patch('/company_types/{company_type}/update', [CompanyTypeController::class, 'update'])
+        ->name('company_types.update');
 
     // Collecting Societies
     Route::get('/collecting_societies', [CollectingSocietyController::class, 'index'])
@@ -935,12 +944,16 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function (): void {
     )->name('collecting_societies.restore');
     Route::delete('/collecting_societies/{id}/force', [CollectingSocietyController::class, 'forceDelete'])
         ->name('collecting_societies.force');
-
+    Route::patch(
+        '/collecting_societies/{collecting_society}/update',
+        [CollectingSocietyController::class, 'update']
+    )->name('collecting_societies.update');
     // Currencies
     Route::get('/currencies', [CurrencyController::class, 'index'])->name('currencies.index');
     Route::post('/currencies', [CurrencyController::class, 'store'])->name('currencies.store');
     Route::delete('/currencies/{currency}', [CurrencyController::class, 'destroy'])->name('currencies.delete');
     Route::patch('/currencies/{currency}/restore', [CurrencyController::class, 'restore'])->name('currencies.restore');
+    Route::patch('/currencies/{currency}/update', [CurrencyController::class, 'update'])->name('currencies.update');
     Route::delete('/currencies/{id}/force', [CurrencyController::class, 'forceDelete'])->name('currencies.force');
 
     // Project States
@@ -949,6 +962,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function (): void {
         ->name('update.project.state');
     Route::delete('/state/{projectStates}', [ProjectStatesController::class, 'destroy'])->name('state.delete');
     Route::patch('/states/{state}/restore', [ProjectStatesController::class, 'restore'])->name('state.restore');
+    Route::patch('/states/{projectStates}/update', [ProjectStatesController::class, 'update'])->name('state.update');
     Route::delete('/states/{id}/force', [ProjectStatesController::class, 'forceDelete'])->name('state.force');
 
     // Project Settings
@@ -965,7 +979,10 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function (): void {
     Route::post('/multi-edit', [EventController::class, 'deleteMultiEdit'])->name('multi-edit.delete');
 
     // Calendar
-    Route::get('/calendars/filters', [CalendarController::class, 'getFilters'])->name('calendar.filters');
+    Route::get(
+        '/calendars/filters',
+        [CalendarController::class, 'getCalendarFilterDefinitions']
+    )->name('calendar.filters');
 
     // Freelancer
     Route::get('/freelancer/{freelancer}', [FreelancerController::class, 'show'])->name('freelancer.show');
@@ -1244,4 +1261,90 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function (): void {
                 ->name('sidebar.tab.reorder');
         });
     });
+
+    Route::group(['prefix' => 'user'], function (): void {
+        Route::get('/{user}/own/operation/plan', [UserController::class, 'operationPlan'])
+            ->name('user.operationPlan');
+        Route::post('/{user}/toggle/compactMode', [UserController::class, 'compactMode'])
+            ->name('user.compact.mode.toggle');
+        // user.update.show_crafts
+        Route::patch('/{user}/update/show/crafts', [UserController::class, 'updateShowCrafts'])
+            ->name('user.update.show_crafts');
+        //user.calendar.go.to.stepper
+        Route::patch('/{user}/calendar/go/to/stepper', [UserController::class, 'calendarGoToStepper'])
+            ->name('user.calendar.go.to.stepper');
+
+
+        // save user shift calendar abo
+        Route::post(
+            '/shift/calendar/abo/create',
+            [\App\Http\Controllers\UserShiftCalendarAboController::class, 'store']
+        )->name('user.shift.calendar.abo.create');
+
+        // user.shift.calendar.abo.update
+        Route::patch(
+            '/shift/calendar/abo/{userShiftCalendarAbo}/update',
+            [\App\Http\Controllers\UserShiftCalendarAboController::class, 'update']
+        )->name('user.shift.calendar.abo.update');
+
+        // save user calendar abo
+        Route::post(
+            '/calendar/abo/create',
+            [\App\Http\Controllers\UserCalenderAboController::class, 'store']
+        )->name('user.calendar.abo.create');
+
+        // user.shift.calendar.abo.update
+        Route::patch(
+            '/calendar/abo/{userCalenderAbo}/update',
+            [\App\Http\Controllers\UserCalenderAboController::class, 'update']
+        )->name('user.calendar.abo.update');
+    });
+
+    Route::group(['prefix' => 'project-roles'], function (): void {
+        Route::resource('project-roles', \App\Http\Controllers\ProjectRoleController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+    });
+
+    // route for shift time preset
+    Route::group(['prefix' => 'shift-time-preset'], function (): void {
+        Route::resource('shift-time-preset', \App\Http\Controllers\ShiftTimePresetController::class)
+            ->only(['store', 'update', 'destroy']);
+    });
+
+    // attach DayService to entity
+    Route::post(
+        '/day-service/{dayService}/attach/{dayServiceable}',
+        [\App\Http\Controllers\DayServiceController::class, 'attachDayServiceable']
+    )
+        ->name('day-service.attach');
+
+    //remove.day.service.from.user
+    Route::patch(
+        '/day-service/remove/{dayServiceable}',
+        [\App\Http\Controllers\DayServiceController::class, 'removeDayServiceable']
+    )
+        ->name('remove.day.service.from.user');
+
+    Route::group(['prefix' => 'inventory-management'], function (): void {
+        Route::get('/', [InventoryController::class, 'inventory'])
+            ->name('inventory-management.inventory');
+        Route::get('/scheduling', [InventoryController::class, 'scheduling'])
+            ->name('inventory-management.scheduling');
+    });
+
+    Route::group(['prefix' => 'searching'], function(){
+        Route::post('/search/users', [UserController::class, 'scoutSearch'])->name('user.scoutSearch');
+    });
 });
+
+Route::get(
+    '/shift/calendar/abo/{calendar_abo_id}',
+    [\App\Http\Controllers\UserShiftCalendarAboController::class, 'show']
+)->name('user-shift-calendar-abo.show');
+
+Route::get(
+    '/calendar/abo/{calendar_abo_id}',
+    [\App\Http\Controllers\UserCalenderAboController::class, 'show']
+)->name('user-calendar-abo.show');
+
+

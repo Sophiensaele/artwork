@@ -32,7 +32,8 @@ readonly class CraftService
 
     public function updateByRequest(CraftUpdateRequest $craftUpdateRequest, Craft $craft): void
     {
-        $craft->update($craftUpdateRequest->only(['name', 'abbreviation', 'assignable_by_all']));
+        $craft->update($craftUpdateRequest
+            ->only(['name', 'abbreviation', 'assignable_by_all', 'color', 'notify_days']));
         if (!$craftUpdateRequest->boolean('assignable_by_all')) {
             $this->craftRepository->syncUsers($craft, $craftUpdateRequest->get('users'));
         } else {
@@ -44,5 +45,15 @@ readonly class CraftService
     {
         $this->craftRepository->detachUsers($craft);
         $this->craftRepository->delete($craft);
+    }
+
+    public function getAssignableByAllCrafts(): Collection
+    {
+        return $this->craftRepository->getAssignableByAllCrafts();
+    }
+
+    public function findById(int $id): Craft
+    {
+        return $this->craftRepository->findById($id);
     }
 }

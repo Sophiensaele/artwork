@@ -2,25 +2,30 @@
 
 namespace Artwork\Modules\Project\Services;
 
-use App\Models\User;
-use App\Support\Services\NotificationService;
 use Artwork\Modules\Change\Services\ChangeService;
 use Artwork\Modules\Checklist\Services\ChecklistService;
+use Artwork\Modules\Event\Models\Event;
 use Artwork\Modules\Event\Services\EventService;
 use Artwork\Modules\EventComment\Services\EventCommentService;
+use Artwork\Modules\Notification\Services\NotificationService;
 use Artwork\Modules\Project\Models\Project;
 use Artwork\Modules\Project\Repositories\ProjectRepository;
 use Artwork\Modules\ProjectTab\Services\ProjectTabService;
+use Artwork\Modules\Shift\Models\Shift;
 use Artwork\Modules\Shift\Services\ShiftFreelancerService;
 use Artwork\Modules\Shift\Services\ShiftService;
 use Artwork\Modules\Shift\Services\ShiftServiceProviderService;
 use Artwork\Modules\Shift\Services\ShiftsQualificationsService;
 use Artwork\Modules\Shift\Services\ShiftUserService;
-use Artwork\Modules\SubEvents\Services\SubEventService;
-use Artwork\Modules\Tasks\Services\TaskService;
+use Artwork\Modules\SubEvent\Services\SubEventService;
+use Artwork\Modules\Task\Services\TaskService;
 use Artwork\Modules\Timeline\Services\TimelineService;
+use Artwork\Modules\User\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Scout\Builder;
 
 readonly class ProjectService
 {
@@ -36,6 +41,44 @@ readonly class ProjectService
     public function getProjectByCostCenter(string $costCenter): Project|null
     {
         return $this->projectRepository->getProjectByCostCenter($costCenter);
+    }
+
+    public function getProjects(): \Illuminate\Database\Eloquent\Builder
+    {
+        return $this->projectRepository->getProjectQuery([
+            'access_budget' => function ($query): void {
+                $query->without(['calendar_settings', 'calendarAbo', 'shiftCalendarAbo', 'vacations']);
+            },
+            'categories',
+            'genres',
+            'managerUsers' => function ($query): void {
+                $query->without(['calendar_settings', 'calendarAbo', 'shiftCalendarAbo', 'vacations']);
+            },
+            'users' => function ($query): void {
+                $query->without(['calendar_settings', 'calendarAbo', 'shiftCalendarAbo', 'vacations']);
+            },
+            'writeUsers' => function ($query): void {
+                $query->without(['calendar_settings', 'calendarAbo', 'shiftCalendarAbo', 'vacations']);
+            },
+            'state',
+            'delete_permission_users' => function ($query): void {
+                $query->without(['calendar_settings', 'calendarAbo', 'shiftCalendarAbo', 'vacations']);
+            },
+        ])->whereNull('pinned_by_users')
+            ->orderBy('id', 'DESC')
+            ->without(['shiftRelevantEventTypes']);
+    }
+
+    public function paginateProjects(
+        Builder|\Illuminate\Database\Eloquent\Builder $projectQuery,
+        int $perPage = 10
+    ): \Illuminate\Pagination\LengthAwarePaginator {
+        return $projectQuery->paginate($perPage);
+    }
+
+    public function getProjectGroups(): Collection
+    {
+        return $this->projectRepository->getProjectGroups();
     }
 
     public function pin(Project $project): bool
@@ -61,7 +104,15 @@ readonly class ProjectService
 
     public function findById(int $id): Project
     {
-        return $this->projectRepository->findById($id);
+        return $this->projectRepository->findOrFail($id);
+    }
+
+    public function save(Project $project): Project
+    {
+        /** @var Project $project */
+        $project = $this->projectRepository->save($project);
+
+        return $project;
     }
 
     public function softDelete(
@@ -352,6 +403,14 @@ readonly class ProjectService
         return $this->projectRepository->getByName($query);
     }
 
+    public function getProjectGroupByName(string $name): ?Project
+    {
+        return $this->projectRepository
+            ->getByName($name)
+            ->where('is_group', '=', true)
+            ->first();
+    }
+
     public function updateShiftContact(Project $project, $time): void
     {
         $project->shift_contact()
@@ -401,5 +460,93 @@ readonly class ProjectService
     private function deleteMoneySources(Project $project): void
     {
         $project->moneySources()->detach();
+    }
+
+    /**
+     * @return array<string, mixed>
+     * @throws ModelNotFoundException
+     */
+    public function getEventsWithRelevantShifts(int|Project $project): array
+    {
+        if (!$project instanceof Project) {
+            $project = $this->projectRepository->findOrFail($project);
+        }
+
+        $eventsWithRelevant = [];
+        foreach (
+            $project
+                ->events()
+                ->whereIn('event_type_id', $project->shiftRelevantEventTypes->pluck('id'))
+                ->with(['timelines', 'shifts', 'event_type', 'room'])
+                ->orderBy('start_time', 'asc')
+                ->get() as $event
+        ) {
+            $timeline = $event->timelines()
+                ->orderBy('start_date')
+                ->orderBy('start')
+                ->orderBy('end_date')
+                ->orderBy('end')
+                ->get()
+                ->toArray();
+
+            foreach ($timeline as &$singleTimeLine) {
+                $singleTimeLine['description_without_html'] = strip_tags($singleTimeLine['description']);
+            }
+
+            foreach ($event->shifts as $shift) {
+                $shift->load('shiftsQualifications');
+
+                foreach ($shift->users as $user) {
+                    $user->formatted_vacation_days = $user->getFormattedVacationDays();
+                }
+            }
+
+            $eventsWithRelevant[] = [
+                'event' => $event,
+                'timeline' => $timeline,
+                'shifts' => $event->shifts,
+                'event_type' => $event->event_type,
+                'room' => $event->room,
+            ];
+        }
+
+        return $eventsWithRelevant;
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function getFirstEventInProject(int|Project $project): Event|null
+    {
+        return $this->projectRepository->getFirstEvent($project);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function getLastEventInProject(int|Project $project): Event|null
+    {
+        return $this->projectRepository->getLastEvent($project);
+    }
+
+    public function getProjectsWithAccessBudgetAndManagerUsers(): Collection
+    {
+        return $this->projectRepository->getProjects(['access_budget', 'managerUsers']);
+    }
+
+    public function associateProjectWithGroup(Project $project, Project $projectGroup): void
+    {
+        $project->groups()->attach($projectGroup->id);
+        $project->save();
+    }
+
+    public function scoutSearch(string $query): Builder
+    {
+        return $this->projectRepository->scoutSearch($query);
+    }
+
+    public function pinnedProjects(): Collection
+    {
+        return $this->projectRepository->pinnedProjects();
     }
 }

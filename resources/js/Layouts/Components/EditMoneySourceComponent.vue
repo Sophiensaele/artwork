@@ -1,10 +1,5 @@
 <template>
-    <jet-dialog-modal :show="true" @close="closeModal()">
-        <template #content>
-            <img alt="Finanzierungsquelle bearbeiten" src="/Svgs/Overlays/illu_money_source_create.svg"
-                 class="-ml-6 -mt-8 mb-4"/>
-            <IconX stroke-width="1.5" @click="closeModal()" class="text-secondary h-5 w-5 right-0 top-0 mt-8 mr-5 absolute cursor-pointer"
-                   aria-hidden="true"/>
+    <BaseModal @closed="closeModal" v-if="true" modal-image="/Svgs/Overlays/illu_money_source_create.svg">
             <div class="mx-4">
                 <!--   Heading   -->
                 <div class="my-1">
@@ -131,7 +126,7 @@
                                             <button type="button" @click="deleteUserFromMoneySourceUserArray(index)">
                                                 <span class="sr-only">{{ $t('Remove user from funding source')}}</span>
                                                 <IconX stroke-width="1.5"
-                                                    class="ml-2 h-4 w-4 p-0.5 hover:text-error rounded-full bg-buttonBlue text-white border-0 "/>
+                                                    class="ml-2 h-4 w-4 p-0.5 hover:text-error rounded-full bg-artwork-buttons-create text-white border-0 "/>
                                             </button>
                                         </div>
                                         </span>
@@ -232,7 +227,7 @@
                                             <button type="button" @click="deleteUserFromMoneySourceUserArray(index)">
                                                 <span class="sr-only">{{ $t('Remove user from funding source')}}</span>
                                                 <IconX stroke-width="1.5"
-                                                    class="ml-2 h-4 w-4 p-0.5 hover:text-error rounded-full bg-buttonBlue text-white border-0 "/>
+                                                    class="ml-2 h-4 w-4 p-0.5 hover:text-error rounded-full bg-artwork-buttons-create text-white border-0 "/>
                                             </button>
                                         </div>
                                         </span>
@@ -294,15 +289,14 @@
                     </div>
                 </div>
             </div>
-        </template>
-    </jet-dialog-modal>
+    </BaseModal>
 
 
 </template>
 
 <script>
 
-import JetDialogModal from "@/Jetstream/DialogModal";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import {ChevronDownIcon, DotsVerticalIcon, PencilAltIcon, XCircleIcon, XIcon} from '@heroicons/vue/outline';
 import {
     Listbox,
@@ -315,21 +309,23 @@ import {
     MenuItems
 } from "@headlessui/vue";
 import {CheckIcon, ChevronUpIcon, TrashIcon} from "@heroicons/vue/solid";
-import SvgCollection from "@/Layouts/Components/SvgCollection";
-import Input from "@/Jetstream/Input";
-import ConfirmationComponent from "@/Layouts/Components/ConfirmationComponent";
-import TagComponent from "@/Layouts/Components/TagComponent";
-import InputComponent from "@/Layouts/Components/InputComponent";
-import {useForm} from "@inertiajs/inertia-vue3";
+import SvgCollection from "@/Layouts/Components/SvgCollection.vue";
+import Input from "@/Jetstream/Input.vue";
+import ConfirmationComponent from "@/Layouts/Components/ConfirmationComponent.vue";
+import TagComponent from "@/Layouts/Components/TagComponent.vue";
+import InputComponent from "@/Layouts/Components/InputComponent.vue";
+import {useForm} from "@inertiajs/vue3";
 import NewUserToolTip from "@/Layouts/Components/NewUserToolTip.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import BaseModal from "@/Components/Modals/BaseModal.vue";
 
 export default {
     name: 'EventComponent',
     mixins: [Permissions, IconLib],
     components: {
+        BaseModal,
         FormButton,
         NewUserToolTip,
         Input,

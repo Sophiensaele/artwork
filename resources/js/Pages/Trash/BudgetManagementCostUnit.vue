@@ -16,7 +16,7 @@
     </div>
     <div v-for="trashedCostUnit in this.filteredTrashedCostUnits"
          class="flex w-full bg-white my-2 border border-gray-200">
-        <button class="bg-buttonBlue hover:bg-buttonHover flex" @click="trashedCostUnit.hidden = !trashedCostUnit.hidden">
+        <button class="bg-artwork-buttons-create hover:bg-artwork-buttons-hover flex" @click="trashedCostUnit.hidden = !trashedCostUnit.hidden">
             <ChevronUpIcon v-if="trashedCostUnit.hidden === true"
                            class="h-6 w-6 text-white my-auto"
             />
@@ -37,7 +37,7 @@
                             <MenuButton
                                 class="flex bg-tagBg p-0.5 rounded-full">
                                 <DotsVerticalIcon
-                                    class=" flex-shrink-0 h-6 w-6 text-menuButtonBlue my-auto"
+                                    class=" flex-shrink-0 h-6 w-6 text-menuartwork-buttons-create my-auto"
                                     aria-hidden="true"/>
                             </MenuButton>
                         </div>
@@ -99,12 +99,12 @@
 </template>
 
 <script>
-import AppLayout from "@/Layouts/AppLayout";
-import TrashLayout from "@/Layouts/TrashLayout";
+import AppLayout from "@/Layouts/AppLayout.vue";
+import TrashLayout from "@/Layouts/TrashLayout.vue";
 import {ChevronUpIcon, ChevronDownIcon, DotsVerticalIcon, RefreshIcon, SearchIcon} from "@heroicons/vue/solid";
 import {TrashIcon, XIcon} from "@heroicons/vue/outline";
 import {Menu, MenuButton,MenuItems,MenuItem } from "@headlessui/vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import Input from "@/Layouts/Components/InputComponent.vue";
 
 export default {

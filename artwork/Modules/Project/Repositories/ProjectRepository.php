@@ -2,12 +2,14 @@
 
 namespace Artwork\Modules\Project\Repositories;
 
-use App\Models\User;
 use Artwork\Core\Database\Repository\BaseRepository;
+use Artwork\Modules\Event\Models\Event;
 use Artwork\Modules\Project\Models\Project;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Laravel\Scout\Builder;
 
-class ProjectRepository extends BaseRepository
+readonly class ProjectRepository extends BaseRepository
 {
     public function findManagers(Project $project): Collection
     {
@@ -19,7 +21,10 @@ class ProjectRepository extends BaseRepository
         return $project->users()->get();
     }
 
-    public function findById(int $id): Project
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function findOrFail(int $id): Project
     {
         return Project::findOrFail($id);
     }
@@ -41,4 +46,75 @@ class ProjectRepository extends BaseRepository
     {
         return Project::byName($query)->get();
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function getFirstEvent(int|Project $project): Event|null
+    {
+        if (!$project instanceof Project) {
+            $project = $this->findOrFail($project);
+        }
+
+        /** @var Event|null $firstEvent */
+        $firstEvent = $project->events()->orderByStartTime()->limit(1)->first();
+
+        return $firstEvent;
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function getLastEvent(int|Project $project): Event|null
+    {
+        if (!$project instanceof Project) {
+            $project = $this->findOrFail($project);
+        }
+
+        /** @var Event|null $lastEvent */
+        $lastEvent = $project->events()->orderByStartTime('DESC')->limit(1)->first();
+
+        return $lastEvent;
+    }
+
+    public function getProjects(array $with = []): Collection
+    {
+        $query = Project::query();
+
+        if (count($with) > 0) {
+            $query->with($with);
+        }
+
+        return $query->get();
+    }
+
+    public function getProjectQuery($with): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = Project::query();
+
+        if (count($with) > 0) {
+            $query->with($with);
+        }
+
+        return $query;
+    }
+
+    public function scoutSearch(string $query): Builder
+    {
+        return Project::search($query);
+    }
+
+    public function pinnedProjects(): Collection
+    {
+        return Project::whereNotNull('pinned_by_users')
+            ->whereRaw("JSON_LENGTH(pinned_by_users) > 0")
+            ->without(['shiftRelevantEventTypes'])
+            ->get();
+    }
+
+    public function getProjectGroups(): Collection
+    {
+        return Project::where('is_group', '=', 1)->with('groups')->get();
+    }
+
 }

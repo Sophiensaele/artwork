@@ -16,7 +16,7 @@
                         id="first_name"
                         type="text"
                         required
-                        class="focus:ring-black focus:border-indigo-600 border-2 w-full sm:text-sm border-gray-200"/>
+                        class="focus:ring-black focus:border-artwork-buttons-create border-2 w-full sm:text-sm border-gray-200"/>
                 </div>
                 <div class="sm:col-span-3 mt-1">
                     <label for="last_name" class="text-sm font-bold text-secondary">{{  $t('name') }}</label>
@@ -25,7 +25,7 @@
                         id="last_name"
                         type="text"
                         required
-                        class="focus:ring-black focus:border-indigo-600 border-2 w-full sm:text-sm border-gray-200"/>
+                        class="focus:ring-black focus:border-artwork-buttons-create border-2 w-full sm:text-sm border-gray-200"/>
                 </div>
                 <div class="sm:col-span-3 mt-1">
                     <label for="email" class="text-sm font-bold text-secondary">{{  $t('Email') }}</label>
@@ -34,7 +34,7 @@
                         id="email"
                         type="email"
                         required
-                        class="focus:ring-black focus:border-indigo-600 border-2 w-full sm:text-sm border-gray-200"/>
+                        class="focus:ring-black focus:border-artwork-buttons-create border-2 w-full sm:text-sm border-gray-200"/>
                 </div>
                 <div class="sm:col-span-3 mt-1">
                     <label for="phoneNumber" class="text-sm font-bold text-secondary">{{ $t('Phone number') }}</label>
@@ -42,7 +42,7 @@
                         v-model="form.phone_number"
                         id="phoneNumber"
                         type="text"
-                        class="focus:ring-black focus:border-indigo-600 border-2 w-full sm:text-sm border-gray-200"/>
+                        class="focus:ring-black focus:border-artwork-buttons-create border-2 w-full sm:text-sm border-gray-200"/>
                 </div>
                 <div class="sm:col-span-3 mt-1">
                     <label for="business" class="text-sm font-bold text-secondary">{{ $t('Company')}}</label>
@@ -51,7 +51,7 @@
                         id="business"
                         type="text"
                         required
-                        class="focus:ring-black focus:border-indigo-600 border-2 w-full sm:text-sm border-gray-200"/>
+                        class="focus:ring-black focus:border-artwork-buttons-create border-2 w-full sm:text-sm border-gray-200"/>
                 </div>
 
                 <div class="sm:col-span-3 mt-1">
@@ -61,7 +61,7 @@
                         id="position"
                         type="text"
                         required
-                        class="focus:ring-black focus:border-indigo-600 border-2 w-full sm:text-sm border-gray-200"/>
+                        class="focus:ring-black focus:border-artwork-buttons-create border-2 w-full sm:text-sm border-gray-200"/>
                 </div>
             </div>
 
@@ -104,7 +104,7 @@
             </div>
 
             <button type="submit"
-                class="px-28 py-3 mt-5 bg-indigo-900 hover:bg-secondary text-xl uppercase text-white disabled:bg-secondary disabled:cursor-not-allowed"
+                class="px-28 py-3 mt-5 bg-artwork-buttons-create hover:bg-secondary text-xl uppercase text-white disabled:bg-secondary disabled:cursor-not-allowed"
                 :disabled="form.email === '' || form.position === '' || form.password === '' || form.first_name === '' || form.last_name === ''">
                 {{$t('Register')}}
             </button>
@@ -114,26 +114,22 @@
 
 <script>
 import {defineComponent} from 'vue'
-import JetAuthenticationCard from '@/Jetstream/AuthenticationCard.vue'
-import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo.vue'
 import JetButton from '@/Jetstream/Button.vue'
 import JetInput from '@/Jetstream/Input.vue'
 import JetCheckbox from '@/Jetstream/Checkbox.vue'
 import JetLabel from '@/Jetstream/Label.vue'
 import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
-import {Head, Link} from '@inertiajs/inertia-vue3';
-import SvgCollection from "@/Layouts/Components/SvgCollection";
+import {Head, Link} from '@inertiajs/vue3';
+import SvgCollection from "@/Layouts/Components/SvgCollection.vue";
 import JetInputError from '@/Jetstream/InputError.vue'
 import {XIcon} from "@heroicons/vue/solid";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 
 
 export default defineComponent({
     mixins: [Permissions],
     components: {
         Head,
-        JetAuthenticationCard,
-        JetAuthenticationCardLogo,
         JetButton,
         JetInput,
         JetCheckbox,

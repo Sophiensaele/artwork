@@ -1,5 +1,5 @@
 <template>
-    <app-layout>
+    <app-layout :title="$t('My tasks')">
         <div class="max-w-screen-xl ml-14 mr-10">
             <div class="flex-wrap">
                 <div class="flex flex-wrap">
@@ -13,13 +13,13 @@
                                 </div>
                             </ListboxButton>
 
-                            <ListboxOptions class="absolute w-56 bg-primary shadow-lg max-h-32 rounded-md focus:outline-none">
+                            <ListboxOptions class="absolute w-56 bg-artwork-navigation-background shadow-lg max-h-32 rounded-md focus:outline-none">
                                 <ListboxOption as="template" class="p-2 text-sm"
                                     v-for="filter in filters"
                                     :key="filter.name"
                                     :value="filter"
                                     v-slot="{ active, selected }">
-                                    <li :class="[active ? 'bg-primaryHover text-white' : 'text-secondary', 'rounded-md cursor-pointer flex justify-between']">
+                                    <li :class="[active ? 'bg-artwork-navigation-color/10 text-white' : 'text-secondary', 'rounded-md cursor-pointer flex justify-between']">
                                         <div :class="[selected ? 'xsWhiteBold' : '', 'truncate']">
                                             {{ filter.name }}
                                         </div>
@@ -35,7 +35,6 @@
                     <!--     Task Index   -->
                     <div class="w-full">
                         <div v-for="task in tasksToDisplay" :key="task.id"  :id="task.id">
-                            wefwef
                             <SingleTask :task="task" :first_project_tasks_tab_id="this.first_project_tasks_tab_id" />
                         </div>
                         <div v-for="task in money_source_task" :key="task.id" :id="task.id">
@@ -50,13 +49,13 @@
 
 <script>
 
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 
 
 import AppLayout from '@/Layouts/AppLayout.vue'
 import {CheckIcon, ChevronDownIcon, ChevronRightIcon} from "@heroicons/vue/solid";
-import TeamIconCollection from "@/Layouts/Components/TeamIconCollection";
-import {Link, useForm} from "@inertiajs/inertia-vue3";
+import TeamIconCollection from "@/Layouts/Components/TeamIconCollection.vue";
+import {Link, useForm} from "@inertiajs/vue3";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/vue";
 import SingleMoneySourceTask from "@/Pages/Tasks/Components/SingleMoneySourceTask.vue";
 import SingleTask from "@/Pages/Tasks/Components/SingleTask.vue";

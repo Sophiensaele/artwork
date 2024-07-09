@@ -1,14 +1,9 @@
 <template>
-    <jet-dialog-modal :show="show" @close="closeModal(false)">
-        <template #content>
-            <img src="/Svgs/Overlays/illu_project_team.svg" class="-ml-6 -mt-8 mb-4"/>
+    <BaseModal @closed="closeModal" v-if="show" modal-image="/Svgs/Overlays/illu_project_team.svg" modal-size="sm:max-w-4xl">
             <div class="mx-3">
                 <div class="font-black font-lexend text-primary text-3xl my-2">
                     {{ $t('Assign project team') }}
                 </div>
-                <XIcon @click="closeModal(false)"
-                       class="h-5 w-5 right-0 top-0 mt-8 mr-5 absolute text-secondary cursor-pointer"
-                       aria-hidden="true"/>
                 <div class="xsLight">
                     {{ $t('Type the name of the users you want to add to the team. The users receive read access to this project. Only the project manager can grant further rights.') }}
                 </div>
@@ -28,7 +23,7 @@
                             v-if="(department_and_user_search_results.users
                                 || department_and_user_search_results.departments)
                                  && department_and_user_query.length > 0"
-                            class="absolute z-10 mt-1 w-full max-h-60 bg-primary shadow-lg
+                            class="absolute z-10 mt-1 w-full max-h-60 bg-artwork-navigation-background shadow-lg
                                          text-base ring-1 ring-black ring-opacity-5
                                          overflow-auto focus:outline-none sm:text-sm">
                             <div class="border-gray-200">
@@ -65,9 +60,8 @@
                     </transition>
                 </div>
                 <div class="mt-4">
-                    <span v-for="user in this.users"
-                          class="flex justify-between mt-4 mr-1 items-center font-bold text-primary border-1 border-b pb-3">
-                        <div class="flex items-center w-64">
+                    <div v-for="user in this.users" class="flex justify-between mt-4 mr-1 items-center font-bold text-primary border-1 border-b pb-3">
+                        <div class="flex items-center w-56">
                             <div class="flex items-center">
                                 <img class="flex h-11 w-11 rounded-full"
                                      :src="user.profile_photo_url"
@@ -78,10 +72,10 @@
                             </div>
                             <button type="button" @click="deleteUserFromProjectTeam(user)">
                                 <span class="sr-only">{{ $t('Remove user from team') }}</span>
-                                <XCircleIcon class="ml-3 text-buttonBlue h-5 w-5 hover:text-error "/>
+                                <XCircleIcon class="ml-3 text-artwork-buttons-create h-5 w-5 hover:text-error "/>
                             </button>
                         </div>
-                        <div class="flex justify-between items-center my-1.5 h-5 w-80">
+                        <div class="flex justify-between items-center my-1.5 h-5 w-2xl">
                             <div class="flex items-center justify-between" v-if="checkUserAuth(user)">
                                <div class="flex">
                                     <input v-model="user.pivot_can_write"
@@ -128,9 +122,30 @@
                                         </div>
                                     </template>
                                 </Dropdown>
+
+                                <Dropdown :open="user.openedMenuRoles" align="right" width="60" class="text-right">
+                                    <template #trigger>
+                                        <span class="inline-flex">
+                                            <button @click="user.openedMenuRoles = !user.openedMenuRoles" type="button"
+                                                    class="text-sm flex items-center ml-14 my-auto text-primary font-semibold focus:outline-none transition">
+                                                {{ $t('Project Roles') }}
+                                            </button>
+                                        </span>
+                                    </template>
+                                    <template #content>
+                                        <div class="w-44 p-4">
+                                            <div class="flex mb-2" v-for="role in projectRoles">
+                                                <input :id="role.id" :name="role.name" type="checkbox" :checked="user?.pivot_roles?.includes(role.id)" @change="addRoleToUser(user, role)" class="ring-offset-0 cursor-pointer focus:ring-0 focus:shadow-none h-6 w-6 text-success border-2 border-gray-300"/>
+                                                <p class=" ml-4 my-auto text-sm text-secondary">
+                                                    {{ role.name }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </Dropdown>
                             </div>
                         </div>
-                    </span>
+                    </div>
                     <span v-for="department in this.departments"
                           class="flex mt-4 mr-1 rounded-full items-center font-bold text-primary">
                         <div class="flex items-center">
@@ -152,24 +167,25 @@
                     />
                 </div>
             </div>
-        </template>
-    </jet-dialog-modal>
+    </BaseModal>
 </template>
 
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import TeamIconCollection from "@/Layouts/Components/TeamIconCollection.vue";
 import {XCircleIcon, XIcon} from "@heroicons/vue/solid";
-import {useForm} from "@inertiajs/inertia-vue3";
+import {useForm} from "@inertiajs/vue3";
 import Dropdown from "@/Jetstream/Dropdown.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import FormButton from "@/Layouts/Components/General/Buttons/FormButton.vue";
-import IconLib from "@/mixins/IconLib.vue";
+import IconLib from "@/Mixins/IconLib.vue";
+import BaseModal from "@/Components/Modals/BaseModal.vue";
 
 export default {
     mixins: [Permissions, IconLib],
     name: "ProjectEditTeamModal",
     components: {
+        BaseModal,
         FormButton,
         Dropdown,
         JetDialogModal,
@@ -182,7 +198,8 @@ export default {
         'assignedUsers',
         'assignedDepartments',
         'userIsProjectManager',
-        'projectId'
+        'projectId',
+        'projectRoles'
     ],
     data(){
         return {
@@ -240,7 +257,8 @@ export default {
                     access_budget: user.pivot_access_budget,
                     is_manager: user.pivot_is_manager,
                     can_write: user.pivot_can_write,
-                    delete_permission: user.pivot_delete_permission
+                    delete_permission: user.pivot_delete_permission,
+                    roles: user.pivot_roles
                 };
             })
             this.form.assigned_departments = [];
@@ -259,6 +277,13 @@ export default {
             }
 
             return this.hasAdminRole();
+        },
+        addRoleToUser(user, role) {
+            if (user.pivot_roles?.includes(role.id)) {
+                user.pivot_roles.splice(user.pivot_roles.indexOf(role.id), 1);
+                return;
+            }
+            user.pivot_roles.push(role.id);
         }
     },
     watch: {

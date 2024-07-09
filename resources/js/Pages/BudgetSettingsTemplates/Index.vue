@@ -14,7 +14,7 @@
             </div>
         </div>
         <div v-for="table in filteredTemplates" class="flex my-6 border-t-2 border-b-2 w-full border-gray-300">
-            <button class="bg-buttonBlue w-6"
+            <button class="bg-artwork-buttons-create w-6"
                     @click="table.closed = !table.closed">
                 <ChevronUpIcon v-if="table.closed"
                                class="h-6 w-6 text-white my-auto"></ChevronUpIcon>
@@ -46,7 +46,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import BudgetComponent from "@/Layouts/Components/BudgetComponent.vue";
 import {ChevronDownIcon, ChevronUpIcon, SearchIcon, XIcon} from "@heroicons/vue/solid";
 import InputComponent from "@/Layouts/Components/InputComponent.vue";
-import Permissions from "@/mixins/Permissions.vue";
+import Permissions from "@/Mixins/Permissions.vue";
 import BudgetSettingsHeader from "@/Pages/BudgetSettings/BudgetSettingsHeader.vue";
 
 

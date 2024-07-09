@@ -10,8 +10,8 @@
             <button :class="[
                         budgetColumnSetting.column_name === '' ?
                             'bg-secondary':
-                            'bg-buttonBlue hover:bg-buttonHover focus:outline-none',
-                        'rounded-full ml-1 items-center text-sm p-1 border border-transparent uppercase shadow-sm text-secondaryHover'
+                            'bg-artwork-buttons-create hover:bg-artwork-buttons-hover focus:outline-none',
+                        'rounded-full ml-1 items-center text-sm p-1 border border-transparent uppercase shadow-sm text-white'
                     ]"
                 :disabled="budgetColumnSetting.column_name === ''"
                 @click="this.saveBudgetColumnSetting(budgetColumnSetting)">
@@ -39,7 +39,7 @@ import BudgetSettingsHeader from "@/Pages/BudgetSettings/BudgetSettingsHeader.vu
 import InputComponent from "@/Layouts/Components/InputComponent.vue";
 import Button from "@/Jetstream/Button.vue";
 import {CheckIcon} from "@heroicons/vue/solid";
-import {Inertia} from "@inertiajs/inertia";
+import {router} from "@inertiajs/vue3";
 import SuccessModal from "@/Layouts/Components/General/SuccessModal.vue";
 import ErrorComponent from "@/Layouts/Components/ErrorComponent.vue";
 
@@ -57,7 +57,7 @@ export default defineComponent({
     ],
     methods: {
         saveBudgetColumnSetting(budgetColumnSetting) {
-            Inertia.patch(
+            router.patch(
                 route(
                     'budget-settings.general.update',
                     {
